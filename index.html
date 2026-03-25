@@ -822,9 +822,37 @@
                 tooltip: {
                     trigger: "axis",
                     axisPointer: { type: "shadow" },
+                    confine: true,
                     backgroundColor: "#FFFFFF",
                     borderColor: "#e5e7eb",
+                    extraCssText: "max-width: 220px; white-space: normal;",
                     textStyle: { color: "#111827", fontFamily: 'Noto Sans SC' },
+                    position: function(point, params, dom, rect, size) {
+                        const contentWidth = size && size.contentSize ? size.contentSize[0] : 0;
+                        const contentHeight = size && size.contentSize ? size.contentSize[1] : 0;
+                        const viewWidth = size && size.viewSize ? size.viewSize[0] : 0;
+                        const viewHeight = size && size.viewSize ? size.viewSize[1] : 0;
+                        const padding = 8;
+
+                        if (window.innerWidth <= 430) {
+                            const x = Math.max(padding, viewWidth - contentWidth - padding);
+                            const y = Math.max(
+                                padding,
+                                Math.min(point[1] - (contentHeight / 2), viewHeight - contentHeight - padding)
+                            );
+                            return [x, y];
+                        }
+
+                        const x = Math.max(
+                            padding,
+                            Math.min(point[0] + 16, viewWidth - contentWidth - padding)
+                        );
+                        const y = Math.max(
+                            padding,
+                            Math.min(point[1] - (contentHeight / 2), viewHeight - contentHeight - padding)
+                        );
+                        return [x, y];
+                    },
                     formatter: function(params) {
                         if (!params || params.length === 0) {
                             return "";
