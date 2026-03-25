@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>美国农业部3月种植意向报告前瞻</title>
     
     <!-- Tailwind CSS -->
@@ -47,6 +48,7 @@
             background-color: #ffffff;
             color: #111827;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
         ::selection {
             background-color: #0f204b;
@@ -116,18 +118,59 @@
         .pb-safe-bottom {
             padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
         }
+        .tab-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .tab-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .tab-strip {
+            display: inline-flex;
+            min-width: max-content;
+            gap: 1.25rem;
+        }
+        .tab-pill {
+            flex: 0 0 auto;
+            white-space: nowrap;
+        }
+        .meta-stack {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        @media (max-width: 430px) {
+            .chart-container {
+                height: 320px;
+            }
+            #countdown {
+                letter-spacing: 0.02em;
+                font-size: 0.95rem;
+            }
+            .tab-strip {
+                gap: 1rem;
+                padding-right: 0.5rem;
+            }
+            .info-trigger {
+                width: 1.125rem;
+                height: 1.125rem;
+                font-size: 0.6875rem;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen font-sans">
 
     <!-- 页头 -->
-    <header class="border-b-4 border-ib-navy pt-12 pb-8 px-6 max-w-5xl mx-auto">
+    <header class="border-b-4 border-ib-navy pt-9 pb-7 px-4 sm:px-6 max-w-5xl mx-auto">
         <div class="mb-4">
-            <h1 class="text-4xl md:text-5xl font-serif font-bold text-slate-900 leading-tight">
+            <h1 class="text-[2rem] sm:text-4xl md:text-5xl font-serif font-bold text-slate-900 leading-tight">
                 美国农业部3月种植意向报告前瞻
             </h1>
         </div>
-        <div class="flex flex-wrap gap-6 items-center border-t border-slate-200 pt-4 mt-6">
+        <div class="meta-stack sm:flex sm:flex-wrap sm:gap-6 sm:items-center border-t border-slate-200 pt-4 mt-6">
             <div class="text-sm font-sans">
                 <span class="text-slate-500 mr-2">报告公布时间:</span>
                 <span class="font-semibold text-ib-navy">北京时间 2026年4月1日 00:00</span>
@@ -142,20 +185,20 @@
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-6 pt-10 pb-32 md:pb-36 space-y-16">
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-32 md:pb-36 space-y-12 sm:space-y-16">
         
         <!-- 执行摘要 -->
         <section>
-            <div class="border-t-2 border-ib-navy bg-slate-50 p-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-serif font-bold text-ib-navy">执行摘要</h2>
+            <div class="border-t-2 border-ib-navy bg-slate-50 p-5 sm:p-8">
+                <div class="flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
+                    <h2 class="text-xl sm:text-2xl font-serif font-bold text-ib-navy">执行摘要</h2>
                     <button onclick="togglePrimer()" class="text-sm flex items-center gap-1 text-ib-navy hover:text-ib-red transition-colors font-sans font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
                         <span id="primer-btn-text">报告背景说明</span>
                     </button>
                 </div>
                 
-                <p class="text-lg font-serif text-slate-800 leading-relaxed mb-8">
+                <p class="text-base sm:text-lg font-serif text-slate-800 leading-relaxed mb-8">
                     <strong class="text-ib-navy">当前基线：</strong>大豆 <strong>8500 万英亩</strong>，玉米 <strong>9400 万英亩</strong>，市场仍在交易“豆进米退”。
                 </p>
 
@@ -200,29 +243,31 @@
 
         <!-- 核心数据 -->
         <section>
-            <h2 class="text-2xl font-serif font-bold text-ib-navy mb-6 border-b border-slate-200 pb-4">核心数据分析</h2>
+            <h2 class="text-xl sm:text-2xl font-serif font-bold text-ib-navy mb-5 sm:mb-6 border-b border-slate-200 pb-4">核心数据分析</h2>
             
-            <div class="flex flex-wrap gap-6 mb-8 border-b border-slate-200">
-                <button id="tab-btn-acreage" onclick="switchTab('acreage')" class="data-tab-btn tab-active pb-3 font-sans text-sm font-medium transition-colors relative">历史种植面积走势</button>
-                <div class="tab-group pb-3">
+            <div class="tab-scroll mb-8 border-b border-slate-200 -mx-1 px-1">
+                <div class="tab-strip">
+                <button id="tab-btn-acreage" onclick="switchTab('acreage')" class="data-tab-btn tab-active tab-pill pb-3 font-sans text-sm font-medium transition-colors relative">历史种植面积走势</button>
+                <div class="tab-group tab-pill pb-3">
                     <button id="tab-btn-share" onclick="switchTab('share')" class="data-tab-btn tab-inactive font-sans text-sm font-medium transition-colors relative">种植结构占比变化</button>
                     <button type="button" onclick="openInfoModal('share', event)" class="info-trigger" aria-label="查看种植结构占比变化说明">?</button>
                 </div>
-                <div class="tab-group pb-3">
+                <div class="tab-group tab-pill pb-3">
                     <button id="tab-btn-ratio" onclick="switchTab('ratio')" class="data-tab-btn tab-inactive font-sans text-sm font-medium transition-colors relative">玉米、大豆比价图</button>
                     <button type="button" onclick="openInfoModal('ratio', event)" class="info-trigger" aria-label="查看玉米、大豆比价图说明">?</button>
                 </div>
-                <div class="tab-group pb-3">
+                <div class="tab-group tab-pill pb-3">
                     <button id="tab-btn-profit" onclick="switchTab('profit')" class="data-tab-btn tab-inactive font-sans text-sm font-medium transition-colors relative">种植利润模型</button>
                     <button type="button" onclick="openInfoModal('profit', event)" class="info-trigger" aria-label="查看种植利润模型说明">?</button>
                 </div>
+                </div>
             </div>
 
-            <div class="bg-white border border-slate-200 p-6">
+            <div class="bg-white border border-slate-200 p-4 sm:p-6">
                 
                 <!-- 标签一：种植面积 -->
                 <div id="tab-content-acreage" class="data-tab-content space-y-6">
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
                         <button id="crop-btn-corn" onclick="switchCrop('corn')" class="crop-btn crop-active px-4 py-1.5 text-sm font-sans border transition-colors">玉米</button>
                         <button id="crop-btn-soybeans" onclick="switchCrop('soybeans')" class="crop-btn crop-inactive px-4 py-1.5 text-sm font-sans border transition-colors">大豆</button>
                         <button id="crop-btn-wheat" onclick="switchCrop('wheat')" class="crop-btn crop-inactive px-4 py-1.5 text-sm font-sans border transition-colors">小麦</button>
@@ -235,10 +280,10 @@
 
                 <!-- 标签二：结构占比 -->
                 <div id="tab-content-share" class="data-tab-content hidden space-y-6">
-                    <div class="flex items-center gap-4 text-sm font-sans text-slate-600 mb-2">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-sm font-sans text-slate-600 mb-2">
                         <span class="flex items-center gap-1.5"><div class="w-3 h-3 bg-ib-navy"></div> 玉米占比</span>
                         <span class="flex items-center gap-1.5"><div class="w-3 h-3 bg-slate-400"></div> 大豆占比</span>
-                        <span class="text-xs text-slate-400 ml-auto border border-slate-200 px-2 py-1">只看玉米和大豆之间的面积分配</span>
+                        <span class="text-xs text-slate-400 w-full sm:w-auto sm:ml-auto border border-slate-200 px-2 py-1">只看玉米和大豆之间的面积分配</span>
                     </div>
                     <div id="share-chart" class="chart-container"></div>
                     <div class="bg-slate-50 p-4 border-l-4 border-ib-navy text-sm font-sans text-slate-700 leading-relaxed">
@@ -248,7 +293,7 @@
 
                 <!-- 标签三：豆玉比价 -->
                 <div id="tab-content-ratio" class="data-tab-content hidden space-y-6">
-                    <div class="flex items-center gap-4 text-sm font-sans text-slate-600 mb-2">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-sm font-sans text-slate-600 mb-2">
                         <span class="text-xs text-slate-500 border border-slate-200 px-2 py-1 bg-slate-50">2.2-2.5 是播种决策模糊区</span>
                         <span class="text-xs text-slate-500 border border-slate-200 px-2 py-1">高于 2.5 倾向多种大豆</span>
                         <span class="text-xs text-slate-500 border border-slate-200 px-2 py-1">低于 2.2 倾向多种玉米</span>
@@ -261,7 +306,7 @@
 
                 <!-- 标签四：利润模型 -->
                 <div id="tab-content-profit" class="data-tab-content hidden space-y-6">
-                    <div class="flex items-center gap-4 text-sm font-sans text-slate-600 mb-2">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-sm font-sans text-slate-600 mb-2">
                         <span class="text-xs text-slate-500 border border-slate-200 px-2 py-1 bg-slate-50">利润 = 价格 × 单产 - 成本</span>
                     </div>
                     <div id="profit-chart" class="chart-container"></div>
@@ -279,13 +324,13 @@
         </section>
 
         <!-- 情形观察与后续跟踪 -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10">
             <div class="lg:col-span-2">
-                <h2 class="text-2xl font-serif font-bold text-ib-navy mb-6 border-b border-slate-200 pb-4">情形观察</h2>
+                <h2 class="text-xl sm:text-2xl font-serif font-bold text-ib-navy mb-6 border-b border-slate-200 pb-4">情形观察</h2>
                 <p class="text-sm font-sans text-slate-500 mb-6">口径说明：本模块基于种植面积与库存数据的不同组合情形进行整理，用于帮助理解报告关注点，不对应任何价格方向或交易建议。</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="border border-slate-200 p-5 hover:border-ib-navy transition-colors">
+                    <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
                         <div class="flex items-center gap-3 mb-3">
                             <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">A</span>
                             <h3 class="font-serif font-bold text-lg">玉米面积低于基线</h3>
@@ -293,7 +338,7 @@
                         <p class="text-sm font-sans text-slate-600 leading-relaxed">若玉米种植面积低于 9400 万英亩，且库存端未显示明显宽松，市场通常会提高对新作供给变化的关注。后续仍需结合天气、播种进度及 6 月最终报告继续观察。</p>
                     </div>
                     
-                    <div class="border border-slate-200 p-5 hover:border-ib-navy transition-colors">
+                    <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
                         <div class="flex items-center gap-3 mb-3">
                             <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">B</span>
                             <h3 class="font-serif font-bold text-lg">大豆面积高于基线</h3>
@@ -301,7 +346,7 @@
                         <p class="text-sm font-sans text-slate-600 leading-relaxed">若大豆种植面积明显高于 8500 万英亩，说明大豆扩种力度强于当前基线设想。后续需要结合季度库存报告、播种节奏以及 6 月最终报告，继续观察新作供给预期是否进一步强化。</p>
                     </div>
 
-                    <div class="border border-slate-200 p-5 hover:border-ib-navy transition-colors">
+                    <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
                         <div class="flex items-center gap-3 mb-3">
                             <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">C</span>
                             <h3 class="font-serif font-bold text-lg">大豆面积低于基线</h3>
@@ -309,7 +354,7 @@
                         <p class="text-sm font-sans text-slate-600 leading-relaxed">若大豆种植面积低于 8500 万英亩，说明农户扩种意愿弱于官方基线。后续仍需结合库存、天气与播种进度继续观察，判断这种偏离是否会在后续报告中得到确认。</p>
                     </div>
 
-                    <div class="border border-slate-200 p-5 hover:border-ib-navy transition-colors">
+                    <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
                         <div class="flex items-center gap-3 mb-3">
                             <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">D</span>
                             <h3 class="font-serif font-bold text-lg">面积与库存结合</h3>
@@ -320,7 +365,7 @@
             </div>
 
             <div>
-                <h2 class="text-2xl font-serif font-bold text-ib-navy mb-6 border-b border-slate-200 pb-4">后续跟踪</h2>
+                <h2 class="text-xl sm:text-2xl font-serif font-bold text-ib-navy mb-6 border-b border-slate-200 pb-4">后续跟踪</h2>
                 <div class="relative border-l border-slate-300 ml-3 space-y-8 py-2">
                     <div class="relative pl-6">
                         <div class="absolute w-2.5 h-2.5 bg-ib-navy rounded-full -left-[5px] top-1.5 ring-4 ring-white"></div>
@@ -354,7 +399,7 @@
     </main>
 
     <div class="fixed bottom-0 left-0 w-full z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.1)] pb-safe-bottom">
-        <div class="max-w-5xl mx-auto px-4 py-3 flex gap-3 md:gap-4 items-center">
+        <div class="max-w-5xl mx-auto px-3 sm:px-4 py-3 flex gap-3 md:gap-4 items-center">
             <button
                 id="share-btn"
                 type="button"
@@ -385,9 +430,9 @@
         </div>
     </div>
 
-    <div id="info-modal" class="hidden fixed inset-0 z-50 px-4 py-8">
+    <div id="info-modal" class="hidden fixed inset-0 z-50 px-3 sm:px-4 py-6 sm:py-8">
         <div class="modal-backdrop absolute inset-0" onclick="closeInfoModal()"></div>
-        <div class="relative max-w-2xl mx-auto bg-white border border-slate-200 shadow-2xl">
+        <div class="relative max-w-2xl mx-auto bg-white border border-slate-200 shadow-2xl max-h-[82vh] overflow-y-auto">
             <div class="flex items-start justify-between gap-4 px-6 py-5 border-b border-slate-200">
                 <div>
                     <p class="text-xs tracking-[0.2em] text-slate-400 font-sans mb-2">口径说明</p>
@@ -781,15 +826,31 @@
                     borderColor: "#e5e7eb",
                     textStyle: { color: "#111827", fontFamily: 'Noto Sans SC' },
                     formatter: function(params) {
+                        if (!params || params.length === 0) {
+                            return "";
+                        }
+
+                        const dataIndex = params[0].dataIndex;
                         const year = params[0].axisValue;
-                        const cornAcres = prospectiveMix.corn[params[0].dataIndex];
-                        const soyAcres = prospectiveMix.soybeans[params[0].dataIndex];
-                        return [
-                            `<div style="font-weight:700;margin-bottom:6px;font-family:'Noto Serif SC'">${year}年 3月种植意向报告</div>`,
-                            `<div style="margin:4px 0;">${params[0].marker}玉米占比：${params[0].data}%</div>`,
-                            `<div style="margin:4px 0;">${params[1].marker}大豆占比：${params[1].data}%</div>`,
-                            `<div style="margin-top:6px;color:#6b7280;font-size:12px;">玉米面积：${cornAcres?.toLocaleString("zh-CN")} / 大豆面积：${soyAcres?.toLocaleString("zh-CN")} 万英亩</div>`
-                        ].join("");
+                        const cornAcres = prospectiveMix.corn[dataIndex];
+                        const soyAcres = prospectiveMix.soybeans[dataIndex];
+                        const itemsByName = params.reduce((acc, item) => {
+                            acc[item.seriesName] = item;
+                            return acc;
+                        }, {});
+                        const lines = [
+                            `<div style="font-weight:700;margin-bottom:6px;font-family:'Noto Serif SC'">${year}年 3月种植意向报告</div>`
+                        ];
+
+                        if (itemsByName["玉米占比"]) {
+                            lines.push(`<div style="margin:4px 0;">${itemsByName["玉米占比"].marker}玉米占比：${itemsByName["玉米占比"].data}%</div>`);
+                        }
+                        if (itemsByName["大豆占比"]) {
+                            lines.push(`<div style="margin:4px 0;">${itemsByName["大豆占比"].marker}大豆占比：${itemsByName["大豆占比"].data}%</div>`);
+                        }
+
+                        lines.push(`<div style="margin-top:6px;color:#6b7280;font-size:12px;">玉米面积：${cornAcres?.toLocaleString("zh-CN")} / 大豆面积：${soyAcres?.toLocaleString("zh-CN")} 万英亩</div>`);
+                        return lines.join("");
                     }
                 },
                 legend: {
@@ -823,6 +884,10 @@
                 ]
             };
             shareChart.setOption(option);
+            shareChart.off('legendselectchanged');
+            shareChart.on('legendselectchanged', () => {
+                shareChart.dispatchAction({ type: 'hideTip' });
+            });
         }
 
         function renderRatioChart() {
