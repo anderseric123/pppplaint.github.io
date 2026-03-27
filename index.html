@@ -1604,7 +1604,7 @@
             const option = {
                 animationDuration: 700,
                 color: seriesConfigs.map(item => item.color),
-                grid: compactMobile ? { left: 42, right: 10, top: 78, bottom: 34 } : { left: 50, right: 20, top: 40, bottom: 40 },
+                grid: compactMobile ? { left: 46, right: 10, top: 76, bottom: 24 } : { left: 56, right: 24, top: 52, bottom: 28 },
                 tooltip: {
                     trigger: "axis",
                     axisPointer: { type: "shadow" },
@@ -1628,28 +1628,24 @@
                 legend: {
                     type: compactMobile ? 'scroll' : 'plain',
                     top: 0,
-                    left: compactMobile ? 24 : 'center',
-                    right: compactMobile ? 8 : 'auto',
+                    left: compactMobile ? 10 : 'center',
+                    right: compactMobile ? 10 : 'auto',
+                    width: compactMobile ? '94%' : 'auto',
                     itemWidth: compactMobile ? 10 : 16,
                     itemHeight: compactMobile ? 8 : 10,
                     itemGap: compactMobile ? 8 : 12,
                     icon: 'rect',
+                    pageButtonPosition: 'end',
                     pageIconSize: compactMobile ? 10 : 12,
                     pageTextStyle: { color: compactMobile ? "#9ca3af" : "#6b7280", fontFamily: 'Noto Sans SC', fontSize: compactMobile ? 10 : 12 },
                     textStyle: { color: "#374151", fontFamily: 'Noto Sans SC', fontSize: compactMobile ? 11 : 12, lineHeight: compactMobile ? 13 : 18 },
                     data: seriesConfigs.map(item => item.name)
                 },
                 xAxis: {
-                    type: "category",
-                    data: acreageYears,
-                    boundaryGap: true,
-                    axisLine: { lineStyle: { color: "#9ca3af" } },
-                    axisLabel: { color: "#374151", fontFamily: 'Noto Sans SC', fontSize: compactMobile ? 11 : 12 }
-                },
-                yAxis: {
                     type: "value",
                     name: "万英亩",
                     nameTextStyle: { color: "#6b7280", padding: [0, 0, 0, 0], fontFamily: 'Noto Sans SC', fontSize: compactMobile ? 10 : 12 },
+                    axisLine: { lineStyle: { color: "#9ca3af" } },
                     axisLabel: {
                         color: "#374151",
                         fontFamily: 'Noto Sans SC',
@@ -1658,11 +1654,23 @@
                     },
                     splitLine: { lineStyle: { color: "#f3f4f6" } }
                 },
+                yAxis: {
+                    type: "category",
+                    data: acreageYears,
+                    axisLine: { lineStyle: { color: "#9ca3af" } },
+                    axisTick: { show: false },
+                    axisLabel: {
+                        color: "#374151",
+                        fontFamily: 'Noto Sans SC',
+                        fontSize: compactMobile ? 11 : 12,
+                        margin: compactMobile ? 10 : 12
+                    }
+                },
                 series: seriesConfigs.map(item => ({
                     name: item.name,
                     type: "bar",
                     data: item.data,
-                    barMaxWidth: compactMobile ? 14 : 18,
+                    barMaxWidth: compactMobile ? 12 : 14,
                     itemStyle: { color: item.color },
                     emphasis: { focus: 'series' }
                 }))
