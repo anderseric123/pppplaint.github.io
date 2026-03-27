@@ -212,6 +212,25 @@
         details.compact-disclosure summary::-webkit-details-marker {
             display: none;
         }
+        .survey-dowjones-detail-table th:first-child,
+        .survey-dowjones-detail-table td:first-child,
+        .reuters-history-table th:first-child,
+        .reuters-history-table td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background: #ffffff;
+            box-shadow: 1px 0 0 #e5e7eb;
+        }
+        .survey-dowjones-detail-table thead th:first-child,
+        .reuters-history-table thead th:first-child {
+            z-index: 3;
+            background: #f8fafc;
+        }
+        .survey-dowjones-detail-table tbody td:first-child,
+        .reuters-history-table tbody td:first-child {
+            z-index: 2;
+        }
         @media (max-width: 430px) {
             .chart-container {
                 height: 292px;
