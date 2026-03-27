@@ -85,6 +85,71 @@
         .crop-inactive:hover {
             border-color: #9ca3af;
         }
+        .survey-active {
+            background-color: #0f204b;
+            color: #ffffff;
+            border-color: #0f204b;
+        }
+        .survey-inactive {
+            background-color: #ffffff;
+            color: #4b5563;
+            border-color: #d1d5db;
+        }
+        .survey-inactive:hover {
+            border-color: #9ca3af;
+        }
+        .stock-active {
+            background-color: #0f204b;
+            color: #ffffff;
+            border-color: #0f204b;
+        }
+        .stock-inactive {
+            background-color: #ffffff;
+            color: #4b5563;
+            border-color: #d1d5db;
+        }
+        .stock-inactive:hover {
+            border-color: #9ca3af;
+        }
+        .reuters-history-active {
+            background-color: #0f204b;
+            color: #ffffff;
+            border-color: #0f204b;
+        }
+        .reuters-history-inactive {
+            background-color: #ffffff;
+            color: #4b5563;
+            border-color: #d1d5db;
+        }
+        .reuters-history-inactive:hover {
+            border-color: #9ca3af;
+        }
+        .scenario-active {
+            background-color: #0f204b;
+            color: #ffffff;
+            border-color: #0f204b;
+        }
+        .scenario-inactive {
+            background-color: #ffffff;
+            color: #4b5563;
+            border-color: #d1d5db;
+        }
+        .scenario-inactive:hover {
+            border-color: #9ca3af;
+        }
+        .board-active {
+            background-color: #0f204b;
+            color: #ffffff;
+            border-color: #0f204b;
+        }
+        .board-inactive {
+            background-color: #ffffff;
+            color: #4b5563;
+            border-color: #d1d5db;
+        }
+        .board-inactive:hover {
+            border-color: #9ca3af;
+        }
         .chart-container {
             width: 100%;
             height: 400px;
@@ -140,6 +205,12 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 0.75rem;
+        }
+        details.compact-disclosure summary {
+            list-style: none;
+        }
+        details.compact-disclosure summary::-webkit-details-marker {
+            display: none;
         }
         @media (max-width: 430px) {
             .chart-container {
@@ -241,10 +312,21 @@
             </div>
         </section>
 
-        <!-- 核心数据 -->
+        <!-- 前瞻看板 -->
         <section>
-            <h2 class="text-xl sm:text-2xl font-serif font-bold text-ib-navy mb-5 sm:mb-6 border-b border-slate-200 pb-4">核心数据分析</h2>
-            
+            <div class="mb-6 border-b border-slate-200 pb-4">
+                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-serif font-bold text-ib-navy">前瞻看板</h2>
+                    </div>
+                    <div class="flex gap-2 overflow-x-auto pb-1">
+                        <button id="board-btn-planting" type="button" onclick="switchBoardPanel('planting')" class="board-btn board-active px-3 py-1.5 text-sm font-sans border transition-colors">种植意向报告前瞻</button>
+                        <button id="board-btn-stocks" type="button" onclick="switchBoardPanel('stocks')" class="board-btn board-inactive px-3 py-1.5 text-sm font-sans border transition-colors">季度库存报告前瞻</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="board-panel-planting" class="board-panel">
             <div class="tab-scroll mb-8 border-b border-slate-200 -mx-1 px-1">
                 <div class="tab-strip">
                 <button id="tab-btn-acreage" onclick="switchTab('acreage')" class="data-tab-btn tab-active tab-pill pb-3 font-sans text-sm font-medium transition-colors relative">历史种植面积走势</button>
@@ -273,11 +355,287 @@
                         <button id="crop-btn-wheat" onclick="switchCrop('wheat')" class="crop-btn crop-inactive px-4 py-1.5 text-sm font-sans border transition-colors">小麦</button>
                     </div>
                     <div id="acreage-chart" class="chart-container"></div>
+                    <div class="border border-slate-200 overflow-hidden">
+                        <div class="px-4 py-3 bg-slate-50 border-b border-slate-200">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <div>
+                                    <h3 class="font-serif font-bold text-base text-slate-900">机构调查数据</h3>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button id="survey-btn-reuters" type="button" onclick="switchSurveyPanel('reuters')" class="survey-btn survey-active px-3 py-1.5 text-sm font-sans border transition-colors">路透3月种植意向调查</button>
+                                    <button id="survey-btn-dowjones" type="button" onclick="switchSurveyPanel('dowjones')" class="survey-btn survey-inactive px-3 py-1.5 text-sm font-sans border transition-colors">道琼斯3月种植意向调查</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="survey-panel-reuters" class="survey-panel">
+                            <div class="flex items-center justify-between gap-2 px-4 py-3 border-b border-slate-200">
+                                <h4 class="font-serif font-bold text-sm sm:text-base text-slate-900">2026年路透3月种植意向调查速览</h4>
+                                <span class="text-xs font-sans text-slate-500">单位：万英亩</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm font-sans text-slate-700">
+                                    <thead class="bg-white">
+                                        <tr class="border-b border-slate-200">
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">作物</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">路透3月种植意向调查</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">对比描述</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b border-slate-200">
+                                            <td class="px-4 py-3 font-medium text-slate-900">大豆</td>
+                                            <td class="px-4 py-3">8554.9</td>
+                                            <td class="px-4 py-3">高于去年种植的 8121.5，亦高于展望论坛预估的 8500。</td>
+                                        </tr>
+                                        <tr class="border-b border-slate-200">
+                                            <td class="px-4 py-3 font-medium text-slate-900">玉米</td>
+                                            <td class="px-4 py-3">9437.1</td>
+                                            <td class="px-4 py-3">低于 2025 年种植面积，但略高于 2026 年展望论坛预测。</td>
+                                        </tr>
+                                        <tr class="border-b border-slate-200">
+                                            <td class="px-4 py-3 font-medium text-slate-900">小麦</td>
+                                            <td class="px-4 py-3">4478.6</td>
+                                            <td class="px-4 py-3">低于 2025 年种植面积。</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-4 py-3 font-medium text-slate-900">棉花</td>
+                                            <td class="px-4 py-3">922.9</td>
+                                            <td class="px-4 py-3">低于美国农业部展望论坛预估的 940。</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <details class="compact-disclosure border-t border-slate-200">
+                                <summary class="flex items-center justify-between gap-4 px-4 py-3 bg-slate-50 cursor-pointer text-sm font-sans text-slate-700">
+                                    <span class="font-medium text-slate-900">路透历史调查回看</span>
+                                    <span class="text-xs text-slate-400">2005-2026 | 万英亩</span>
+                                </summary>
+                                <div class="border-t border-slate-200 p-4 space-y-5">
+                                    <p class="text-sm font-sans text-slate-600 leading-relaxed">这组表把路透调查均值、美国农业部 3 月种植意向、6 月面积报告和最终种植面积放到同一张表里，便于横向对照历史预期与最终落点。</p>
+                                    <div class="flex gap-2 overflow-x-auto pb-1">
+                                        <button id="reuters-history-btn-corn" type="button" onclick="switchReutersHistoryPanel('corn')" class="reuters-history-btn reuters-history-active px-3 py-1.5 text-sm font-sans border transition-colors">玉米</button>
+                                        <button id="reuters-history-btn-soybeans" type="button" onclick="switchReutersHistoryPanel('soybeans')" class="reuters-history-btn reuters-history-inactive px-3 py-1.5 text-sm font-sans border transition-colors">大豆</button>
+                                        <button id="reuters-history-btn-wheat" type="button" onclick="switchReutersHistoryPanel('wheat')" class="reuters-history-btn reuters-history-inactive px-3 py-1.5 text-sm font-sans border transition-colors">小麦</button>
+                                    </div>
+
+                                    <div id="reuters-history-panel-corn" class="reuters-history-panel space-y-3">
+                                        <h4 class="font-serif font-bold text-base text-slate-900">玉米</h4>
+                                        <div class="overflow-x-auto">
+                                            <table class="reuters-history-table min-w-[760px] w-full text-sm font-sans text-slate-700">
+                                                <thead class="bg-slate-50">
+                                                    <tr class="border-b border-slate-200">
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">年份</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">路透均值</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 3月</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 6月</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 最终</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2026</td><td class="px-4 py-3">94.371</td><td class="px-4 py-3">待公布</td><td class="px-4 py-3">待公布</td><td class="px-4 py-3">待公布</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2025</td><td class="px-4 py-3">94.361</td><td class="px-4 py-3">95.326</td><td class="px-4 py-3">95.203</td><td class="px-4 py-3">98.788</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2024</td><td class="px-4 py-3">91.776</td><td class="px-4 py-3">90.036</td><td class="px-4 py-3">91.475</td><td class="px-4 py-3">90.909</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2023</td><td class="px-4 py-3">90.880</td><td class="px-4 py-3">91.996</td><td class="px-4 py-3">94.096</td><td class="px-4 py-3">94.641</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2022</td><td class="px-4 py-3">92.001</td><td class="px-4 py-3">89.490</td><td class="px-4 py-3">89.921</td><td class="px-4 py-3">88.162</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2021</td><td class="px-4 py-3">93.208</td><td class="px-4 py-3">91.144</td><td class="px-4 py-3">92.692</td><td class="px-4 py-3">92.901</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2020</td><td class="px-4 py-3">94.328</td><td class="px-4 py-3">96.990</td><td class="px-4 py-3">92.006</td><td class="px-4 py-3">90.432</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2019</td><td class="px-4 py-3">91.332</td><td class="px-4 py-3">92.792</td><td class="px-4 py-3">91.700</td><td class="px-4 py-3">89.370</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2018</td><td class="px-4 py-3">89.420</td><td class="px-4 py-3">88.026</td><td class="px-4 py-3">89.128</td><td class="px-4 py-3">88.821</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2017</td><td class="px-4 py-3">90.969</td><td class="px-4 py-3">89.996</td><td class="px-4 py-3">90.886</td><td class="px-4 py-3">90.167</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2016</td><td class="px-4 py-3">89.972</td><td class="px-4 py-3">93.601</td><td class="px-4 py-3">94.148</td><td class="px-4 py-3">94.004</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2015</td><td class="px-4 py-3">88.731</td><td class="px-4 py-3">89.199</td><td class="px-4 py-3">88.897</td><td class="px-4 py-3">88.019</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2014</td><td class="px-4 py-3">92.748</td><td class="px-4 py-3">91.691</td><td class="px-4 py-3">91.641</td><td class="px-4 py-3">90.597</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2013</td><td class="px-4 py-3">97.252</td><td class="px-4 py-3">97.282</td><td class="px-4 py-3">97.379</td><td class="px-4 py-3">95.365</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2012</td><td class="px-4 py-3">94.720</td><td class="px-4 py-3">95.864</td><td class="px-4 py-3">96.405</td><td class="px-4 py-3">97.291</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2011</td><td class="px-4 py-3">91.839</td><td class="px-4 py-3">92.178</td><td class="px-4 py-3">92.282</td><td class="px-4 py-3">91.936</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2010</td><td class="px-4 py-3">89.189</td><td class="px-4 py-3">88.798</td><td class="px-4 py-3">87.872</td><td class="px-4 py-3">88.192</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2009</td><td class="px-4 py-3">84.411</td><td class="px-4 py-3">84.986</td><td class="px-4 py-3">87.035</td><td class="px-4 py-3">86.382</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2008</td><td class="px-4 py-3">87.387</td><td class="px-4 py-3">86.014</td><td class="px-4 py-3">87.327</td><td class="px-4 py-3">85.982</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2007</td><td class="px-4 py-3">87.987</td><td class="px-4 py-3">90.454</td><td class="px-4 py-3">92.888</td><td class="px-4 py-3">93.527</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2006</td><td class="px-4 py-3">80.505</td><td class="px-4 py-3">78.019</td><td class="px-4 py-3">79.366</td><td class="px-4 py-3">78.327</td></tr>
+                                                    <tr><td class="px-4 py-3 font-medium text-slate-900">2005</td><td class="px-4 py-3">82.383</td><td class="px-4 py-3">81.413</td><td class="px-4 py-3">81.592</td><td class="px-4 py-3">81.779</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <div id="reuters-history-panel-soybeans" class="reuters-history-panel hidden space-y-3">
+                                        <h4 class="font-serif font-bold text-base text-slate-900">大豆</h4>
+                                        <div class="overflow-x-auto">
+                                            <table class="reuters-history-table min-w-[760px] w-full text-sm font-sans text-slate-700">
+                                                <thead class="bg-slate-50">
+                                                    <tr class="border-b border-slate-200">
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">年份</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">路透均值</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 3月</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 6月</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 最终</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2026</td><td class="px-4 py-3">85.549</td><td class="px-4 py-3">待公布</td><td class="px-4 py-3">待公布</td><td class="px-4 py-3">待公布</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2025</td><td class="px-4 py-3">83.762</td><td class="px-4 py-3">83.495</td><td class="px-4 py-3">83.380</td><td class="px-4 py-3">81.215</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2024</td><td class="px-4 py-3">86.530</td><td class="px-4 py-3">86.510</td><td class="px-4 py-3">86.100</td><td class="px-4 py-3">87.260</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2023</td><td class="px-4 py-3">88.242</td><td class="px-4 py-3">87.505</td><td class="px-4 py-3">83.505</td><td class="px-4 py-3">83.600</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2022</td><td class="px-4 py-3">88.727</td><td class="px-4 py-3">90.955</td><td class="px-4 py-3">88.325</td><td class="px-4 py-3">87.450</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2021</td><td class="px-4 py-3">89.996</td><td class="px-4 py-3">87.600</td><td class="px-4 py-3">87.555</td><td class="px-4 py-3">87.195</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2020</td><td class="px-4 py-3">84.865</td><td class="px-4 py-3">83.510</td><td class="px-4 py-3">83.825</td><td class="px-4 py-3">83.354</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2019</td><td class="px-4 py-3">86.169</td><td class="px-4 py-3">84.617</td><td class="px-4 py-3">80.040</td><td class="px-4 py-3">76.100</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2018</td><td class="px-4 py-3">91.056</td><td class="px-4 py-3">88.982</td><td class="px-4 py-3">89.557</td><td class="px-4 py-3">89.167</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2017</td><td class="px-4 py-3">88.214</td><td class="px-4 py-3">89.482</td><td class="px-4 py-3">89.513</td><td class="px-4 py-3">90.162</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2016</td><td class="px-4 py-3">83.057</td><td class="px-4 py-3">82.236</td><td class="px-4 py-3">83.688</td><td class="px-4 py-3">83.453</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2015</td><td class="px-4 py-3">85.919</td><td class="px-4 py-3">84.635</td><td class="px-4 py-3">85.139</td><td class="px-4 py-3">82.660</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2014</td><td class="px-4 py-3">81.075</td><td class="px-4 py-3">81.493</td><td class="px-4 py-3">84.839</td><td class="px-4 py-3">83.296</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2013</td><td class="px-4 py-3">78.394</td><td class="px-4 py-3">77.126</td><td class="px-4 py-3">77.728</td><td class="px-4 py-3">76.820</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2012</td><td class="px-4 py-3">75.393</td><td class="px-4 py-3">73.902</td><td class="px-4 py-3">76.080</td><td class="px-4 py-3">77.198</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2011</td><td class="px-4 py-3">76.870</td><td class="px-4 py-3">76.609</td><td class="px-4 py-3">75.208</td><td class="px-4 py-3">75.046</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2010</td><td class="px-4 py-3">78.458</td><td class="px-4 py-3">78.098</td><td class="px-4 py-3">78.868</td><td class="px-4 py-3">77.404</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2009</td><td class="px-4 py-3">79.622</td><td class="px-4 py-3">76.024</td><td class="px-4 py-3">77.483</td><td class="px-4 py-3">77.451</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2008</td><td class="px-4 py-3">71.721</td><td class="px-4 py-3">74.793</td><td class="px-4 py-3">74.533</td><td class="px-4 py-3">75.718</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2007</td><td class="px-4 py-3">69.179</td><td class="px-4 py-3">67.140</td><td class="px-4 py-3">64.081</td><td class="px-4 py-3">64.741</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2006</td><td class="px-4 py-3">74.217</td><td class="px-4 py-3">76.895</td><td class="px-4 py-3">74.930</td><td class="px-4 py-3">75.522</td></tr>
+                                                    <tr><td class="px-4 py-3 font-medium text-slate-900">2005</td><td class="px-4 py-3">73.368</td><td class="px-4 py-3">73.910</td><td class="px-4 py-3">73.303</td><td class="px-4 py-3">72.032</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <div id="reuters-history-panel-wheat" class="reuters-history-panel hidden space-y-3">
+                                        <h4 class="font-serif font-bold text-base text-slate-900">小麦</h4>
+                                        <div class="overflow-x-auto">
+                                            <table class="reuters-history-table min-w-[760px] w-full text-sm font-sans text-slate-700">
+                                                <thead class="bg-slate-50">
+                                                    <tr class="border-b border-slate-200">
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">年份</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">路透均值</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 3月</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 6月</th>
+                                                        <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 最终</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2026</td><td class="px-4 py-3">44.786</td><td class="px-4 py-3">待公布</td><td class="px-4 py-3">待公布</td><td class="px-4 py-3">待公布</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2025</td><td class="px-4 py-3">46.475</td><td class="px-4 py-3">45.350</td><td class="px-4 py-3">45.478</td><td class="px-4 py-3">45.328</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2024</td><td class="px-4 py-3">47.330</td><td class="px-4 py-3">47.498</td><td class="px-4 py-3">47.240</td><td class="px-4 py-3">46.274</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2023</td><td class="px-4 py-3">48.852</td><td class="px-4 py-3">49.855</td><td class="px-4 py-3">49.628</td><td class="px-4 py-3">49.575</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2022</td><td class="px-4 py-3">47.771</td><td class="px-4 py-3">47.351</td><td class="px-4 py-3">47.092</td><td class="px-4 py-3">45.769</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2021</td><td class="px-4 py-3">44.971</td><td class="px-4 py-3">46.358</td><td class="px-4 py-3">46.743</td><td class="px-4 py-3">46.740</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2020</td><td class="px-4 py-3">44.982</td><td class="px-4 py-3">44.655</td><td class="px-4 py-3">44.250</td><td class="px-4 py-3">44.450</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2019</td><td class="px-4 py-3">46.915</td><td class="px-4 py-3">45.754</td><td class="px-4 py-3">45.609</td><td class="px-4 py-3">45.485</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2018</td><td class="px-4 py-3">46.297</td><td class="px-4 py-3">47.339</td><td class="px-4 py-3">47.821</td><td class="px-4 py-3">47.820</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2017</td><td class="px-4 py-3">46.139</td><td class="px-4 py-3">46.059</td><td class="px-4 py-3">45.657</td><td class="px-4 py-3">46.052</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2016</td><td class="px-4 py-3">51.702</td><td class="px-4 py-3">49.559</td><td class="px-4 py-3">50.816</td><td class="px-4 py-3">50.116</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2015</td><td class="px-4 py-3">55.796</td><td class="px-4 py-3">55.367</td><td class="px-4 py-3">56.079</td><td class="px-4 py-3">54.999</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2014</td><td class="px-4 py-3">56.277</td><td class="px-4 py-3">55.815</td><td class="px-4 py-3">56.474</td><td class="px-4 py-3">56.841</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2013</td><td class="px-4 py-3">56.414</td><td class="px-4 py-3">56.440</td><td class="px-4 py-3">56.530</td><td class="px-4 py-3">56.236</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2012</td><td class="px-4 py-3">57.422</td><td class="px-4 py-3">55.908</td><td class="px-4 py-3">56.017</td><td class="px-4 py-3">55.294</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2011</td><td class="px-4 py-3">57.289</td><td class="px-4 py-3">58.021</td><td class="px-4 py-3">56.433</td><td class="px-4 py-3">54.277</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2010</td><td class="px-4 py-3">53.376</td><td class="px-4 py-3">53.827</td><td class="px-4 py-3">54.305</td><td class="px-4 py-3">52.620</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2009</td><td class="px-4 py-3">58.598</td><td class="px-4 py-3">58.638</td><td class="px-4 py-3">59.775</td><td class="px-4 py-3">59.017</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2008</td><td class="px-4 py-3">63.628</td><td class="px-4 py-3">63.803</td><td class="px-4 py-3">63.457</td><td class="px-4 py-3">63.617</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2007</td><td class="px-4 py-3">59.686</td><td class="px-4 py-3">60.303</td><td class="px-4 py-3">60.505</td><td class="px-4 py-3">60.460</td></tr>
+                                                    <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2006</td><td class="px-4 py-3">58.233</td><td class="px-4 py-3">57.128</td><td class="px-4 py-3">57.873</td><td class="px-4 py-3">57.334</td></tr>
+                                                    <tr><td class="px-4 py-3 font-medium text-slate-900">2005</td><td class="px-4 py-3">57.961</td><td class="px-4 py-3">58.592</td><td class="px-4 py-3">58.080</td><td class="px-4 py-3">57.214</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+
+                        <div id="survey-panel-dowjones" class="survey-panel hidden">
+                            <div class="px-4 py-3 border-b border-slate-200">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                                    <h4 class="font-serif font-bold text-sm sm:text-base text-slate-900">道琼斯3月种植意向调查总览</h4>
+                                    <span class="text-xs font-sans text-slate-500">单位：万英亩 | 发布时间：2026-03-27 01:23</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200">
+                                <div class="bg-white p-4">
+                                    <div class="text-xs font-sans text-slate-400 mb-2">玉米</div>
+                                    <div class="text-lg font-serif font-bold text-slate-900">9448.1</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">区间 9260-9600</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">2025种植 9878.8</div>
+                                </div>
+                                <div class="bg-white p-4">
+                                    <div class="text-xs font-sans text-slate-400 mb-2">大豆</div>
+                                    <div class="text-lg font-serif font-bold text-slate-900">8546.3</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">区间 8400-8650</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">2025种植 8121.5</div>
+                                </div>
+                                <div class="bg-white p-4">
+                                    <div class="text-xs font-sans text-slate-400 mb-2">全部小麦</div>
+                                    <div class="text-lg font-serif font-bold text-slate-900">4460.5</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">区间 4310-4660</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">2025种植 4532.8</div>
+                                </div>
+                                <div class="bg-white p-4">
+                                    <div class="text-xs font-sans text-slate-400 mb-2">冬小麦</div>
+                                    <div class="text-lg font-serif font-bold text-slate-900">3273.2</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">区间 3190-3330</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">2025种植 3315.3</div>
+                                </div>
+                                <div class="bg-white p-4">
+                                    <div class="text-xs font-sans text-slate-400 mb-2">春小麦</div>
+                                    <div class="text-lg font-serif font-bold text-slate-900">968.1</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">区间 820-1100</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">2025种植 999.0</div>
+                                </div>
+                                <div class="bg-white p-4">
+                                    <div class="text-xs font-sans text-slate-400 mb-2">杜伦麦</div>
+                                    <div class="text-lg font-serif font-bold text-slate-900">203.7</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">区间 160-230</div>
+                                    <div class="text-xs font-sans text-slate-500 mt-1">2025种植 218.5</div>
+                                </div>
+                            </div>
+                            <details class="compact-disclosure border-t border-slate-200">
+                                <summary class="flex items-center justify-between gap-4 px-4 py-3 cursor-pointer text-sm font-sans text-slate-700">
+                                    <span>查看细分机构调查</span>
+                                    <span class="text-xs text-slate-400">16家机构 | 万英亩</span>
+                                </summary>
+                                <div class="border-t border-slate-200 overflow-x-auto">
+                                    <table class="survey-dowjones-detail-table min-w-[860px] w-full text-sm font-sans text-slate-700">
+                                        <thead class="bg-slate-50">
+                                            <tr class="border-b border-slate-200">
+                                                <th class="px-4 py-3 text-left font-medium text-slate-500">机构</th>
+                                                <th class="px-4 py-3 text-left font-medium text-slate-500">玉米</th>
+                                                <th class="px-4 py-3 text-left font-medium text-slate-500">大豆</th>
+                                                <th class="px-4 py-3 text-left font-medium text-slate-500">全部小麦</th>
+                                                <th class="px-4 py-3 text-left font-medium text-slate-500">冬小麦</th>
+                                                <th class="px-4 py-3 text-left font-medium text-slate-500">春小麦</th>
+                                                <th class="px-4 py-3 text-left font-medium text-slate-500">杜伦麦</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Allendale</td><td class="px-4 py-3">93.7</td><td class="px-4 py-3">85.7</td><td class="px-4 py-3">44.9</td><td class="px-4 py-3">33.1</td><td class="px-4 py-3">9.7</td><td class="px-4 py-3">2.1</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Doane</td><td class="px-4 py-3">96.0</td><td class="px-4 py-3">84.3</td><td class="px-4 py-3">44.4</td><td class="px-4 py-3">32.8</td><td class="px-4 py-3">9.5</td><td class="px-4 py-3">2.1</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Grain Cycles</td><td class="px-4 py-3">95.5</td><td class="px-4 py-3">85.7</td><td class="px-4 py-3">44.5</td><td class="px-4 py-3">32.5</td><td class="px-4 py-3">10.0</td><td class="px-4 py-3">2.0</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Linn Group</td><td class="px-4 py-3">95.0</td><td class="px-4 py-3">85.0</td><td class="px-4 py-3">44.0</td><td class="px-4 py-3">32.2</td><td class="px-4 py-3">9.8</td><td class="px-4 py-3">2.0</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Sid Love Consulting</td><td class="px-4 py-3">95.0</td><td class="px-4 py-3">85.0</td><td class="px-4 py-3">44.5</td><td class="px-4 py-3">33.0</td><td class="px-4 py-3">9.5</td><td class="px-4 py-3">2.0</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Marex</td><td class="px-4 py-3">93.5</td><td class="px-4 py-3">86.0</td><td class="px-4 py-3">44.4</td><td class="px-4 py-3">32.5</td><td class="px-4 py-3">9.8</td><td class="px-4 py-3">2.1</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Midland Research</td><td class="px-4 py-3">94.2</td><td class="px-4 py-3">85.6</td><td class="px-4 py-3">44.6</td><td class="px-4 py-3">32.5</td><td class="px-4 py-3">10.1</td><td class="px-4 py-3">2.0</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Midwest Market Solutions</td><td class="px-4 py-3">95.0</td><td class="px-4 py-3">85.1</td><td class="px-4 py-3">43.5</td><td class="px-4 py-3">33.0</td><td class="px-4 py-3">8.2</td><td class="px-4 py-3">2.2</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Northstar Commodity</td><td class="px-4 py-3">93.6</td><td class="px-4 py-3">86.0</td><td class="px-4 py-3">46.6</td><td class="px-4 py-3">33.3</td><td class="px-4 py-3">11.0</td><td class="px-4 py-3">2.3</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Ocean State Research</td><td class="px-4 py-3">94.5</td><td class="px-4 py-3">85.5</td><td class="px-4 py-3">44.6</td><td class="px-4 py-3">33.0</td><td class="px-4 py-3">9.5</td><td class="px-4 py-3">2.1</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Prime Ag</td><td class="px-4 py-3">94.5</td><td class="px-4 py-3">86.5</td><td class="px-4 py-3">-</td><td class="px-4 py-3">-</td><td class="px-4 py-3">9.5</td><td class="px-4 py-3">-</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">RJ O'Brien</td><td class="px-4 py-3">95.0</td><td class="px-4 py-3">85.0</td><td class="px-4 py-3">44.0</td><td class="px-4 py-3">32.5</td><td class="px-4 py-3">9.5</td><td class="px-4 py-3">2.0</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">StoneX</td><td class="px-4 py-3">94.7</td><td class="px-4 py-3">85.5</td><td class="px-4 py-3">43.1</td><td class="px-4 py-3">31.9</td><td class="px-4 py-3">9.1</td><td class="px-4 py-3">2.0</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">U.S. Commodities</td><td class="px-4 py-3">94.0</td><td class="px-4 py-3">86.1</td><td class="px-4 py-3">46.0</td><td class="px-4 py-3">33.0</td><td class="px-4 py-3">10.0</td><td class="px-4 py-3">1.6</td></tr>
+                                            <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">Vantage RM</td><td class="px-4 py-3">95.0</td><td class="px-4 py-3">84.0</td><td class="px-4 py-3">45.0</td><td class="px-4 py-3">33.0</td><td class="px-4 py-3">10.0</td><td class="px-4 py-3">2.0</td></tr>
+                                            <tr><td class="px-4 py-3 font-medium text-slate-900">Zaner Ag Hedge</td><td class="px-4 py-3">92.6</td><td class="px-4 py-3">86.5</td><td class="px-4 py-3">45.1</td><td class="px-4 py-3">-</td><td class="px-4 py-3">-</td><td class="px-4 py-3">-</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
                     <div class="bg-slate-50 p-4 border-l-4 border-ib-navy text-sm font-sans text-slate-700 leading-relaxed">
-                        <strong class="text-slate-900">直观看点：</strong>2021-2025 这 5 个完整年份里，玉米在 2023 和 2025 年都出现了“3 月意向上修到 6 月进一步确认”的特征；大豆则在 2022、2023、2024 年都经历了从展望论坛到正式报告的方向再修正。也就是说，展望论坛很重要，但它从来不是最后答案。
+                        <strong class="text-slate-900">直观看点：</strong>2026 年在展望论坛值之外，报告发布前的主流预期已经形成了两层参考。路透调查显示大豆 8554.9、玉米 9437.1、小麦 4478.6 万英亩；道琼斯调查均值则给出玉米 9448.1、大豆 8546.3、全部小麦 4460.5 万英亩。再往回看，路透历史调查与美国农业部 3 月、6 月及最终面积之间并不是简单同步，这也是为什么报告前几天的预期修正，常常比“静态基线”更值得盯。
                     </div>
                 </div>
-
+                
                 <!-- 标签二：结构占比 -->
                 <div id="tab-content-share" class="data-tab-content hidden space-y-6">
                     <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-sm font-sans text-slate-600 mb-2">
@@ -321,6 +679,286 @@
                 </div>
 
             </div>
+            </div>
+
+            <div id="board-panel-stocks" class="board-panel hidden">
+            <div class="mb-6 border-b border-slate-200 pb-4">
+                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+                    <div>
+                        <p class="text-sm font-sans text-slate-500 mt-2">同一天发布的还有 3 月 1 日季度库存报告。下面这组统计把路透预估、预估区间和美国农业部实际公布值放在一起，便于判断库存端的历史偏差。</p>
+                    </div>
+                    <span class="text-xs font-sans text-slate-400">单位：亿蒲式耳</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="border border-slate-200 p-4 sm:p-5">
+                    <div class="text-xs font-sans text-slate-400 mb-2">玉米库存</div>
+                    <div class="text-2xl font-serif font-bold text-slate-900">91.04</div>
+                    <div class="text-sm font-sans text-slate-500 mt-2">2026 路透均值</div>
+                    <div class="text-sm font-sans text-slate-600 mt-3">区间 85.75 - 93.78</div>
+                    <div class="text-sm font-sans text-slate-600 mt-1">2025 USDA：81.51</div>
+                </div>
+                <div class="border border-slate-200 p-4 sm:p-5">
+                    <div class="text-xs font-sans text-slate-400 mb-2">大豆库存</div>
+                    <div class="text-2xl font-serif font-bold text-slate-900">20.67</div>
+                    <div class="text-sm font-sans text-slate-500 mt-2">2026 路透均值</div>
+                    <div class="text-sm font-sans text-slate-600 mt-3">区间 19.05 - 21.25</div>
+                    <div class="text-sm font-sans text-slate-600 mt-1">2025 USDA：19.10</div>
+                </div>
+                <div class="border border-slate-200 p-4 sm:p-5">
+                    <div class="text-xs font-sans text-slate-400 mb-2">小麦库存</div>
+                    <div class="text-2xl font-serif font-bold text-slate-900">13.10</div>
+                    <div class="text-sm font-sans text-slate-500 mt-2">2026 路透均值</div>
+                    <div class="text-sm font-sans text-slate-600 mt-3">区间 12.89 - 13.34</div>
+                    <div class="text-sm font-sans text-slate-600 mt-1">2025 USDA：12.37</div>
+                </div>
+            </div>
+
+            <div class="mt-5 bg-slate-50 p-4 border-l-4 border-ib-navy text-sm font-sans text-slate-700 leading-relaxed">
+                <strong class="text-slate-900">怎么用这组表：</strong>如果面积报告偏利空、但库存报告低于预估，盘面未必会单边交易；反过来，如果面积和库存同时偏向同一方向，市场重定价通常会更顺畅。历史上库存端与调查均值之间的误差并不大，但在个别年份也会出现明显偏离。
+            </div>
+
+            <div class="mt-5 border border-slate-200 overflow-hidden">
+                <details class="compact-disclosure">
+                    <summary class="flex items-center justify-between gap-4 px-4 py-3 bg-slate-50 cursor-pointer text-sm font-sans text-slate-700">
+                        <span class="font-medium text-slate-900">查看 2005-2026 年季度库存历史统计</span>
+                        <span class="text-xs text-slate-400">路透均值 / 区间 / USDA / 偏差</span>
+                    </summary>
+                    <div class="border-t border-slate-200 p-4 space-y-5">
+                        <div class="flex gap-2 overflow-x-auto pb-1">
+                            <button id="stock-history-btn-corn" type="button" onclick="switchStockHistoryPanel('corn')" class="stock-history-btn stock-active px-3 py-1.5 text-sm font-sans border transition-colors">玉米</button>
+                            <button id="stock-history-btn-soybeans" type="button" onclick="switchStockHistoryPanel('soybeans')" class="stock-history-btn stock-inactive px-3 py-1.5 text-sm font-sans border transition-colors">大豆</button>
+                            <button id="stock-history-btn-wheat" type="button" onclick="switchStockHistoryPanel('wheat')" class="stock-history-btn stock-inactive px-3 py-1.5 text-sm font-sans border transition-colors">小麦</button>
+                        </div>
+
+                        <div id="stock-history-panel-corn" class="stock-history-panel space-y-3">
+                            <h3 class="font-serif font-bold text-base text-slate-900">玉米</h3>
+                            <div class="overflow-x-auto">
+                                <table class="stock-history-table min-w-[820px] w-full text-sm font-sans text-slate-700">
+                                    <thead class="bg-slate-50">
+                                        <tr class="border-b border-slate-200">
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">年份</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">路透均值</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">区间低值</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">区间高值</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 3月1日</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">偏差%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2026</td><td class="px-4 py-3">9.104</td><td class="px-4 py-3">8.575</td><td class="px-4 py-3">9.378</td><td class="px-4 py-3">待公布</td><td class="px-4 py-3">待公布</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2025</td><td class="px-4 py-3">8.151</td><td class="px-4 py-3">8.050</td><td class="px-4 py-3">8.311</td><td class="px-4 py-3">8.151</td><td class="px-4 py-3">0.00</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2024</td><td class="px-4 py-3">8.427</td><td class="px-4 py-3">8.129</td><td class="px-4 py-3">8.568</td><td class="px-4 py-3">8.347</td><td class="px-4 py-3">0.96</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2023</td><td class="px-4 py-3">7.470</td><td class="px-4 py-3">7.240</td><td class="px-4 py-3">7.830</td><td class="px-4 py-3">7.401</td><td class="px-4 py-3">0.93</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2022</td><td class="px-4 py-3">7.877</td><td class="px-4 py-3">7.630</td><td class="px-4 py-3">8.087</td><td class="px-4 py-3">7.850</td><td class="px-4 py-3">0.34</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2021</td><td class="px-4 py-3">7.767</td><td class="px-4 py-3">7.573</td><td class="px-4 py-3">7.980</td><td class="px-4 py-3">7.701</td><td class="px-4 py-3">0.86</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2020</td><td class="px-4 py-3">8.125</td><td class="px-4 py-3">7.825</td><td class="px-4 py-3">8.492</td><td class="px-4 py-3">7.953</td><td class="px-4 py-3">2.16</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2019</td><td class="px-4 py-3">8.335</td><td class="px-4 py-3">7.620</td><td class="px-4 py-3">8.800</td><td class="px-4 py-3">8.605</td><td class="px-4 py-3">-3.14</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2018</td><td class="px-4 py-3">8.706</td><td class="px-4 py-3">8.550</td><td class="px-4 py-3">8.881</td><td class="px-4 py-3">8.888</td><td class="px-4 py-3">-2.05</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2017</td><td class="px-4 py-3">8.534</td><td class="px-4 py-3">8.205</td><td class="px-4 py-3">8.900</td><td class="px-4 py-3">8.616</td><td class="px-4 py-3">-0.95</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2016</td><td class="px-4 py-3">7.801</td><td class="px-4 py-3">7.700</td><td class="px-4 py-3">7.975</td><td class="px-4 py-3">7.808</td><td class="px-4 py-3">-0.09</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2015</td><td class="px-4 py-3">7.609</td><td class="px-4 py-3">7.459</td><td class="px-4 py-3">7.800</td><td class="px-4 py-3">7.745</td><td class="px-4 py-3">-1.76</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2014</td><td class="px-4 py-3">7.099</td><td class="px-4 py-3">6.861</td><td class="px-4 py-3">7.540</td><td class="px-4 py-3">7.006</td><td class="px-4 py-3">1.33</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2013</td><td class="px-4 py-3">5.013</td><td class="px-4 py-3">4.885</td><td class="px-4 py-3">5.248</td><td class="px-4 py-3">5.399</td><td class="px-4 py-3">-7.15</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2012</td><td class="px-4 py-3">6.150</td><td class="px-4 py-3">5.925</td><td class="px-4 py-3">6.288</td><td class="px-4 py-3">6.009</td><td class="px-4 py-3">2.34</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2011</td><td class="px-4 py-3">6.690</td><td class="px-4 py-3">6.552</td><td class="px-4 py-3">6.880</td><td class="px-4 py-3">6.523</td><td class="px-4 py-3">2.56</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2010</td><td class="px-4 py-3">7.496</td><td class="px-4 py-3">7.318</td><td class="px-4 py-3">7.758</td><td class="px-4 py-3">7.694</td><td class="px-4 py-3">-2.57</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2009</td><td class="px-4 py-3">7.010</td><td class="px-4 py-3">6.888</td><td class="px-4 py-3">7.146</td><td class="px-4 py-3">6.958</td><td class="px-4 py-3">0.74</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2008</td><td class="px-4 py-3">7.078</td><td class="px-4 py-3">6.950</td><td class="px-4 py-3">7.254</td><td class="px-4 py-3">6.859</td><td class="px-4 py-3">3.19</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2007</td><td class="px-4 py-3">5.994</td><td class="px-4 py-3">5.906</td><td class="px-4 py-3">6.080</td><td class="px-4 py-3">6.070</td><td class="px-4 py-3">-1.25</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2006</td><td class="px-4 py-3">6.985</td><td class="px-4 py-3">6.942</td><td class="px-4 py-3">7.057</td><td class="px-4 py-3">6.987</td><td class="px-4 py-3">-0.03</td></tr>
+                                        <tr><td class="px-4 py-3 font-medium text-slate-900">2005</td><td class="px-4 py-3">6.721</td><td class="px-4 py-3">6.699</td><td class="px-4 py-3">6.752</td><td class="px-4 py-3">6.754</td><td class="px-4 py-3">-0.48</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="stock-history-panel-soybeans" class="stock-history-panel hidden space-y-3">
+                            <h3 class="font-serif font-bold text-base text-slate-900">大豆</h3>
+                            <div class="overflow-x-auto">
+                                <table class="stock-history-table min-w-[820px] w-full text-sm font-sans text-slate-700">
+                                    <thead class="bg-slate-50">
+                                        <tr class="border-b border-slate-200">
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">年份</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">路透均值</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">区间低值</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">区间高值</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 3月1日</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">偏差%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2026</td><td class="px-4 py-3">2.067</td><td class="px-4 py-3">1.905</td><td class="px-4 py-3">2.125</td><td class="px-4 py-3">待公布</td><td class="px-4 py-3">待公布</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2025</td><td class="px-4 py-3">1.901</td><td class="px-4 py-3">1.823</td><td class="px-4 py-3">2.015</td><td class="px-4 py-3">1.910</td><td class="px-4 py-3">-0.47</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2024</td><td class="px-4 py-3">1.828</td><td class="px-4 py-3">1.740</td><td class="px-4 py-3">1.986</td><td class="px-4 py-3">1.845</td><td class="px-4 py-3">-0.92</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2023</td><td class="px-4 py-3">1.742</td><td class="px-4 py-3">1.600</td><td class="px-4 py-3">1.910</td><td class="px-4 py-3">1.685</td><td class="px-4 py-3">3.38</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2022</td><td class="px-4 py-3">1.902</td><td class="px-4 py-3">1.602</td><td class="px-4 py-3">1.965</td><td class="px-4 py-3">1.931</td><td class="px-4 py-3">-1.50</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2021</td><td class="px-4 py-3">1.534</td><td class="px-4 py-3">1.440</td><td class="px-4 py-3">1.775</td><td class="px-4 py-3">1.564</td><td class="px-4 py-3">-1.92</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2020</td><td class="px-4 py-3">2.241</td><td class="px-4 py-3">2.075</td><td class="px-4 py-3">2.701</td><td class="px-4 py-3">2.253</td><td class="px-4 py-3">-0.53</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2019</td><td class="px-4 py-3">2.683</td><td class="px-4 py-3">2.095</td><td class="px-4 py-3">2.797</td><td class="px-4 py-3">2.716</td><td class="px-4 py-3">-1.22</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2018</td><td class="px-4 py-3">2.030</td><td class="px-4 py-3">1.810</td><td class="px-4 py-3">2.110</td><td class="px-4 py-3">2.107</td><td class="px-4 py-3">-3.65</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2017</td><td class="px-4 py-3">1.684</td><td class="px-4 py-3">1.627</td><td class="px-4 py-3">1.885</td><td class="px-4 py-3">1.735</td><td class="px-4 py-3">-2.94</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2016</td><td class="px-4 py-3">1.556</td><td class="px-4 py-3">1.425</td><td class="px-4 py-3">1.615</td><td class="px-4 py-3">1.531</td><td class="px-4 py-3">1.63</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2015</td><td class="px-4 py-3">1.346</td><td class="px-4 py-3">1.273</td><td class="px-4 py-3">1.404</td><td class="px-4 py-3">1.334</td><td class="px-4 py-3">0.90</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2014</td><td class="px-4 py-3">0.989</td><td class="px-4 py-3">0.955</td><td class="px-4 py-3">1.087</td><td class="px-4 py-3">0.992</td><td class="px-4 py-3">-0.30</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2013</td><td class="px-4 py-3">0.935</td><td class="px-4 py-3">0.905</td><td class="px-4 py-3">0.984</td><td class="px-4 py-3">0.999</td><td class="px-4 py-3">-6.43</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2012</td><td class="px-4 py-3">1.387</td><td class="px-4 py-3">1.270</td><td class="px-4 py-3">1.585</td><td class="px-4 py-3">1.372</td><td class="px-4 py-3">1.07</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2011</td><td class="px-4 py-3">1.299</td><td class="px-4 py-3">1.266</td><td class="px-4 py-3">1.366</td><td class="px-4 py-3">1.249</td><td class="px-4 py-3">4.01</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2010</td><td class="px-4 py-3">1.208</td><td class="px-4 py-3">1.161</td><td class="px-4 py-3">1.270</td><td class="px-4 py-3">1.270</td><td class="px-4 py-3">-4.88</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2009</td><td class="px-4 py-3">1.322</td><td class="px-4 py-3">1.295</td><td class="px-4 py-3">1.353</td><td class="px-4 py-3">1.302</td><td class="px-4 py-3">1.57</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2008</td><td class="px-4 py-3">1.355</td><td class="px-4 py-3">1.290</td><td class="px-4 py-3">1.425</td><td class="px-4 py-3">1.428</td><td class="px-4 py-3">-5.12</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2007</td><td class="px-4 py-3">1.797</td><td class="px-4 py-3">1.762</td><td class="px-4 py-3">1.823</td><td class="px-4 py-3">1.784</td><td class="px-4 py-3">0.71</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2006</td><td class="px-4 py-3">1.680</td><td class="px-4 py-3">1.660</td><td class="px-4 py-3">1.703</td><td class="px-4 py-3">1.669</td><td class="px-4 py-3">0.69</td></tr>
+                                        <tr><td class="px-4 py-3 font-medium text-slate-900">2005</td><td class="px-4 py-3">1.425</td><td class="px-4 py-3">1.405</td><td class="px-4 py-3">1.454</td><td class="px-4 py-3">1.381</td><td class="px-4 py-3">3.19</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="stock-history-panel-wheat" class="stock-history-panel hidden space-y-3">
+                            <h3 class="font-serif font-bold text-base text-slate-900">小麦</h3>
+                            <div class="overflow-x-auto">
+                                <table class="stock-history-table min-w-[820px] w-full text-sm font-sans text-slate-700">
+                                    <thead class="bg-slate-50">
+                                        <tr class="border-b border-slate-200">
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">年份</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">路透均值</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">区间低值</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">区间高值</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">USDA 3月1日</th>
+                                            <th class="px-4 py-3 text-left font-medium text-slate-500">偏差%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2026</td><td class="px-4 py-3">1.310</td><td class="px-4 py-3">1.289</td><td class="px-4 py-3">1.334</td><td class="px-4 py-3">待公布</td><td class="px-4 py-3">待公布</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2025</td><td class="px-4 py-3">1.215</td><td class="px-4 py-3">1.125</td><td class="px-4 py-3">1.252</td><td class="px-4 py-3">1.237</td><td class="px-4 py-3">-1.78</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2024</td><td class="px-4 py-3">1.044</td><td class="px-4 py-3">0.997</td><td class="px-4 py-3">1.080</td><td class="px-4 py-3">1.087</td><td class="px-4 py-3">-3.96</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2023</td><td class="px-4 py-3">0.934</td><td class="px-4 py-3">0.891</td><td class="px-4 py-3">1.020</td><td class="px-4 py-3">0.946</td><td class="px-4 py-3">-1.27</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2022</td><td class="px-4 py-3">1.045</td><td class="px-4 py-3">0.998</td><td class="px-4 py-3">1.302</td><td class="px-4 py-3">1.025</td><td class="px-4 py-3">1.95</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2021</td><td class="px-4 py-3">1.272</td><td class="px-4 py-3">1.227</td><td class="px-4 py-3">1.405</td><td class="px-4 py-3">1.314</td><td class="px-4 py-3">-3.20</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2020</td><td class="px-4 py-3">1.432</td><td class="px-4 py-3">1.385</td><td class="px-4 py-3">1.572</td><td class="px-4 py-3">1.412</td><td class="px-4 py-3">1.42</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2019</td><td class="px-4 py-3">1.555</td><td class="px-4 py-3">1.435</td><td class="px-4 py-3">1.617</td><td class="px-4 py-3">1.591</td><td class="px-4 py-3">-2.26</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2018</td><td class="px-4 py-3">1.498</td><td class="px-4 py-3">1.450</td><td class="px-4 py-3">1.640</td><td class="px-4 py-3">1.494</td><td class="px-4 py-3">0.27</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2017</td><td class="px-4 py-3">1.627</td><td class="px-4 py-3">1.450</td><td class="px-4 py-3">1.721</td><td class="px-4 py-3">1.655</td><td class="px-4 py-3">-1.69</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2016</td><td class="px-4 py-3">1.356</td><td class="px-4 py-3">1.325</td><td class="px-4 py-3">1.460</td><td class="px-4 py-3">1.372</td><td class="px-4 py-3">-1.17</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2015</td><td class="px-4 py-3">1.140</td><td class="px-4 py-3">1.083</td><td class="px-4 py-3">1.200</td><td class="px-4 py-3">1.124</td><td class="px-4 py-3">1.42</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2014</td><td class="px-4 py-3">1.042</td><td class="px-4 py-3">0.985</td><td class="px-4 py-3">1.115</td><td class="px-4 py-3">1.056</td><td class="px-4 py-3">-1.33</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2013</td><td class="px-4 py-3">1.177</td><td class="px-4 py-3">1.055</td><td class="px-4 py-3">1.238</td><td class="px-4 py-3">1.234</td><td class="px-4 py-3">-4.63</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2012</td><td class="px-4 py-3">1.223</td><td class="px-4 py-3">1.181</td><td class="px-4 py-3">1.251</td><td class="px-4 py-3">1.201</td><td class="px-4 py-3">1.86</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2011</td><td class="px-4 py-3">1.399</td><td class="px-4 py-3">1.275</td><td class="px-4 py-3">1.488</td><td class="px-4 py-3">1.425</td><td class="px-4 py-3">-1.79</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2010</td><td class="px-4 py-3">1.366</td><td class="px-4 py-3">1.332</td><td class="px-4 py-3">1.398</td><td class="px-4 py-3">1.352</td><td class="px-4 py-3">1.01</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2009</td><td class="px-4 py-3">1.062</td><td class="px-4 py-3">0.980</td><td class="px-4 py-3">1.113</td><td class="px-4 py-3">1.037</td><td class="px-4 py-3">2.45</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2008</td><td class="px-4 py-3">0.666</td><td class="px-4 py-3">0.647</td><td class="px-4 py-3">0.692</td><td class="px-4 py-3">0.710</td><td class="px-4 py-3">-6.15</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2007</td><td class="px-4 py-3">0.881</td><td class="px-4 py-3">0.857</td><td class="px-4 py-3">0.901</td><td class="px-4 py-3">0.856</td><td class="px-4 py-3">2.95</td></tr>
+                                        <tr class="border-b border-slate-200"><td class="px-4 py-3 font-medium text-slate-900">2006</td><td class="px-4 py-3">0.973</td><td class="px-4 py-3">0.961</td><td class="px-4 py-3">0.993</td><td class="px-4 py-3">0.972</td><td class="px-4 py-3">0.08</td></tr>
+                                        <tr><td class="px-4 py-3 font-medium text-slate-900">2005</td><td class="px-4 py-3">0.993</td><td class="px-4 py-3">0.973</td><td class="px-4 py-3">1.040</td><td class="px-4 py-3">0.981</td><td class="px-4 py-3">1.22</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+            </div>
+        </section>
+
+        <!-- 情景推演 / 机构前瞻 / 后续跟踪 -->
+        <section>
+            <div class="mb-6 border-b border-slate-200 pb-4">
+                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-serif font-bold text-ib-navy">情景推演</h2>
+                    </div>
+                    <div class="flex gap-2 overflow-x-auto pb-1">
+                        <button id="scenario-btn-scenario" type="button" onclick="switchScenarioPanel('scenario')" class="scenario-btn scenario-active px-3 py-1.5 text-sm font-sans border transition-colors">情景推演</button>
+                        <button id="scenario-btn-institution" type="button" onclick="switchScenarioPanel('institution')" class="scenario-btn scenario-inactive px-3 py-1.5 text-sm font-sans border transition-colors">机构观点</button>
+                        <button id="scenario-btn-followup" type="button" onclick="switchScenarioPanel('followup')" class="scenario-btn scenario-inactive px-3 py-1.5 text-sm font-sans border transition-colors">后续跟踪</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-slate-200 p-4 sm:p-6">
+                <div id="scenario-panel-scenario" class="scenario-panel space-y-6">
+                    <p class="text-sm font-sans text-slate-500">口径说明：本模块基于种植面积与库存数据的不同组合情形进行整理，用于帮助理解报告关注点，不对应任何价格方向或交易建议。</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">A</span>
+                                <h3 class="font-serif font-bold text-lg">玉米面积低于基线</h3>
+                            </div>
+                            <p class="text-sm font-sans text-slate-600 leading-relaxed">若玉米种植面积低于 9400 万英亩，且库存端未显示明显宽松，市场通常会提高对新作供给变化的关注。后续仍需结合天气、播种进度及 6 月最终报告继续观察。</p>
+                        </div>
+                        <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">B</span>
+                                <h3 class="font-serif font-bold text-lg">大豆面积高于基线</h3>
+                            </div>
+                            <p class="text-sm font-sans text-slate-600 leading-relaxed">若大豆种植面积明显高于 8500 万英亩，说明大豆扩种力度强于当前基线设想。后续需要结合季度库存报告、播种节奏以及 6 月最终报告，继续观察新作供给预期是否进一步强化。</p>
+                        </div>
+                        <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">C</span>
+                                <h3 class="font-serif font-bold text-lg">大豆面积低于基线</h3>
+                            </div>
+                            <p class="text-sm font-sans text-slate-600 leading-relaxed">若大豆种植面积低于 8500 万英亩，说明农户扩种意愿弱于官方基线。后续仍需结合库存、天气与播种进度继续观察，判断这种偏离是否会在后续报告中得到确认。</p>
+                        </div>
+                        <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">D</span>
+                                <h3 class="font-serif font-bold text-lg">面积与库存结合</h3>
+                            </div>
+                            <p class="text-sm font-sans text-slate-600 leading-relaxed">若种植面积与季度库存报告释放出不同信号，解读时需要把新作面积和旧作库存放在一起观察。后续还应继续跟踪播种进度、天气变化及 6 月最终报告。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="scenario-panel-institution" class="scenario-panel hidden space-y-4">
+                    <div class="space-y-4">
+                        <div class="border border-slate-200 p-4 sm:p-5">
+                            <div class="flex flex-wrap items-center gap-2 mb-3 text-xs font-sans text-slate-400">
+                                <span class="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-500">瑞达期货</span>
+                                <span>面积预期 / 天气风险</span>
+                            </div>
+                            <p class="text-sm font-sans text-slate-600 leading-relaxed">瑞达期货认为，3 月种植意向报告大概率会提升总体种植面积。机构强调，如果 2026/27 年度拉尼娜在春季温和发展，美国中西部偏温暖干燥的环境通常利于早播和大豆生长；若拉尼娜走强，则要警惕中西部干旱与南部三角洲过湿。结合当前盘面上美豆仍有盈利、玉米偏亏损、豆玉比处于高位，机构倾向于判断新年度大豆面积至少持稳，甚至有望增加。</p>
+                        </div>
+                        <div class="border border-slate-200 p-4 sm:p-5">
+                            <div class="flex flex-wrap items-center gap-2 mb-3 text-xs font-sans text-slate-400">
+                                <span class="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-500">银河期货</span>
+                                <span>路透均值 / 宏观扰动</span>
+                            </div>
+                            <p class="text-sm font-sans text-slate-600 leading-relaxed">银河期货提到，机构平均预计美国 2026 年大豆种植面积为 8554.9 万英亩，高于展望论坛给出的 8500 万英亩。与此同时，近期盘面受宏观与基本面交替影响，整体波动明显放大。机构判断，在基本面压力尚未完全消化的情况下，美豆与相关油粕品种更适合谨慎对待，短期更像宽幅震荡环境，而不是单边顺畅行情。</p>
+                        </div>
+                        <div class="border border-slate-200 p-4 sm:p-5">
+                            <div class="flex flex-wrap items-center gap-2 mb-3 text-xs font-sans text-slate-400">
+                                <span class="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-500">创元期货</span>
+                                <span>生柴政策 / 月底双事件</span>
+                            </div>
+                            <p class="text-sm font-sans text-slate-600 leading-relaxed">创元期货把重点放在月底两件事上：一是美国生物柴油政策终案，二是美豆种植意向报告。机构认为，油脂板块当前仍处高位震荡区间，生柴政策提供的支撑使其更容易受原油带动而波动放大；在此背景下，月底的政策落地与面积报告会共同决定油脂油粕板块接下来的交易重心。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="scenario-panel-followup" class="scenario-panel hidden">
+                    <div class="relative border-l border-slate-300 ml-3 space-y-8 py-2">
+                        <div class="relative pl-6">
+                            <div class="absolute w-2.5 h-2.5 bg-ib-navy rounded-full -left-[5px] top-1.5 ring-4 ring-white"></div>
+                            <h4 class="font-serif font-bold text-slate-900 mb-1">4月上旬</h4>
+                            <p class="text-sm font-sans text-slate-600 leading-relaxed">看市场是否把 3 月 31 日结果重新映射到新作平衡表，尤其是大豆单产还未进入天气交易前，面积权重会很高。</p>
+                        </div>
+                        <div class="relative pl-6">
+                            <div class="absolute w-2.5 h-2.5 bg-slate-400 rounded-full -left-[5px] top-1.5 ring-4 ring-white"></div>
+                            <h4 class="font-serif font-bold text-slate-900 mb-1">4月中下旬</h4>
+                            <p class="text-sm font-sans text-slate-600 leading-relaxed">播种进度和土壤墒情会逐步接管叙事。若玉米播种慢、豆类播种快，资金会进一步强化“豆进米退”。</p>
+                        </div>
+                        <div class="relative pl-6">
+                            <div class="absolute w-2.5 h-2.5 bg-slate-400 rounded-full -left-[5px] top-1.5 ring-4 ring-white"></div>
+                            <h4 class="font-serif font-bold text-slate-900 mb-1">6月种植面积报告</h4>
+                            <p class="text-sm font-sans text-slate-600 leading-relaxed">这是对 3 月意向的第一次官方复核。若两次数字偏差大，6 月通常会成为第二次重定价窗口。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section>
@@ -328,122 +966,77 @@
                 <h2 class="text-xl sm:text-2xl font-serif font-bold text-ib-navy">热点资讯追踪</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <a href="https://esmis.nal.usda.gov/publication/prospective-plantings" target="_blank" rel="noopener noreferrer" class="group border border-slate-200 bg-white p-4 sm:p-5 hover:border-ib-navy hover:shadow-sm transition-all">
-                    <div class="flex flex-wrap items-center gap-2 text-xs font-sans text-slate-400 mb-3">
-                        <span class="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-500">官方发布</span>
-                        <span>2026-03-31 12:00 ET</span>
-                    </div>
-                    <h3 class="font-serif font-bold text-lg text-slate-900 leading-snug mb-3 group-hover:text-ib-navy transition-colors">美农3月种植意向报告将于3月31日发布，可直接追踪官方原始文件</h3>
-                    <p class="text-sm font-sans text-slate-600 leading-relaxed">美国农业部发布页已列出 2026 年 Prospective Plantings 的发布时间和历史下载入口，适合在报告前后第一时间核对原文、PDF 与往年版本。</p>
-                    <div class="mt-4 flex items-center justify-between text-sm font-sans">
-                        <span class="text-slate-400">来源：美国农业部 / NASS</span>
-                        <span class="text-ib-navy font-medium">查看原文</span>
-                    </div>
-                </a>
-
-                <a href="https://www.agrinews-pubs.com/business/2026/03/08/swing-to-more-soybeans-in-usda-crop-forecast/" target="_blank" rel="noopener noreferrer" class="group border border-slate-200 bg-white p-4 sm:p-5 hover:border-ib-navy hover:shadow-sm transition-all">
-                    <div class="flex flex-wrap items-center gap-2 text-xs font-sans text-slate-400 mb-3">
-                        <span class="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-500">前瞻信号</span>
-                        <span>2026-03-08</span>
-                    </div>
-                    <h3 class="font-serif font-bold text-lg text-slate-900 leading-snug mb-3 group-hover:text-ib-navy transition-colors">农业展望论坛释放“豆增米减”线索，3月31日报告是关键验证点</h3>
-                    <p class="text-sm font-sans text-slate-600 leading-relaxed">AgriNews 援引美国农业部论坛观点，指出新作年度可能出现更多大豆、相对更少玉米的面积切换，且 5 月 WASDE 会纳入 3 月 31 日调查口径。</p>
-                    <div class="mt-4 flex items-center justify-between text-sm font-sans">
-                        <span class="text-slate-400">来源：AgriNews</span>
-                        <span class="text-ib-navy font-medium">查看原文</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <a href="https://qihuo.jin10.com/flashDetail.html?id=20260326102948361800" target="_blank" rel="noopener noreferrer" class="group border border-slate-200 bg-white hover:border-ib-navy hover:shadow-sm transition-all overflow-hidden">
+                    <div class="p-4 sm:p-5">
+                        <div class="flex flex-wrap items-center gap-2 text-xs font-sans text-slate-400 mb-3">
+                            <span class="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-500">Pro快讯</span>
+                            <span>期货Pro视角</span>
+                        </div>
+                        <h3 class="font-serif font-bold text-lg text-slate-900 leading-snug mb-3 group-hover:text-ib-navy transition-colors">【期货Pro视角】USDA种植意向报告前瞻：玉米、大豆种植预期调整与基金持仓共振</h3>
+                        <p class="text-sm font-sans text-slate-600 leading-relaxed">聚焦月底 USDA 种植意向报告前的关键交易线索，把玉米与大豆种植预期变化、基金持仓结构和盘面共振放在一起看。</p>
+                        <div class="mt-4 flex items-center justify-between text-sm font-sans">
+                            <span class="text-slate-400">来源：金十期货 Pro快讯</span>
+                            <span class="text-ib-navy font-medium">查看原文</span>
+                        </div>
                     </div>
                 </a>
 
-                <a href="https://www.fcsamerica.com/resources/learning-center/planting-decisions-2026-27-grain-outlook" target="_blank" rel="noopener noreferrer" class="group border border-slate-200 bg-white p-4 sm:p-5 hover:border-ib-navy hover:shadow-sm transition-all">
-                    <div class="flex flex-wrap items-center gap-2 text-xs font-sans text-slate-400 mb-3">
-                        <span class="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-500">利润视角</span>
-                        <span>2026-02-11</span>
-                    </div>
-                    <h3 class="font-serif font-bold text-lg text-slate-900 leading-snug mb-3 group-hover:text-ib-navy transition-colors">紧利润背景下的2026/27种植决策：更多库存、更弱价格、更重比较逻辑</h3>
-                    <p class="text-sm font-sans text-slate-600 leading-relaxed">FCSAmerica 的早期展望提到，农户在 2026 年仍面临紧利润环境，玉米和大豆都要同时面对高库存、需求分化和价格承压，这与页面里的利润模型很适合作联动阅读。</p>
-                    <div class="mt-4 flex items-center justify-between text-sm font-sans">
-                        <span class="text-slate-400">来源：FCSAmerica / Terrain</span>
-                        <span class="text-ib-navy font-medium">查看原文</span>
-                    </div>
-                </a>
-
-                <a href="https://roachag.com/march-2026-usda-supply-demand-report/" target="_blank" rel="noopener noreferrer" class="group border border-slate-200 bg-white p-4 sm:p-5 hover:border-ib-navy hover:shadow-sm transition-all">
-                    <div class="flex flex-wrap items-center gap-2 text-xs font-sans text-slate-400 mb-3">
-                        <span class="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-500">交易焦点</span>
-                        <span>2026-03-10</span>
-                    </div>
-                    <h3 class="font-serif font-bold text-lg text-slate-900 leading-snug mb-3 group-hover:text-ib-navy transition-colors">3月 WASDE 偏平淡，市场关注点重新切回月底种植意向与库存双报告</h3>
-                    <p class="text-sm font-sans text-slate-600 leading-relaxed">Roach Ag 认为 3 月 WASDE 整体偏“睡眠式”更新，真正更可能带来重新定价的是 3 月 31 日的 Prospective Plantings 与 Grain Stocks，这适合做报告前的情绪跟踪入口。</p>
-                    <div class="mt-4 flex items-center justify-between text-sm font-sans">
-                        <span class="text-slate-400">来源：Roach Ag</span>
-                        <span class="text-ib-navy font-medium">查看原文</span>
+                <a href="https://qihuo.jin10.com/articleDetail.html?id=214601&comments=all" target="_blank" rel="noopener noreferrer" class="group border border-slate-200 bg-white hover:border-ib-navy hover:shadow-sm transition-all overflow-hidden">
+                    <div class="p-4 sm:p-5">
+                        <div class="flex flex-wrap items-center gap-2 text-xs font-sans text-slate-400 mb-3">
+                            <span class="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-500">文章</span>
+                            <span>种植面积前瞻</span>
+                        </div>
+                        <h3 class="font-serif font-bold text-lg text-slate-900 leading-snug mb-3 group-hover:text-ib-navy transition-colors">【USDA种植意向报告前瞻】预计今年美豆种植面积增加，玉米种植面积减少</h3>
+                        <p class="text-sm font-sans text-slate-600 leading-relaxed">围绕报告前主流预期展开，重点落在“美豆增加、玉米减少”的面积切换逻辑。</p>
+                        <div class="mt-4 flex items-center justify-between text-sm font-sans">
+                            <span class="text-slate-400">来源：金十期货文章</span>
+                            <span class="text-ib-navy font-medium">查看原文</span>
+                        </div>
                     </div>
                 </a>
             </div>
-        </section>
 
-        <!-- 情形观察与后续跟踪 -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-10">
-            <div class="lg:col-span-2">
-                <h2 class="text-xl sm:text-2xl font-serif font-bold text-ib-navy mb-6 border-b border-slate-200 pb-4">情形观察</h2>
-                <p class="text-sm font-sans text-slate-500 mb-6">口径说明：本模块基于种植面积与库存数据的不同组合情形进行整理，用于帮助理解报告关注点，不对应任何价格方向或交易建议。</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">A</span>
-                            <h3 class="font-serif font-bold text-lg">玉米面积低于基线</h3>
-                        </div>
-                        <p class="text-sm font-sans text-slate-600 leading-relaxed">若玉米种植面积低于 9400 万英亩，且库存端未显示明显宽松，市场通常会提高对新作供给变化的关注。后续仍需结合天气、播种进度及 6 月最终报告继续观察。</p>
-                    </div>
-                    
-                    <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">B</span>
-                            <h3 class="font-serif font-bold text-lg">大豆面积高于基线</h3>
-                        </div>
-                        <p class="text-sm font-sans text-slate-600 leading-relaxed">若大豆种植面积明显高于 8500 万英亩，说明大豆扩种力度强于当前基线设想。后续需要结合季度库存报告、播种节奏以及 6 月最终报告，继续观察新作供给预期是否进一步强化。</p>
-                    </div>
+            <details class="compact-disclosure mt-4 border border-slate-200 overflow-hidden">
+                <summary class="flex items-center justify-between gap-4 px-4 py-3 bg-slate-50 cursor-pointer text-sm font-sans text-slate-700">
+                    <span class="font-medium text-slate-900">查看更多资讯</span>
+                    <span class="text-xs text-slate-400">其余 2 篇</span>
+                </summary>
+                <div class="border-t border-slate-200 p-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <a href="https://qihuo.jin10.com/articleDetail.html?id=1114068&comments=all" target="_blank" rel="noopener noreferrer" class="group border border-slate-200 bg-white hover:border-ib-navy hover:shadow-sm transition-all overflow-hidden">
+                            <div class="p-4 sm:p-5">
+                                <div class="flex flex-wrap items-center gap-2 text-xs font-sans text-slate-400 mb-3">
+                                    <span class="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-500">文章</span>
+                                    <span>库存前瞻</span>
+                                </div>
+                                <h3 class="font-serif font-bold text-lg text-slate-900 leading-snug mb-3 group-hover:text-ib-navy transition-colors">4月1日双报告来袭！美豆库存或冲向六年最高，关注实际数据将如何变动？</h3>
+                                <p class="text-sm font-sans text-slate-600 leading-relaxed">把市场焦点从面积延伸到库存端，强调旧作库存与新作面积会如何共同影响盘面定价。</p>
+                                <div class="mt-4 flex items-center justify-between text-sm font-sans">
+                                    <span class="text-slate-400">来源：金十期货文章</span>
+                                    <span class="text-ib-navy font-medium">查看原文</span>
+                                </div>
+                            </div>
+                        </a>
 
-                    <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">C</span>
-                            <h3 class="font-serif font-bold text-lg">大豆面积低于基线</h3>
-                        </div>
-                        <p class="text-sm font-sans text-slate-600 leading-relaxed">若大豆种植面积低于 8500 万英亩，说明农户扩种意愿弱于官方基线。后续仍需结合库存、天气与播种进度继续观察，判断这种偏离是否会在后续报告中得到确认。</p>
-                    </div>
-
-                    <div class="border border-slate-200 p-4 sm:p-5 hover:border-ib-navy transition-colors">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="w-8 h-8 flex items-center justify-center bg-ib-navy text-white font-bold font-sans text-sm">D</span>
-                            <h3 class="font-serif font-bold text-lg">面积与库存结合</h3>
-                        </div>
-                        <p class="text-sm font-sans text-slate-600 leading-relaxed">若种植面积与季度库存报告释放出不同信号，解读时需要把新作面积和旧作库存放在一起观察。后续还应继续跟踪播种进度、天气变化及 6 月最终报告。</p>
+                        <a href="https://qihuo.jin10.com/articleDetail.html?id=1114018&comments=all" target="_blank" rel="noopener noreferrer" class="group border border-slate-200 bg-white hover:border-ib-navy hover:shadow-sm transition-all overflow-hidden">
+                            <div class="p-4 sm:p-5">
+                                <div class="flex flex-wrap items-center gap-2 text-xs font-sans text-slate-400 mb-3">
+                                    <span class="px-2 py-1 border border-slate-200 bg-slate-50 text-slate-500">文章</span>
+                                    <span>成本与价格</span>
+                                </div>
+                                <h3 class="font-serif font-bold text-lg text-slate-900 leading-snug mb-3 group-hover:text-ib-navy transition-colors">CBOT大豆期货小幅上涨，种植成本飙升，谷物价格要“变天”？</h3>
+                                <p class="text-sm font-sans text-slate-600 leading-relaxed">从价格与成本两端切入，补充“为什么面积预期变化会牵动盘面”的交易背景。</p>
+                                <div class="mt-4 flex items-center justify-between text-sm font-sans">
+                                    <span class="text-slate-400">来源：金十期货文章</span>
+                                    <span class="text-ib-navy font-medium">查看原文</span>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
-            </div>
-
-            <div>
-                <h2 class="text-xl sm:text-2xl font-serif font-bold text-ib-navy mb-6 border-b border-slate-200 pb-4">后续跟踪</h2>
-                <div class="relative border-l border-slate-300 ml-3 space-y-8 py-2">
-                    <div class="relative pl-6">
-                        <div class="absolute w-2.5 h-2.5 bg-ib-navy rounded-full -left-[5px] top-1.5 ring-4 ring-white"></div>
-                        <h4 class="font-serif font-bold text-slate-900 mb-1">4月上旬</h4>
-                        <p class="text-sm font-sans text-slate-600 leading-relaxed">看市场是否把 3 月 31 日结果重新映射到新作平衡表，尤其是大豆单产还未进入天气交易前，面积权重会很高。</p>
-                    </div>
-                    <div class="relative pl-6">
-                        <div class="absolute w-2.5 h-2.5 bg-slate-400 rounded-full -left-[5px] top-1.5 ring-4 ring-white"></div>
-                        <h4 class="font-serif font-bold text-slate-900 mb-1">4月中下旬</h4>
-                        <p class="text-sm font-sans text-slate-600 leading-relaxed">播种进度和土壤墒情会逐步接管叙事。若玉米播种慢、豆类播种快，资金会进一步强化“豆进米退”。</p>
-                    </div>
-                    <div class="relative pl-6">
-                        <div class="absolute w-2.5 h-2.5 bg-slate-400 rounded-full -left-[5px] top-1.5 ring-4 ring-white"></div>
-                        <h4 class="font-serif font-bold text-slate-900 mb-1">6月种植面积报告</h4>
-                        <p class="text-sm font-sans text-slate-600 leading-relaxed">这是对 3 月意向的第一次官方复核。若两次数字偏差大，6 月通常会成为第二次重定价窗口。</p>
-                    </div>
-                </div>
-            </div>
+            </details>
         </section>
 
         <!-- 免责声明 -->
@@ -451,7 +1044,7 @@
             <div class="flex items-start gap-3 text-sm font-sans text-slate-500">
                 <svg class="shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div class="space-y-2">
-                    <p><strong>资料来源：</strong>本页主要依据美国农业部、美国农业统计部门、美国联邦作物保险相关公开资料整理，相关发布时间、面积基线、库存数据及比价参考均以官方口径为准。</p>
+                    <p><strong>资料来源：</strong>本页主要依据美国农业部、美国农业统计部门、美国联邦作物保险相关公开资料及路透调查统计整理，相关发布时间、面积基线、库存数据及比价参考均以官方口径为准。</p>
                     <p><strong>免责声明：</strong>页内关于市场关注点和情形推演的内容，系基于公开数据的整理与归纳，仅供信息参考，不构成任何投资建议或交易依据。</p>
                 </div>
             </div>
@@ -520,19 +1113,25 @@
                 label: "玉米",
                 forum: [92.0, 92.0, 91.0, 91.0, 94.0, 94.0].map(millionToWanAcres),
                 prospective: [91.1, 89.5, 92.0, 90.0, 95.3, null].map(millionToWanAcres),
-                acreage: [92.7, 89.9, 94.1, 91.5, 95.2, null].map(millionToWanAcres)
+                acreage: [92.7, 89.9, 94.1, 91.5, 95.2, null].map(millionToWanAcres),
+                reuters: [93.208, 92.001, 90.880, 91.776, 94.361, 94.371].map(millionToWanAcres),
+                dowJones: [null, null, null, null, null, 94.481].map(millionToWanAcres)
             },
             soybeans: {
                 label: "大豆",
                 forum: [90.0, 88.0, 87.5, 87.5, 84.0, 85.0].map(millionToWanAcres),
                 prospective: [87.6, 91.0, 87.5, 86.5, 83.5, null].map(millionToWanAcres),
-                acreage: [87.6, 88.3, 83.5, 86.1, 83.4, null].map(millionToWanAcres)
+                acreage: [87.6, 88.3, 83.5, 86.1, 83.4, null].map(millionToWanAcres),
+                reuters: [89.996, 88.727, 88.242, 86.530, 83.762, 85.549].map(millionToWanAcres),
+                dowJones: [null, null, null, null, null, 85.463].map(millionToWanAcres)
             },
             wheat: {
                 label: "小麦",
                 forum: [45.0, 48.0, 49.5, 47.0, 47.0, 45.0].map(millionToWanAcres),
                 prospective: [46.4, 47.4, 49.9, 47.5, 45.4, null].map(millionToWanAcres),
-                acreage: [46.7, 47.1, 49.6, 47.2, 45.5, null].map(millionToWanAcres)
+                acreage: [46.7, 47.1, 49.6, 47.2, 45.5, null].map(millionToWanAcres),
+                reuters: [44.971, 47.771, 48.852, 47.330, 46.475, 44.786].map(millionToWanAcres),
+                dowJones: [null, null, null, null, null, 44.605].map(millionToWanAcres)
             }
         };
 
@@ -600,6 +1199,7 @@
         };
 
         let activeCrop = 'corn';
+        let activeSurveyPanel = 'reuters';
         let acreageChart, shareChart, ratioChart, profitChart;
 
         const releaseTime = new Date("2026-03-31T16:00:00Z").getTime(); // 北京时间 4月1日 00:00
@@ -781,41 +1381,170 @@
             renderAcreageChart();
         }
 
+        function switchSurveyPanel(panelId) {
+            activeSurveyPanel = panelId;
+            document.querySelectorAll('.survey-panel').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`survey-panel-${panelId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.survey-btn').forEach(el => {
+                el.classList.remove('survey-active');
+                el.classList.add('survey-inactive');
+            });
+            document.getElementById(`survey-btn-${panelId}`).classList.remove('survey-inactive');
+            document.getElementById(`survey-btn-${panelId}`).classList.add('survey-active');
+        }
+
+        function switchStockHistoryPanel(panelId) {
+            document.querySelectorAll('.stock-history-panel').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`stock-history-panel-${panelId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.stock-history-btn').forEach(el => {
+                el.classList.remove('stock-active');
+                el.classList.add('stock-inactive');
+            });
+            document.getElementById(`stock-history-btn-${panelId}`).classList.remove('stock-inactive');
+            document.getElementById(`stock-history-btn-${panelId}`).classList.add('stock-active');
+        }
+
+        function switchReutersHistoryPanel(panelId) {
+            document.querySelectorAll('.reuters-history-panel').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`reuters-history-panel-${panelId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.reuters-history-btn').forEach(el => {
+                el.classList.remove('reuters-history-active');
+                el.classList.add('reuters-history-inactive');
+            });
+            document.getElementById(`reuters-history-btn-${panelId}`).classList.remove('reuters-history-inactive');
+            document.getElementById(`reuters-history-btn-${panelId}`).classList.add('reuters-history-active');
+        }
+
+        function switchScenarioPanel(panelId) {
+            document.querySelectorAll('.scenario-panel').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`scenario-panel-${panelId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.scenario-btn').forEach(el => {
+                el.classList.remove('scenario-active');
+                el.classList.add('scenario-inactive');
+            });
+            document.getElementById(`scenario-btn-${panelId}`).classList.remove('scenario-inactive');
+            document.getElementById(`scenario-btn-${panelId}`).classList.add('scenario-active');
+        }
+
+        function switchBoardPanel(panelId) {
+            document.querySelectorAll('.board-panel').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`board-panel-${panelId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.board-btn').forEach(el => {
+                el.classList.remove('board-active');
+                el.classList.add('board-inactive');
+            });
+            document.getElementById(`board-btn-${panelId}`).classList.remove('board-inactive');
+            document.getElementById(`board-btn-${panelId}`).classList.add('board-active');
+        }
+
+        function convertSurveyTablesToWanAcres() {
+            document.querySelectorAll('.survey-dowjones-detail-table').forEach(table => {
+                if (table.dataset.converted === 'true') return;
+
+                table.querySelectorAll('tbody tr').forEach(row => {
+                    Array.from(row.cells).forEach((cell, index) => {
+                        if (index === 0) return;
+                        const text = cell.textContent.trim();
+                        if (!text || text === '-') return;
+                        const value = Number(text);
+                        if (!Number.isFinite(value)) return;
+                        cell.textContent = (value * 100).toFixed(1);
+                    });
+                });
+
+                table.dataset.converted = 'true';
+            });
+        }
+
+        function convertReutersHistoryTablesToWanAcres() {
+            document.querySelectorAll('.reuters-history-table').forEach(table => {
+                if (table.dataset.converted === 'true') return;
+
+                table.querySelectorAll('tbody tr').forEach(row => {
+                    Array.from(row.cells).forEach((cell, index) => {
+                        if (index === 0) return;
+                        const text = cell.textContent.trim();
+                        if (!text || text === '待公布') return;
+                        const value = Number(text);
+                        if (!Number.isFinite(value)) return;
+                        cell.textContent = (value * 100).toFixed(1);
+                    });
+                });
+
+                table.dataset.converted = 'true';
+            });
+        }
+
+        function convertStockTablesToYiBushels() {
+            document.querySelectorAll('.stock-history-table').forEach(table => {
+                if (table.dataset.converted === 'true') return;
+
+                table.querySelectorAll('tbody tr').forEach(row => {
+                    Array.from(row.cells).forEach((cell, index) => {
+                        if (index === 0 || index === row.cells.length - 1) return;
+                        const text = cell.textContent.trim();
+                        if (!text || text === '待公布') return;
+                        const value = Number(text);
+                        if (!Number.isFinite(value)) return;
+                        cell.textContent = (value * 10).toFixed(2);
+                    });
+                });
+
+                table.dataset.converted = 'true';
+            });
+        }
+
         function renderAcreageChart() {
             const crop = acreageSeries[activeCrop];
+            const seriesConfigs = [
+                { name: "2月展望论坛", data: crop.forum, color: IB_NAVY },
+                { name: "3月种植意向报告", data: crop.prospective, color: IB_RED },
+                { name: "6月种植面积报告", data: crop.acreage, color: IB_GRAY },
+                { name: "路透3月种植意向调查", data: crop.reuters, color: '#c9972f' },
+                { name: "道琼斯3月种植意向调查", data: crop.dowJones, color: '#14532d' }
+            ].filter(item => item.data.some(value => value != null));
+
             const option = {
                 animationDuration: 700,
-                color: [IB_NAVY, IB_RED, IB_GRAY],
-                grid: { left: 50, right: 20, top: 40, bottom: 30 },
+                color: seriesConfigs.map(item => item.color),
+                grid: { left: 50, right: 20, top: 40, bottom: 40 },
                 tooltip: {
                     trigger: "axis",
+                    axisPointer: { type: "shadow" },
                     backgroundColor: "#FFFFFF",
                     borderColor: "#e5e7eb",
                     textStyle: { color: "#111827", fontFamily: 'Noto Sans SC' },
                     formatter: function(params) {
-                        const lines = [`<div style="font-weight:700;margin-bottom:6px;font-family:'Noto Serif SC'">${params[0].axisValue}年 ${crop.label}</div>`];
-                        params.forEach(item => {
-                            const val = item.data == null ? "待公布" : item.data.toLocaleString("zh-CN") + " 万英亩";
+                        const validItems = params.filter(item => item.data != null);
+                        if (!validItems.length) {
+                            return "";
+                        }
+
+                        const lines = [`<div style="font-weight:700;margin-bottom:6px;font-family:'Noto Serif SC'">${validItems[0].axisValue}年 ${crop.label}</div>`];
+                        validItems.forEach(item => {
+                            const val = item.data.toLocaleString("zh-CN") + " 万英亩";
                             lines.push(`<div style="margin:4px 0;">${item.marker}${item.seriesName}：${val}</div>`);
                         });
-                        if (params[0].axisValue === "2026") {
-                            lines.push(`<div style="margin-top:6px;color:#6b7280;font-size:12px;">截至 2026-03-25，2026 年仅论坛值已公布</div>`);
-                        }
                         return lines.join("");
                     }
                 },
                 legend: {
                     top: 0,
                     itemWidth: 16,
-                    itemHeight: 2,
+                    itemHeight: 10,
                     icon: 'rect',
                     textStyle: { color: "#374151", fontFamily: 'Noto Sans SC' },
-                    data: ["展望论坛", "种植意向报告", "种植面积报告"]
+                    data: seriesConfigs.map(item => item.name)
                 },
                 xAxis: {
                     type: "category",
                     data: acreageYears,
-                    boundaryGap: false,
+                    boundaryGap: true,
                     axisLine: { lineStyle: { color: "#9ca3af" } },
                     axisLabel: { color: "#374151", fontFamily: 'Noto Sans SC' }
                 },
@@ -830,46 +1559,14 @@
                     },
                     splitLine: { lineStyle: { color: "#f3f4f6" } }
                 },
-                series: [
-                    {
-                        name: "展望论坛",
-                        type: "line",
-                        symbol: "circle",
-                        symbolSize: 6,
-                        data: crop.forum,
-                        lineStyle: { width: 2 },
-                    },
-                    {
-                        name: "种植意向报告",
-                        type: "line",
-                        symbol: "square",
-                        symbolSize: 6,
-                        data: crop.prospective,
-                        connectNulls: false,
-                        lineStyle: { width: 2, type: "dashed" },
-                    },
-                    {
-                        name: "种植面积报告",
-                        type: "line",
-                        symbol: "triangle",
-                        symbolSize: 8,
-                        data: crop.acreage,
-                        connectNulls: false,
-                        lineStyle: { width: 2 },
-                        markPoint: {
-                            symbol: 'rect',
-                            symbolSize: [50, 24],
-                            label: {
-                                color: "#FFFFFF",
-                                fontSize: 10,
-                                formatter: "待公布",
-                                fontFamily: 'Noto Sans SC'
-                            },
-                            itemStyle: { color: IB_GRAY },
-                            data: crop.acreage[5] == null ? [{ coord: ["2026", crop.forum[5]], value: "待公布" }] : []
-                        }
-                    }
-                ]
+                series: seriesConfigs.map(item => ({
+                    name: item.name,
+                    type: "bar",
+                    data: item.data,
+                    barMaxWidth: 18,
+                    itemStyle: { color: item.color },
+                    emphasis: { focus: 'series' }
+                }))
             };
             acreageChart.setOption(option, true);
         }
@@ -1086,6 +1783,9 @@
             renderShareChart();
             renderRatioChart();
             renderProfitChart();
+            convertSurveyTablesToWanAcres();
+            convertReutersHistoryTablesToWanAcres();
+            convertStockTablesToYiBushels();
             initAppEnvironment();
             bindExternalLinks();
 
