@@ -457,7 +457,6 @@
 
                         <div id="survey-panel-reuters" class="survey-panel">
                             <div class="flex items-center justify-between gap-2 px-4 py-3 border-b border-slate-200">
-                                <h4 class="font-serif font-bold text-sm sm:text-base text-slate-900">2026年路透3月种植意向调查速览</h4>
                                 <span class="text-xs font-sans text-slate-500">单位：万英亩</span>
                             </div>
                             <div class="overflow-x-auto">
@@ -635,8 +634,7 @@
                         <div id="survey-panel-dowjones" class="survey-panel hidden">
                             <div class="px-4 py-3 border-b border-slate-200">
                                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                    <h4 class="font-serif font-bold text-sm sm:text-base text-slate-900">道琼斯3月种植意向调查总览</h4>
-                                    <span class="text-xs font-sans text-slate-500">单位：万英亩 | 发布时间：2026-03-27 01:23</span>
+                                    <span class="text-xs font-sans text-slate-500">单位：万英亩</span>
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 lg:grid-cols-3 gap-px bg-slate-200">
@@ -728,7 +726,6 @@
                     <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-sm font-sans text-slate-600 mb-2">
                         <span class="flex items-center gap-1.5"><div class="w-3 h-3 bg-ib-navy"></div> 玉米占比</span>
                         <span class="flex items-center gap-1.5"><div class="w-3 h-3 bg-slate-400"></div> 大豆占比</span>
-                        <span class="text-xs text-slate-400 w-full sm:w-auto sm:ml-auto border border-slate-200 px-2 py-1">只看玉米和大豆之间的面积分配</span>
                     </div>
                     <div id="share-chart" class="chart-container"></div>
                     <div class="bg-slate-50 p-4 border-l-4 border-ib-navy text-sm font-sans text-slate-700 leading-relaxed">
@@ -1132,7 +1129,7 @@
                 <svg class="shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div class="space-y-2">
                     <p><strong>资料来源：</strong>本页主要依据美国农业部、美国农业统计部门、美国联邦作物保险相关公开资料及路透调查统计整理，相关发布时间、面积基线、库存数据及比价参考均以官方口径为准。</p>
-                    <p><strong>免责声明：</strong>页内关于市场关注点和情形推演的内容，系基于公开数据的整理与归纳，仅供信息参考，不构成任何投资建议或交易依据。</p>
+                    <p><strong>免责声明：</strong>页内关于市场关注点和情形推演的内容，系AI基于公开数据的整理与归纳，仅供信息参考，不构成任何投资建议或交易依据。</p>
                 </div>
             </div>
         </section>
@@ -1604,7 +1601,7 @@
             const option = {
                 animationDuration: 700,
                 color: seriesConfigs.map(item => item.color),
-                grid: compactMobile ? { left: 46, right: 10, top: 76, bottom: 24 } : { left: 56, right: 24, top: 52, bottom: 28 },
+                grid: compactMobile ? { left: 42, right: 10, top: 78, bottom: 34 } : { left: 50, right: 20, top: 40, bottom: 40 },
                 tooltip: {
                     trigger: "axis",
                     axisPointer: { type: "shadow" },
@@ -1628,24 +1625,28 @@
                 legend: {
                     type: compactMobile ? 'scroll' : 'plain',
                     top: 0,
-                    left: compactMobile ? 10 : 'center',
-                    right: compactMobile ? 10 : 'auto',
-                    width: compactMobile ? '94%' : 'auto',
+                    left: compactMobile ? 24 : 'center',
+                    right: compactMobile ? 8 : 'auto',
                     itemWidth: compactMobile ? 10 : 16,
                     itemHeight: compactMobile ? 8 : 10,
                     itemGap: compactMobile ? 8 : 12,
                     icon: 'rect',
-                    pageButtonPosition: 'end',
                     pageIconSize: compactMobile ? 10 : 12,
                     pageTextStyle: { color: compactMobile ? "#9ca3af" : "#6b7280", fontFamily: 'Noto Sans SC', fontSize: compactMobile ? 10 : 12 },
                     textStyle: { color: "#374151", fontFamily: 'Noto Sans SC', fontSize: compactMobile ? 11 : 12, lineHeight: compactMobile ? 13 : 18 },
                     data: seriesConfigs.map(item => item.name)
                 },
                 xAxis: {
+                    type: "category",
+                    data: acreageYears,
+                    boundaryGap: true,
+                    axisLine: { lineStyle: { color: "#9ca3af" } },
+                    axisLabel: { color: "#374151", fontFamily: 'Noto Sans SC', fontSize: compactMobile ? 11 : 12 }
+                },
+                yAxis: {
                     type: "value",
                     name: "万英亩",
                     nameTextStyle: { color: "#6b7280", padding: [0, 0, 0, 0], fontFamily: 'Noto Sans SC', fontSize: compactMobile ? 10 : 12 },
-                    axisLine: { lineStyle: { color: "#9ca3af" } },
                     axisLabel: {
                         color: "#374151",
                         fontFamily: 'Noto Sans SC',
@@ -1654,23 +1655,11 @@
                     },
                     splitLine: { lineStyle: { color: "#f3f4f6" } }
                 },
-                yAxis: {
-                    type: "category",
-                    data: acreageYears,
-                    axisLine: { lineStyle: { color: "#9ca3af" } },
-                    axisTick: { show: false },
-                    axisLabel: {
-                        color: "#374151",
-                        fontFamily: 'Noto Sans SC',
-                        fontSize: compactMobile ? 11 : 12,
-                        margin: compactMobile ? 10 : 12
-                    }
-                },
                 series: seriesConfigs.map(item => ({
                     name: item.name,
                     type: "bar",
                     data: item.data,
-                    barMaxWidth: compactMobile ? 12 : 14,
+                    barMaxWidth: compactMobile ? 14 : 18,
                     itemStyle: { color: item.color },
                     emphasis: { focus: 'series' }
                 }))
