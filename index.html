@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1059,7 +1060,7 @@
         <div class="board-head">
           <div class="section-head" style="margin-bottom:0;">
             <h3 class="section-title">州级监控</h3>
-            <div class="section-note">温度偏离 / 降水偏离 / 未来7天雨量</div>
+            <div class="section-note">较常年偏暖偏冷 / 偏湿偏干 / 未来7天雨量</div>
           </div>
         </div>
         <div class="board-list" id="boardList"></div>
@@ -1325,6 +1326,10 @@
       return (f - 32) * 5 / 9;
     }
 
+    function toMetricTempDelta(deltaF) {
+      return deltaF * 5 / 9;
+    }
+
     function toMetricRain(inch) {
       return inch * 25.4;
     }
@@ -1361,7 +1366,7 @@
 
     function displaySignedTemp(valueF, digits = 1) {
       if (valueF === null || Number.isNaN(valueF)) return "--";
-      const value = APP.unit === "metric" ? toMetricTemp(valueF) : valueF;
+      const value = APP.unit === "metric" ? toMetricTempDelta(valueF) : valueF;
       return `${fmtSigned(value, digits)}${tempUnitLabel()}`;
     }
 
@@ -1369,6 +1374,28 @@
       if (valueIn === null || Number.isNaN(valueIn)) return "--";
       const value = APP.unit === "metric" ? toMetricRain(valueIn) : valueIn;
       return `${fmtSigned(value, digits)}${rainUnitLabel()}`;
+    }
+
+    function displayDeltaTemp(valueF, digits = 1) {
+      if (valueF === null || Number.isNaN(valueF)) return "--";
+      const value = APP.unit === "metric" ? toMetricTempDelta(Math.abs(valueF)) : Math.abs(valueF);
+      return `${fmtNumber(value, digits)}${tempUnitLabel()}`;
+    }
+
+    function displayDeltaRain(valueIn, digits = 1) {
+      if (valueIn === null || Number.isNaN(valueIn)) return "--";
+      const value = APP.unit === "metric" ? toMetricRain(Math.abs(valueIn)) : Math.abs(valueIn);
+      return `${fmtNumber(value, digits)}${rainUnitLabel()}`;
+    }
+
+    function tempBiasText(valueF, digits = 1) {
+      if (valueF === null || Number.isNaN(valueF)) return "--";
+      return `${valueF >= 0 ? "偏暖" : "偏冷"} ${displayDeltaTemp(valueF, digits)}`;
+    }
+
+    function rainBiasText(valueIn, digits = 1) {
+      if (valueIn === null || Number.isNaN(valueIn)) return "--";
+      return `${valueIn >= 0 ? "偏湿" : "偏干"} ${displayDeltaRain(valueIn, digits)}`;
     }
 
     function getSeason(now = new Date()) {
@@ -1593,8 +1620,8 @@
         lead = "整体偏暖偏干，播前窗口改善。";
       }
       const tags = [
-        { text: `温度 ${displaySignedTemp(belt.avgTempAnomF, 1)}`, tone: belt.avgTempAnomF >= 0 ? "amber" : "blue" },
-        { text: `降水 ${displaySignedRain(belt.avgRainAnomIn, 1)}`, tone: belt.avgRainAnomIn >= 0 ? "blue" : "green" },
+        { text: `温度 ${tempBiasText(belt.avgTempAnomF, 1)}`, tone: belt.avgTempAnomF >= 0 ? "amber" : "blue" },
+        { text: `降水 ${rainBiasText(belt.avgRainAnomIn, 1)}`, tone: belt.avgRainAnomIn >= 0 ? "blue" : "green" },
         { text: `最湿 ${wetState.label}`, tone: "blue" },
         { text: `最暖 ${warmState.label}`, tone: "amber" },
         { text: season.key === "preplant" || season.key === "planting" ? "关注下地窗口" : season.key === "growth" ? "关注热量墒情" : "关注收割窗口", tone: "green" }
@@ -1642,15 +1669,15 @@
 
       const rows = [
         {
-          k: "8州均温偏离",
-          v: belt.avgTempAnomF !== null ? displaySignedTemp(belt.avgTempAnomF, 1) : displayTemp(belt.avgTempF, 1),
-          s: belt.avgTempAnomF !== null ? "近7天 vs 10年同期" : "近7天均值",
+          k: "8州温度状态",
+          v: belt.avgTempAnomF !== null ? tempBiasText(belt.avgTempAnomF, 1) : displayTemp(belt.avgTempF, 1),
+          s: belt.avgTempAnomF !== null ? "近7天较常年" : "近7天均值",
           tone: belt.avgTempAnomF === null ? "text" : belt.avgTempAnomF > 0 ? "amber" : "blue"
         },
         {
-          k: "8州降水偏离",
-          v: belt.avgRainAnomIn !== null ? displaySignedRain(belt.avgRainAnomIn, 1) : displayRain(belt.avgRainIn, 2),
-          s: belt.avgRainAnomIn !== null ? "近7天 vs 10年同期" : "近7天均值",
+          k: "8州雨量状态",
+          v: belt.avgRainAnomIn !== null ? rainBiasText(belt.avgRainAnomIn, 1) : displayRain(belt.avgRainIn, 2),
+          s: belt.avgRainAnomIn !== null ? "近7天较常年" : "近7天均值",
           tone: belt.avgRainAnomIn === null ? "text" : belt.avgRainAnomIn > 0 ? "blue" : "green"
         },
         {
@@ -1738,13 +1765,13 @@
         {
           k: "近7天均温",
           v: displayTemp(stats.windowTempF, 1),
-          s: stats.tempAnomF !== null ? `同期 ${displaySignedTemp(stats.tempAnomF, 1)}` : "历史同步中",
+          s: stats.tempAnomF !== null ? `较常年${tempBiasText(stats.tempAnomF, 1)}` : "历史同步中",
           tone: stats.tempAnomF === null ? "text" : stats.tempAnomF > 0 ? "amber" : "blue"
         },
         {
           k: "近7天降水",
           v: displayRain(stats.windowPrecipIn, 2),
-          s: stats.precipAnomIn !== null ? `同期 ${displaySignedRain(stats.precipAnomIn, 1)}` : "历史同步中",
+          s: stats.precipAnomIn !== null ? `较常年${rainBiasText(stats.precipAnomIn, 1)}` : "历史同步中",
           tone: stats.precipAnomIn === null ? "text" : stats.precipAnomIn > 0 ? "blue" : "green"
         },
         {
@@ -1804,16 +1831,16 @@
               </div>
               <div class="board-metrics">
                 <div class="board-cell">
-                  <div class="board-k">温度偏离</div>
+                  <div class="board-k">较常年温度</div>
                   <div class="board-v tone-${stats.tempAnomF === null ? "text" : (stats.tempAnomF > 0 ? "amber" : "blue")}">
-                    ${stats.tempAnomF !== null ? displaySignedTemp(stats.tempAnomF, 1) : displayTemp(stats.windowTempF, 1)}
+                    ${stats.tempAnomF !== null ? tempBiasText(stats.tempAnomF, 1) : displayTemp(stats.windowTempF, 1)}
                   </div>
                   <div class="track"><div class="fill" style="width:${tempTrack}%;background:${stats.tempAnomF !== null && stats.tempAnomF < 0 ? "var(--blue)" : "var(--amber)"};"></div></div>
                 </div>
                 <div class="board-cell">
-                  <div class="board-k">降水偏离</div>
+                  <div class="board-k">较常年雨量</div>
                   <div class="board-v tone-${stats.precipAnomIn === null ? "text" : (stats.precipAnomIn > 0 ? "blue" : "green")}">
-                    ${stats.precipAnomIn !== null ? displaySignedRain(stats.precipAnomIn, 1) : displayRain(stats.windowPrecipIn, 2)}
+                    ${stats.precipAnomIn !== null ? rainBiasText(stats.precipAnomIn, 1) : displayRain(stats.windowPrecipIn, 2)}
                   </div>
                   <div class="track"><div class="fill" style="width:${rainTrack}%;background:${stats.precipAnomIn !== null && stats.precipAnomIn < 0 ? "var(--green)" : "var(--blue)"};"></div></div>
                 </div>
