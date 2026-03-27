@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>美国大豆主产区天气监测</title>
+  <style>
+    :root {
+      --bg: #06101d;
+      --bg-soft: #0b1627;
+      --panel: rgba(11, 22, 39, 0.92);
+      --panel-2: rgba(17, 31, 53, 0.92);
+      --line: rgba(153, 176, 219, 0.18);
+      --line-strong: rgba(153, 176, 219, 0.32);
+      --text: #f3f7ff;
+      --muted: #95a6c6;
+      --muted-2: #7084a8;
+      --blue: #66b8ff;
+      --cyan: #3bd7c4;
+      --green: #35c47b;
+      --amber: #f2b34f;
+      --red: #ff6d74;
+      --white-soft: rgba(255, 255, 255, 0.06);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(77, 131, 205, 0.16), transparent 34%),
+        radial-gradient(circle at 80% 20%, rgba(59, 215, 196, 0.12), transparent 28%),
+        linear-gradient(180deg, #06101d 0%, #08111e 46%, #091320 100%);
+      color: var(--text);
+      font-family: "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 0 0 92px;
+      position: relative;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(180deg, rgba(6, 16, 29, 0.96), rgba(6, 16, 29, 0.84));
+      border-bottom: 1px solid rgba(153, 176, 219, 0.1);
+      padding: 14px 16px 12px;
+    }
+
+    .topbar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 0 rgba(59, 215, 196, 0.6);
+      animation: pulse 1.9s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(59, 215, 196, 0.55); }
+      70% { box-shadow: 0 0 0 10px rgba(59, 215, 196, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(59, 215, 196, 0); }
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .chip-btn,
+    .seg button,
+    .unit button {
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      transition: all 0.22s ease;
+    }
+
+    .chip-btn {
+      height: 34px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .chip-btn:active,
+    .seg button:active,
+    .unit button:active,
+    .state-tab:active,
+    .refresh:active {
+      transform: scale(0.98);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 18px 16px 20px;
+      border-bottom: 1px solid rgba(153, 176, 219, 0.09);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(120deg, rgba(102, 184, 255, 0.12), transparent 38%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 48%);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 22px 22px;
+      opacity: 0.18;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.8), transparent 80%);
+      pointer-events: none;
+    }
+
+    .hero-head {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .hero-copy {
+      min-width: 0;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      border: 1px solid rgba(102, 184, 255, 0.16);
+      border-radius: 999px;
+      font-size: 11px;
+      color: #b6d9ff;
+      background: rgba(102, 184, 255, 0.08);
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      margin: 0;
+      font-size: 31px;
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      max-width: 280px;
+    }
+
+    .hero-subtitle {
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+      max-width: 300px;
+    }
+
+    .hero-side {
+      width: 94px;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+
+    .phase-box {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .phase-k {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    .phase-v {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .phase-s {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .hero-kpis {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 14px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(153, 176, 219, 0.1);
+    }
+
+    .kpi {
+      min-width: 0;
+    }
+
+    .kpi-k {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+
+    .kpi-v {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .kpi-s {
+      margin-top: 7px;
+      font-size: 11px;
+      color: var(--muted-2);
+    }
+
+    .mini-panels {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(153, 176, 219, 0.1);
+    }
+
+    .mini-panel {
+      border: 1px solid rgba(153, 176, 219, 0.1);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+      padding: 13px 14px 14px;
+    }
+
+    .season-track {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .season-step {
+      position: relative;
+      padding: 10px 9px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(153, 176, 219, 0.08);
+      background: rgba(255, 255, 255, 0.025);
+      min-height: 76px;
+    }
+
+    .season-step.active {
+      border-color: rgba(102, 184, 255, 0.24);
+      background: linear-gradient(180deg, rgba(102, 184, 255, 0.14), rgba(102, 184, 255, 0.04));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .season-step::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 3px;
+      border-radius: 0 0 14px 14px;
+      background: transparent;
+    }
+
+    .season-step.active::after {
+      background: linear-gradient(90deg, #2f7dda, #66b8ff);
+    }
+
+    .season-name {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .season-range {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .season-focus {
+      font-size: 10px;
+      color: var(--muted-2);
+      line-height: 1.45;
+    }
+
+    .summary-lead {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 11px;
+    }
+
+    .summary-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .summary-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid rgba(153, 176, 219, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--muted);
+    }
+
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-text { color: var(--text); }
+
+    .belt-overview {
+      position: relative;
+      z-index: 1;
+      margin-top: 18px;
+      border-top: 1px solid rgba(153, 176, 219, 0.1);
+      padding-top: 16px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .section-note {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .belt-map {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .belt-node {
+      position: relative;
+      padding: 9px 10px 10px;
+      min-height: 70px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+      overflow: hidden;
+    }
+
+    .belt-node::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 4px;
+      background: var(--line-strong);
+    }
+
+    .belt-node.tone-green::after { background: linear-gradient(90deg, #166642, #35c47b); }
+    .belt-node.tone-amber::after { background: linear-gradient(90deg, #865a1d, #f2b34f); }
+    .belt-node.tone-red::after { background: linear-gradient(90deg, #7f2730, #ff6d74); }
+    .belt-node.tone-blue::after { background: linear-gradient(90deg, #184f7a, #66b8ff); }
+
+    .belt-code {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .belt-main {
+      font-size: 18px;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+
+    .belt-mini {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .sticky-tabs {
+      position: sticky;
+      top: 76px;
+      z-index: 24;
+      background: linear-gradient(180deg, rgba(6, 16, 29, 0.95), rgba(6, 16, 29, 0.78));
+      backdrop-filter: blur(18px);
+      padding: 10px 0 12px;
+      border-bottom: 1px solid rgba(153, 176, 219, 0.08);
+    }
+
+    .tabs-scroll,
+    .seg,
+    .forecast-scroll {
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .tabs-scroll::-webkit-scrollbar,
+    .seg::-webkit-scrollbar,
+    .forecast-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      white-space: nowrap;
+      min-width: 100%;
+    }
+
+    .state-tab {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 3px;
+      min-width: 88px;
+      padding: 10px 12px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      transition: all 0.22s ease;
+    }
+
+    .state-tab.active {
+      color: var(--text);
+      border-color: rgba(102, 184, 255, 0.34);
+      background: linear-gradient(180deg, rgba(102, 184, 255, 0.12), rgba(102, 184, 255, 0.04));
+      box-shadow: 0 10px 24px rgba(16, 58, 102, 0.28);
+    }
+
+    .state-tab strong {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .state-tab span {
+      font-size: 11px;
+    }
+
+    .state-tab i {
+      position: absolute;
+      inset: auto 0 0;
+      height: 3px;
+      border-radius: 0 0 18px 18px;
+      opacity: 0.95;
+    }
+
+    .content {
+      padding: 14px 16px 0;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(11, 22, 39, 0.94), rgba(10, 19, 33, 0.94));
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .detail-head {
+      padding: 16px 16px 14px;
+      border-bottom: 1px solid rgba(153, 176, 219, 0.1);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .detail-title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .detail-sub {
+      margin-top: 7px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 260px;
+    }
+
+    .signal {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      white-space: nowrap;
+    }
+
+    .signal-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .metrics-strip {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0;
+      border-bottom: 1px solid rgba(153, 176, 219, 0.1);
+    }
+
+    .metrics-strip .item {
+      padding: 14px 16px;
+      border-right: 1px solid rgba(153, 176, 219, 0.08);
+      border-bottom: 1px solid rgba(153, 176, 219, 0.08);
+    }
+
+    .metrics-strip .item:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .metrics-strip .item:nth-last-child(-n + 2) {
+      border-bottom: 0;
+    }
+
+    .item-k {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .item-v {
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .item-s {
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--muted-2);
+    }
+
+    .chart-block {
+      padding: 14px 16px 18px;
+      border-top: 1px solid rgba(153, 176, 219, 0.08);
+    }
+
+    .chart-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .chart-title h3 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .chart-legend {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      min-height: 176px;
+      border: 1px solid rgba(153, 176, 219, 0.08);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+      overflow: hidden;
+    }
+
+    .chart-wrap svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .chart-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 176px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .forecast-block {
+      padding: 14px 16px 16px;
+      border-top: 1px solid rgba(153, 176, 219, 0.08);
+    }
+
+    .forecast-row {
+      display: inline-flex;
+      gap: 8px;
+      padding-bottom: 2px;
+    }
+
+    .forecast-card {
+      width: 88px;
+      padding: 12px 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(153, 176, 219, 0.1);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    }
+
+    .forecast-date {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .forecast-temp {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+
+    .forecast-rain,
+    .forecast-pop {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .board {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(11, 22, 39, 0.92), rgba(10, 18, 31, 0.92));
+      box-shadow: var(--shadow);
+    }
+
+    .board-head {
+      padding: 15px 16px 13px;
+      border-bottom: 1px solid rgba(153, 176, 219, 0.08);
+    }
+
+    .board-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .board-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      padding: 14px 16px;
+      border-top: 1px solid rgba(153, 176, 219, 0.08);
+    }
+
+    .board-row:first-child {
+      border-top: 0;
+    }
+
+    .board-left {
+      min-width: 0;
+    }
+
+    .board-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .board-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 12px;
+    }
+
+    .board-cell {
+      min-width: 0;
+    }
+
+    .board-k {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .board-v {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    .track {
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .board-right {
+      text-align: right;
+      min-width: 64px;
+    }
+
+    .board-right .label {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .board-right .value {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .board-right .sub {
+      margin-top: 5px;
+      font-size: 11px;
+      color: var(--muted-2);
+    }
+
+    .bottom-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      width: calc(100% - 24px);
+      max-width: 406px;
+      z-index: 40;
+      border: 1px solid rgba(153, 176, 219, 0.16);
+      border-radius: 20px;
+      background: rgba(9, 19, 32, 0.94);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .seg,
+    .unit {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .seg button,
+    .unit button {
+      height: 36px;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .seg button.active,
+    .unit button.active {
+      background: linear-gradient(180deg, rgba(102, 184, 255, 0.18), rgba(102, 184, 255, 0.08));
+      border-color: rgba(102, 184, 255, 0.34);
+      color: var(--text);
+    }
+
+    .refresh {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #4ba9fb, #2e7bd9);
+      color: #f7fbff;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .footer {
+      padding: 14px 16px 0;
+      color: var(--muted-2);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .footer a {
+      color: #98d0ff;
+      text-decoration: none;
+    }
+
+    @media (max-width: 360px) {
+      .hero-title {
+        font-size: 28px;
+      }
+
+      .belt-map {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-row">
+        <div class="brand">
+          <div class="eyebrow">US Soybean Weather Monitor</div>
+          <h1 class="title">美国大豆主产区天气</h1>
+          <div class="meta">
+            <span class="status-dot"></span>
+            <span id="syncText">快照载入</span>
+            <span id="updateText">更新至 2026-03-27</span>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="chip-btn" id="historyMeta">2016-2025 同期</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-grid"></div>
+      <div class="hero-head">
+        <div class="hero-copy">
+          <div class="hero-label" id="heroLabel">大豆带综合状态</div>
+          <h2 class="hero-title" id="heroTitle">播前分化</h2>
+          <div class="hero-subtitle" id="heroSubtitle">东部雨带偏强，西部升温更快，田间窗口并不一致。</div>
+        </div>
+        <div class="hero-side">
+          <div class="phase-box">
+            <div class="phase-k">当前农时</div>
+            <div class="phase-v" id="phaseName">播前</div>
+            <div class="phase-s" id="phaseFocus">关注土温与作业窗口</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-kpis" id="heroKpis"></div>
+
+      <div class="mini-panels">
+        <div class="mini-panel">
+          <div class="section-head">
+            <h3 class="section-title">美豆生长周期</h3>
+            <div class="section-note" id="seasonDetail">当前阶段</div>
+          </div>
+          <div class="season-track" id="seasonTrack"></div>
+        </div>
+        <div class="mini-panel">
+          <div class="section-head">
+            <h3 class="section-title">产区天气总结</h3>
+            <div class="section-note">一眼看全局</div>
+          </div>
+          <div class="summary-lead" id="summaryLead">整体偏暖，东部雨量更强。</div>
+          <div class="summary-tags" id="summaryTags"></div>
+        </div>
+      </div>
+
+      <div class="belt-overview">
+        <div class="section-head">
+          <h3 class="section-title">8州热区</h3>
+          <div class="section-note" id="beltWindowNote">近7天 vs 10年同期</div>
+        </div>
+        <div class="belt-map" id="beltMap"></div>
+      </div>
+    </section>
+
+    <div class="sticky-tabs">
+      <div class="tabs-scroll">
+        <div class="tabs" id="stateTabs"></div>
+      </div>
+    </div>
+
+    <main class="content">
+      <section class="panel">
+        <div class="detail-head">
+          <div>
+            <h2 class="detail-title" id="detailTitle">伊利诺伊</h2>
+            <div class="detail-sub" id="detailSub">近7天回看与未来7天预报。</div>
+          </div>
+          <div class="signal" id="detailSignal">
+            <span class="signal-dot"></span>
+            <span id="detailSignalText">作业窗口</span>
+          </div>
+        </div>
+
+        <div class="metrics-strip" id="stateMetrics"></div>
+
+        <div class="chart-block">
+          <div class="chart-title">
+            <h3 id="tempHeading">均温对比</h3>
+            <div class="chart-legend" id="tempLegend">
+              <span><i class="legend-dot" style="background:#66b8ff;"></i>近7天</span>
+              <span><i class="legend-dot" style="background:#8f9bb0;"></i>10年同期均值</span>
+            </div>
+          </div>
+          <div class="chart-wrap" id="tempChart"></div>
+        </div>
+
+        <div class="chart-block">
+          <div class="chart-title">
+            <h3 id="rainHeading">降水对比</h3>
+            <div class="chart-legend" id="rainLegend">
+              <span><i class="legend-dot" style="background:#3bd7c4;"></i>近7天</span>
+              <span><i class="legend-dot" style="background:#8f9bb0;"></i>10年同期均值</span>
+            </div>
+          </div>
+          <div class="chart-wrap" id="rainChart"></div>
+        </div>
+
+        <div class="forecast-block">
+          <div class="section-head">
+            <h3 class="section-title">未来7天</h3>
+            <div class="section-note" id="forecastWindowNote">预报</div>
+          </div>
+          <div class="forecast-scroll">
+            <div class="forecast-row" id="forecastRow"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="board">
+        <div class="board-head">
+          <div class="section-head" style="margin-bottom:0;">
+            <h3 class="section-title">州级监控</h3>
+            <div class="section-note">温度偏离 / 降水偏离 / 未来7天雨量</div>
+          </div>
+        </div>
+        <div class="board-list" id="boardList"></div>
+      </section>
+    </main>
+
+    <div class="footer">
+      数据源：
+      <a href="https://open-meteo.com/en/docs" target="_blank" rel="noreferrer">Open-Meteo</a>
+      /
+      <a href="https://www.nass.usda.gov/Charts_and_Maps/Crop_Progress_%26_Condition/2025/index.php" target="_blank" rel="noreferrer">USDA NASS Crop Progress</a>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="seg" id="seasonSeg">
+      <button class="active" data-view="recent">近7天</button>
+      <button data-view="forecast">未来7天</button>
+    </div>
+    <div class="unit" id="unitSeg">
+      <button class="active" data-unit="metric">公制</button>
+      <button data-unit="imperial">英制</button>
+    </div>
+    <button class="refresh" id="refreshBtn">刷新</button>
+  </div>
+
+  <script>
+    const STATE_META = [
+      { id: "illinois", zh: "伊利诺伊", en: "Illinois", code: "IL", lat: 40.6331, lon: -89.3985, region: "east" },
+      { id: "iowa", zh: "爱荷华", en: "Iowa", code: "IA", lat: 42.0329, lon: -93.5815, region: "west" },
+      { id: "indiana", zh: "印第安纳", en: "Indiana", code: "IN", lat: 39.7684, lon: -86.1581, region: "east" },
+      { id: "minnesota", zh: "明尼苏达", en: "Minnesota", code: "MN", lat: 46.7296, lon: -94.6859, region: "north" },
+      { id: "nebraska", zh: "内布拉斯加", en: "Nebraska", code: "NE", lat: 41.4925, lon: -99.9018, region: "west" },
+      { id: "ohio", zh: "俄亥俄", en: "Ohio", code: "OH", lat: 40.4173, lon: -82.9071, region: "east" },
+      { id: "missouri", zh: "密苏里", en: "Missouri", code: "MO", lat: 38.5767, lon: -92.1735, region: "south" },
+      { id: "south_dakota", zh: "南达科他", en: "South Dakota", code: "SD", lat: 44.3683, lon: -100.351, region: "west" }
+    ];
+
+    const BOOTSTRAP = {
+      generatedAt: "2026-03-27 17:36",
+      recentStart: "2026-03-20",
+      recentEnd: "2026-03-26",
+      forecastStart: "2026-03-27",
+      forecastEnd: "2026-04-02",
+      states: {
+        illinois: {
+          recent: {
+            dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
+            meanF: [60.0,62.1,57.1,37.6,43.1,56.0,63.9],
+            maxF: [76.8,79.6,68.9,46.3,57.4,72.2,85.8],
+            minF: [45.5,45.6,37.2,30.1,31.3,40.6,47.2],
+            precipIn: [0,0,0.020,0,0,0,1.437]
+          },
+          forecast: {
+            dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
+            meanF: [36.8,38.0,50.5,65.3,68.8,45.8,38.3],
+            maxF: [45.4,49.3,60.6,76.1,80.4,50.7,42.8],
+            minF: [31.1,29.8,39.5,57.0,51.8,40.1,34.1],
+            precipIn: [0.020,0,0,0.059,0.319,0.055,0.154],
+            pop: [7,0,0,9,33,42,43]
+          }
+        },
+        iowa: {
+          recent: {
+            dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
+            meanF: [58.4,66.2,49.5,38.6,45.6,56.1,55.2],
+            maxF: [74.7,88.2,68.9,48.7,57.3,75.2,64.0],
+            minF: [49.0,48.6,37.0,26.8,34.7,40.7,40.8],
+            precipIn: [0,0,0,0.004,0,0,0.020]
+          },
+          forecast: {
+            dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
+            meanF: [38.7,40.5,56.2,66.1,63.8,42.9,36.1],
+            maxF: [46.9,57.2,70.4,80.9,77.3,50.1,43.8],
+            minF: [30.9,23.4,42.7,53.2,47.5,34.4,32.1],
+            precipIn: [0,0,0,0,0.055,0,0.272],
+            pop: [0,0,0,8,24,31,27]
+          }
+        },
+        indiana: {
+          recent: {
+            dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
+            meanF: [59.9,58.8,66.2,39.6,40.0,54.0,68.3],
+            maxF: [74.9,72.5,85.1,48.4,52.6,68.9,82.2],
+            minF: [49.5,44.7,50.5,33.6,28.3,39.8,58.2],
+            precipIn: [0,0,0.602,0,0,0,0.181]
+          },
+          forecast: {
+            dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
+            meanF: [42.1,36.8,48.9,61.5,69.1,54.5,43.2],
+            maxF: [55.9,44.7,57.2,72.0,78.4,69.3,48.9],
+            minF: [33.0,31.7,38.3,55.6,62.8,44.1,37.6],
+            precipIn: [0.807,0,0,0,0,0.094,0.035],
+            pop: [28,0,2,10,22,35,44]
+          }
+        },
+        minnesota: {
+          recent: {
+            dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
+            meanF: [46.2,47.0,30.9,32.7,39.4,48.4,32.8],
+            maxF: [60.6,64.7,34.2,43.1,49.5,64.4,40.3],
+            minF: [33.8,33.9,28.0,22.3,29.3,38.7,23.3],
+            precipIn: [0,0,0,0,0,0,0.035]
+          },
+          forecast: {
+            dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
+            meanF: [22.7,36.9,41.0,42.7,34.2,29.7,29.8],
+            maxF: [28.2,57.9,55.0,54.4,39.5,38.0,31.6],
+            minF: [16.2,17.1,28.5,34.6,26.5,21.8,27.9],
+            precipIn: [0,0,0,0,0.004,0,0.083],
+            pop: [1,1,0,6,13,12,15]
+          }
+        },
+        nebraska: {
+          recent: {
+            dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
+            meanF: [65.3,69.0,45.1,39.9,50.5,66.0,53.0],
+            maxF: [82.0,89.6,68.7,53.0,68.9,84.8,68.1],
+            minF: [48.8,48.9,34.8,28.7,36.5,49.5,34.1],
+            precipIn: [0,0,0,0,0,0,0.020]
+          },
+          forecast: {
+            dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
+            meanF: [36.6,47.9,63.7,70.6,55.1,42.2,42.4],
+            maxF: [48.8,66.9,80.7,86.8,74.8,52.1,53.5],
+            minF: [26.9,33.3,49.6,54.4,41.7,31.4,36.6],
+            precipIn: [0,0,0,0,0,0.004,0.150],
+            pop: [0,1,2,3,10,29,19]
+          }
+        },
+        ohio: {
+          recent: {
+            dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
+            meanF: [53.6,47.9,58.8,36.3,34.8,48.5,62.2],
+            maxF: [66.3,60.3,79.7,39.8,45.5,59.8,77.7],
+            minF: [40.5,34.5,40.1,32.3,24.1,35.8,51.3],
+            precipIn: [0.008,0,1.075,0.240,0,0,0.831]
+          },
+          forecast: {
+            dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
+            meanF: [35.8,33.0,43.6,55.8,64.8,52.0,39.1],
+            maxF: [51.1,38.3,56.0,63.7,74.2,66.4,48.6],
+            minF: [30.7,29.2,32.7,47.0,57.6,38.5,28.4],
+            precipIn: [0.757,0.016,0,0.024,0.004,0.094,0],
+            pop: [26,0,2,14,31,31,37]
+          }
+        },
+        missouri: {
+          recent: {
+            dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
+            meanF: [66.0,68.8,66.8,43.8,52.5,64.5,77.4],
+            maxF: [86.4,87.3,82.5,51.2,65.0,84.3,92.2],
+            minF: [48.5,54.6,47.0,35.4,41.2,47.7,57.9],
+            precipIn: [0,0,0,0,0,0,0.067]
+          },
+          forecast: {
+            dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
+            meanF: [49.1,45.6,55.5,68.6,71.2,51.2,47.2],
+            maxF: [57.0,60.4,70.6,82.1,82.5,57.1,56.0],
+            minF: [40.0,31.9,41.8,57.0,54.6,44.9,42.9],
+            precipIn: [0.189,0,0,0,0.280,0.024,0.531],
+            pop: [16,0,0,4,19,40,42]
+          }
+        },
+        south_dakota: {
+          recent: {
+            dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
+            meanF: [55.1,56.5,37.2,42.0,47.2,56.5,39.1],
+            maxF: [78.3,76.4,45.6,61.1,62.2,74.7,56.8],
+            minF: [36.4,40.6,32.1,28.2,35.1,42.1,28.6],
+            precipIn: [0,0,0.020,0,0,0,0]
+          },
+          forecast: {
+            dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
+            meanF: [32.7,53.1,57.8,64.9,51.0,40.8,37.5],
+            maxF: [48.4,77.0,71.6,81.2,67.8,52.7,48.4],
+            minF: [20.1,33.8,43.9,52.0,39.1,28.8,34.8],
+            precipIn: [0,0,0,0,0,0,0.165],
+            pop: [0,0,0,2,9,22,20]
+          }
+        }
+      }
+    };
+
+    const BOOTSTRAP_HIST = {
+      illinois: { dailyTempAvgF: [41.3, 41.9, 42.9, 44.5, 44.8, 44.0, 43.8], dailyPrecipAvgIn: [0.060, 0.021, 0.139, 0.135, 0.259, 0.248, 0.093], windowTempAvgF: 43.3, windowPrecipAvgIn: 0.955 },
+      iowa: { dailyTempAvgF: [39.7, 43.1, 41.8, 40.5, 41.0, 42.3, 40.6], dailyPrecipAvgIn: [0.011, 0.009, 0.150, 0.196, 0.212, 0.090, 0.112], windowTempAvgF: 41.3, windowPrecipAvgIn: 0.779 },
+      indiana: { dailyTempAvgF: [41.9, 41.1, 42.8, 45.6, 47.0, 46.3, 46.3], dailyPrecipAvgIn: [0.141, 0.034, 0.221, 0.182, 0.265, 0.215, 0.155], windowTempAvgF: 44.4, windowPrecipAvgIn: 1.212 },
+      minnesota: { dailyTempAvgF: [29.6, 30.3, 30.5, 30.4, 30.9, 32.1, 28.9], dailyPrecipAvgIn: [0.011, 0.038, 0.113, 0.057, 0.083, 0.060, 0.075], windowTempAvgF: 30.4, windowPrecipAvgIn: 0.438 },
+      nebraska: { dailyTempAvgF: [38.7, 41.8, 42.7, 39.5, 41.0, 40.3, 38.1], dailyPrecipAvgIn: [0.004, 0.014, 0.065, 0.217, 0.180, 0.071, 0.027], windowTempAvgF: 40.3, windowPrecipAvgIn: 0.579 },
+      ohio: { dailyTempAvgF: [40.6, 39.2, 40.7, 43.5, 45.9, 45.4, 44.6], dailyPrecipAvgIn: [0.128, 0.044, 0.094, 0.232, 0.139, 0.132, 0.145], windowTempAvgF: 42.9, windowPrecipAvgIn: 0.913 },
+      missouri: { dailyTempAvgF: [46.8, 47.3, 50.1, 50.9, 49.3, 48.8, 49.8], dailyPrecipAvgIn: [0.011, 0.076, 0.103, 0.195, 0.234, 0.272, 0.037], windowTempAvgF: 49.0, windowPrecipAvgIn: 0.928 },
+      south_dakota: { dailyTempAvgF: [36.4, 37.0, 37.1, 38.8, 39.0, 37.6, 36.3], dailyPrecipAvgIn: [0.000, 0.031, 0.003, 0.027, 0.012, 0.032, 0.033], windowTempAvgF: 37.5, windowPrecipAvgIn: 0.138 }
+    };
+
+    Object.keys(BOOTSTRAP_HIST).forEach((id) => {
+      BOOTSTRAP.states[id].hist = BOOTSTRAP_HIST[id];
+    });
+
+    const APP = {
+      unit: "metric",
+      view: "recent",
+      selected: "illinois",
+      liveMode: "snapshot",
+      data: JSON.parse(JSON.stringify(BOOTSTRAP))
+    };
+
+    const dom = {
+      syncText: document.getElementById("syncText"),
+      updateText: document.getElementById("updateText"),
+      historyMeta: document.getElementById("historyMeta"),
+      heroLabel: document.getElementById("heroLabel"),
+      heroTitle: document.getElementById("heroTitle"),
+      heroSubtitle: document.getElementById("heroSubtitle"),
+      phaseName: document.getElementById("phaseName"),
+      phaseFocus: document.getElementById("phaseFocus"),
+      heroKpis: document.getElementById("heroKpis"),
+      seasonDetail: document.getElementById("seasonDetail"),
+      seasonTrack: document.getElementById("seasonTrack"),
+      summaryLead: document.getElementById("summaryLead"),
+      summaryTags: document.getElementById("summaryTags"),
+      beltWindowNote: document.getElementById("beltWindowNote"),
+      beltMap: document.getElementById("beltMap"),
+      stateTabs: document.getElementById("stateTabs"),
+      detailTitle: document.getElementById("detailTitle"),
+      detailSub: document.getElementById("detailSub"),
+      detailSignal: document.getElementById("detailSignal"),
+      detailSignalText: document.getElementById("detailSignalText"),
+      stateMetrics: document.getElementById("stateMetrics"),
+      tempHeading: document.getElementById("tempHeading"),
+      tempLegend: document.getElementById("tempLegend"),
+      rainHeading: document.getElementById("rainHeading"),
+      rainLegend: document.getElementById("rainLegend"),
+      tempChart: document.getElementById("tempChart"),
+      rainChart: document.getElementById("rainChart"),
+      forecastWindowNote: document.getElementById("forecastWindowNote"),
+      forecastRow: document.getElementById("forecastRow"),
+      boardList: document.getElementById("boardList"),
+      refreshBtn: document.getElementById("refreshBtn"),
+      seasonSeg: document.getElementById("seasonSeg"),
+      unitSeg: document.getElementById("unitSeg")
+    };
+
+    function mean(arr) {
+      if (!arr || !arr.length) return null;
+      return arr.reduce((sum, value) => sum + Number(value || 0), 0) / arr.length;
+    }
+
+    function sum(arr) {
+      if (!arr || !arr.length) return null;
+      return arr.reduce((total, value) => total + Number(value || 0), 0);
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function formatDateLabel(iso) {
+      return iso.slice(5).replace("-", "/");
+    }
+
+    function toMetricTemp(f) {
+      return (f - 32) * 5 / 9;
+    }
+
+    function toMetricRain(inch) {
+      return inch * 25.4;
+    }
+
+    function fmtNumber(value, digits = 1) {
+      return Number(value).toFixed(digits);
+    }
+
+    function fmtSigned(value, digits = 1) {
+      if (value === null || Number.isNaN(value)) return "--";
+      const n = Number(value);
+      return `${n > 0 ? "+" : ""}${n.toFixed(digits)}`;
+    }
+
+    function tempUnitLabel() {
+      return APP.unit === "metric" ? "°C" : "°F";
+    }
+
+    function rainUnitLabel() {
+      return APP.unit === "metric" ? "mm" : "in";
+    }
+
+    function displayTemp(valueF, digits = 1) {
+      if (valueF === null || Number.isNaN(valueF)) return "--";
+      const value = APP.unit === "metric" ? toMetricTemp(valueF) : valueF;
+      return `${fmtNumber(value, digits)}${tempUnitLabel()}`;
+    }
+
+    function displayRain(valueIn, digits = 1) {
+      if (valueIn === null || Number.isNaN(valueIn)) return "--";
+      const value = APP.unit === "metric" ? toMetricRain(valueIn) : valueIn;
+      return `${fmtNumber(value, digits)}${rainUnitLabel()}`;
+    }
+
+    function displaySignedTemp(valueF, digits = 1) {
+      if (valueF === null || Number.isNaN(valueF)) return "--";
+      const value = APP.unit === "metric" ? toMetricTemp(valueF) : valueF;
+      return `${fmtSigned(value, digits)}${tempUnitLabel()}`;
+    }
+
+    function displaySignedRain(valueIn, digits = 1) {
+      if (valueIn === null || Number.isNaN(valueIn)) return "--";
+      const value = APP.unit === "metric" ? toMetricRain(valueIn) : valueIn;
+      return `${fmtSigned(value, digits)}${rainUnitLabel()}`;
+    }
+
+    function getSeason(now = new Date()) {
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+      const md = month * 100 + day;
+      if (md < 415) {
+        return { key: "preplant", label: "播前", focus: "关注土温与作业窗口" };
+      }
+      if (md <= 610) {
+        return { key: "planting", label: "播种", focus: "关注降水对播种进度影响" };
+      }
+      if (md <= 915) {
+        return { key: "growth", label: "生长", focus: "关注热量与降水平衡" };
+      }
+      if (md <= 1130) {
+        return { key: "harvest", label: "收获", focus: "关注干燥窗口与雨带回摆" };
+      }
+      return { key: "offseason", label: "休整", focus: "关注冬春墒情与下季准备" };
+    }
+
+    function getRecentWindow(reference = new Date()) {
+      const end = new Date(reference);
+      end.setDate(end.getDate() - 1);
+      const start = new Date(reference);
+      start.setDate(start.getDate() - 7);
+      return { start: isoDate(start), end: isoDate(end) };
+    }
+
+    function getForecastWindow(reference = new Date()) {
+      const start = new Date(reference);
+      const end = new Date(reference);
+      end.setDate(end.getDate() + 6);
+      return { start: isoDate(start), end: isoDate(end) };
+    }
+
+    function isoDate(date) {
+      const copy = new Date(date);
+      copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
+      return copy.toISOString().slice(0, 10);
+    }
+
+    function parseBatchResponse(json) {
+      const list = Array.isArray(json) ? json : [json];
+      const data = {};
+      list.forEach((item, index) => {
+        const meta = STATE_META[index];
+        if (!meta) return;
+        data[meta.id] = item.daily;
+      });
+      return data;
+    }
+
+    function stateWindowStats(state) {
+      const recent = state.recent || {};
+      const forecast = state.forecast || {};
+      const hist = state.hist || null;
+      const windowTempF = mean(recent.meanF || []);
+      const windowPrecipIn = sum(recent.precipIn || []);
+      const forecastPrecipIn = sum(forecast.precipIn || []);
+      return {
+        windowTempF,
+        windowPrecipIn,
+        forecastPrecipIn,
+        histTempF: hist ? hist.windowTempAvgF : null,
+        histPrecipIn: hist ? hist.windowPrecipAvgIn : null,
+        tempAnomF: hist ? windowTempF - hist.windowTempAvgF : null,
+        precipAnomIn: hist ? windowPrecipIn - hist.windowPrecipAvgIn : null
+      };
+    }
+
+    function stateSignal(meta, state, season) {
+      const stats = stateWindowStats(state);
+      const tempAnom = stats.tempAnomF;
+      const precipAnom = stats.precipAnomIn;
+      const nextRain = stats.forecastPrecipIn || 0;
+      if (season.key === "preplant" || season.key === "planting") {
+        if (nextRain > 1.0 || precipAnom > 0.55) {
+          return { tone: "red", label: "偏湿拖慢" };
+        }
+        if (tempAnom < -4) {
+          return { tone: "blue", label: "偏冷偏慢" };
+        }
+        if (tempAnom > 3 && precipAnom < 0.15) {
+          return { tone: "green", label: "窗口偏好" };
+        }
+        return { tone: "amber", label: "分化观察" };
+      }
+      if (season.key === "growth") {
+        if (tempAnom > 4 && precipAnom < -0.4) {
+          return { tone: "red", label: "热压偏强" };
+        }
+        if (precipAnom > 0.8) {
+          return { tone: "amber", label: "偏湿积水" };
+        }
+        return { tone: "green", label: "长势平稳" };
+      }
+      if (season.key === "harvest") {
+        if (nextRain > 1.2 || precipAnom > 0.6) {
+          return { tone: "red", label: "收割受扰" };
+        }
+        if (precipAnom < -0.25) {
+          return { tone: "green", label: "利于推进" };
+        }
+        return { tone: "amber", label: "关注雨带" };
+      }
+      return { tone: "amber", label: "继续跟踪" };
+    }
+
+    function getToneColor(tone) {
+      if (tone === "green") return "var(--green)";
+      if (tone === "red") return "var(--red)";
+      if (tone === "blue") return "var(--blue)";
+      return "var(--amber)";
+    }
+
+    function beltStats() {
+      const states = STATE_META.map((meta) => APP.data.states[meta.id]).filter(Boolean);
+      const temps = states.map((state) => stateWindowStats(state).windowTempF).filter((v) => v !== null);
+      const rains = states.map((state) => stateWindowStats(state).windowPrecipIn).filter((v) => v !== null);
+      const tempAnoms = states.map((state) => stateWindowStats(state).tempAnomF).filter((v) => v !== null);
+      const rainAnoms = states.map((state) => stateWindowStats(state).precipAnomIn).filter((v) => v !== null);
+      const eastIds = ["illinois", "indiana", "ohio"];
+      const westIds = ["iowa", "nebraska", "south_dakota", "minnesota"];
+      const eastRain = mean(eastIds.map((id) => stateWindowStats(APP.data.states[id]).windowPrecipIn));
+      const westRain = mean(westIds.map((id) => stateWindowStats(APP.data.states[id]).windowPrecipIn));
+      const eastTemp = mean(eastIds.map((id) => stateWindowStats(APP.data.states[id]).windowTempF));
+      const westTemp = mean(westIds.map((id) => stateWindowStats(APP.data.states[id]).windowTempF));
+      return {
+        avgTempF: mean(temps),
+        avgRainIn: mean(rains),
+        avgTempAnomF: tempAnoms.length ? mean(tempAnoms) : null,
+        avgRainAnomIn: rainAnoms.length ? mean(rainAnoms) : null,
+        eastRain,
+        westRain,
+        eastTemp,
+        westTemp
+      };
+    }
+
+    function headlineForBelt(season) {
+      const belt = beltStats();
+      if (belt.avgTempAnomF === null || belt.avgRainAnomIn === null) {
+        return {
+          title: `${season.label}监控`,
+          subtitle: "快照已载入，历史同期对比同步中。"
+        };
+      }
+      const eastWet = belt.eastRain - belt.westRain > 0.5;
+      const westWarmer = belt.westTemp - belt.eastTemp > 4;
+      if (season.key === "preplant" || season.key === "planting") {
+        if (eastWet && westWarmer) {
+          return {
+            title: "播前分化",
+            subtitle: "东部雨带偏强，西部升温更快，田间窗口并不一致。"
+          };
+        }
+        if (belt.avgRainAnomIn > 0.4) {
+          return {
+            title: "播前偏湿",
+            subtitle: "近7天降水高于同期，播种准备与下地节奏偏慢。"
+          };
+        }
+        if (belt.avgTempAnomF > 2.5 && belt.avgRainAnomIn < 0.15) {
+          return {
+            title: "播前偏暖",
+            subtitle: "热量抬升更快，整地与播前准备窗口改善。"
+          };
+        }
+      }
+      if (season.key === "growth") {
+        if (belt.avgTempAnomF > 3 && belt.avgRainAnomIn < -0.35) {
+          return {
+            title: "生长偏热干",
+            subtitle: "热量偏高但水分回补偏弱，关注墒情压力。"
+          };
+        }
+      }
+      if (season.key === "harvest") {
+        if (belt.avgRainAnomIn < -0.2) {
+          return {
+            title: "收获窗口偏开",
+            subtitle: "近7天偏干，机械收获节奏相对顺畅。"
+          };
+        }
+      }
+      return {
+        title: `${season.label}平衡`,
+        subtitle: "主产区整体接近常态，重点看区域性冷热与雨带差异。"
+      };
+    }
+
+    function renderSeasonModule(season) {
+      const steps = [
+        { key: "preplant", label: "播前", range: "3-4月", focus: "整地 / 土温" },
+        { key: "planting", label: "播种", range: "4-6月", focus: "下地 / 进度" },
+        { key: "growth", label: "生长", range: "6-9月", focus: "热量 / 墒情" },
+        { key: "harvest", label: "收获", range: "9-11月", focus: "干燥 / 雨带" }
+      ];
+      dom.seasonDetail.textContent = `当前：${season.label}`;
+      dom.seasonTrack.innerHTML = steps.map((step) => `
+        <div class="season-step ${step.key === season.key ? "active" : ""}">
+          <div class="season-name">${step.label}</div>
+          <div class="season-range">${step.range}</div>
+          <div class="season-focus">${step.focus}</div>
+        </div>
+      `).join("");
+    }
+
+    function summaryForBelt() {
+      const belt = beltStats();
+      const season = getSeason();
+      const eastWet = belt.eastRain - belt.westRain > 0.5;
+      const warmState = findExtreme("warm");
+      const wetState = findExtreme("wet");
+      let lead = "热量偏暖，雨量分布分化。";
+      if (eastWet && belt.avgTempAnomF > 1.5) {
+        lead = "西部升温快，东部雨量更强。";
+      } else if (belt.avgRainAnomIn > 0.25) {
+        lead = "整体偏湿，田间作业节奏偏慢。";
+      } else if (belt.avgTempAnomF > 1.5 && belt.avgRainAnomIn < 0.1) {
+        lead = "整体偏暖偏干，播前窗口改善。";
+      }
+      const tags = [
+        { text: `温度 ${displaySignedTemp(belt.avgTempAnomF, 1)}`, tone: belt.avgTempAnomF >= 0 ? "amber" : "blue" },
+        { text: `降水 ${displaySignedRain(belt.avgRainAnomIn, 1)}`, tone: belt.avgRainAnomIn >= 0 ? "blue" : "green" },
+        { text: `最湿 ${wetState.label}`, tone: "blue" },
+        { text: `最暖 ${warmState.label}`, tone: "amber" },
+        { text: season.key === "preplant" || season.key === "planting" ? "关注下地窗口" : season.key === "growth" ? "关注热量墒情" : "关注收割窗口", tone: "green" }
+      ];
+      return { lead, tags };
+    }
+
+    function buildTabs() {
+      dom.stateTabs.innerHTML = STATE_META.map((meta) => {
+        const signal = stateSignal(meta, APP.data.states[meta.id], getSeason());
+        return `
+          <button class="state-tab ${APP.selected === meta.id ? "active" : ""}" data-state="${meta.id}">
+            <strong>${meta.zh}</strong>
+            <span>${signal.label}</span>
+            <i style="background:${getToneColor(signal.tone)};"></i>
+          </button>
+        `;
+      }).join("");
+
+      dom.stateTabs.querySelectorAll(".state-tab").forEach((button) => {
+        button.addEventListener("click", () => {
+          APP.selected = button.dataset.state;
+          render();
+        });
+      });
+    }
+
+    function renderHero() {
+      const season = getSeason();
+      const belt = beltStats();
+      const headline = headlineForBelt(season);
+      const summary = summaryForBelt();
+      dom.heroLabel.textContent = "大豆带综合状态";
+      dom.heroTitle.textContent = headline.title;
+      dom.heroSubtitle.textContent = headline.subtitle;
+      dom.phaseName.textContent = season.label;
+      dom.phaseFocus.textContent = season.focus;
+      renderSeasonModule(season);
+      dom.summaryLead.textContent = summary.lead;
+      dom.summaryTags.innerHTML = summary.tags.map((tag) => `
+        <span class="summary-tag" style="color:${getToneColor(tag.tone)};">${tag.text}</span>
+      `).join("");
+      dom.beltWindowNote.textContent = `${formatDateLabel(APP.data.recentStart)}-${formatDateLabel(APP.data.recentEnd)} vs 2016-2025`;
+      dom.historyMeta.textContent = "2016-2025 同期";
+
+      const rows = [
+        {
+          k: "8州均温偏离",
+          v: belt.avgTempAnomF !== null ? displaySignedTemp(belt.avgTempAnomF, 1) : displayTemp(belt.avgTempF, 1),
+          s: belt.avgTempAnomF !== null ? "近7天 vs 10年同期" : "近7天均值",
+          tone: belt.avgTempAnomF === null ? "text" : belt.avgTempAnomF > 0 ? "amber" : "blue"
+        },
+        {
+          k: "8州降水偏离",
+          v: belt.avgRainAnomIn !== null ? displaySignedRain(belt.avgRainAnomIn, 1) : displayRain(belt.avgRainIn, 2),
+          s: belt.avgRainAnomIn !== null ? "近7天 vs 10年同期" : "近7天均值",
+          tone: belt.avgRainAnomIn === null ? "text" : belt.avgRainAnomIn > 0 ? "blue" : "green"
+        },
+        {
+          k: "最湿州",
+          v: findExtreme("wet").label,
+          s: findExtreme("wet").sub,
+          tone: "blue"
+        },
+        {
+          k: "最暖州",
+          v: findExtreme("warm").label,
+          s: findExtreme("warm").sub,
+          tone: "amber"
+        }
+      ];
+
+      dom.heroKpis.innerHTML = rows.map((row) => `
+        <div class="kpi">
+          <div class="kpi-k">${row.k}</div>
+          <div class="kpi-v tone-${row.tone}">${row.v}</div>
+          <div class="kpi-s">${row.s}</div>
+        </div>
+      `).join("");
+
+      dom.beltMap.innerHTML = STATE_META.map((meta) => {
+        const state = APP.data.states[meta.id];
+        const stats = stateWindowStats(state);
+        const signal = stateSignal(meta, state, season);
+        const mainValue = stats.tempAnomF !== null ? displaySignedTemp(stats.tempAnomF, 1) : displayTemp(stats.windowTempF, 0);
+        const mini = stats.precipAnomIn !== null ? `雨 ${displaySignedRain(stats.precipAnomIn, 1)}` : `雨 ${displayRain(stats.windowPrecipIn, 2)}`;
+        return `
+          <button class="belt-node tone-${signal.tone}" data-jump="${meta.id}">
+            <div class="belt-code">${meta.code}</div>
+            <div class="belt-main">${mainValue}</div>
+            <div class="belt-mini">${signal.label}<br>${mini}</div>
+          </button>
+        `;
+      }).join("");
+
+      dom.beltMap.querySelectorAll(".belt-node").forEach((node) => {
+        node.addEventListener("click", () => {
+          APP.selected = node.dataset.jump;
+          render();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+    }
+
+    function findExtreme(kind) {
+      const scored = STATE_META.map((meta) => {
+        const state = APP.data.states[meta.id];
+        const stats = stateWindowStats(state);
+        return { meta, state, stats };
+      });
+
+      if (kind === "wet") {
+        scored.sort((a, b) => (b.stats.windowPrecipIn || 0) - (a.stats.windowPrecipIn || 0));
+        return {
+          label: scored[0].meta.zh,
+          sub: displayRain(scored[0].stats.windowPrecipIn, 2)
+        };
+      }
+
+      scored.sort((a, b) => (b.stats.windowTempF || -999) - (a.stats.windowTempF || -999));
+      return {
+        label: scored[0].meta.zh,
+        sub: displayTemp(scored[0].stats.windowTempF, 1)
+      };
+    }
+
+    function renderSelectedState() {
+      const meta = STATE_META.find((item) => item.id === APP.selected);
+      const state = APP.data.states[APP.selected];
+      const stats = stateWindowStats(state);
+      const season = getSeason();
+      const signal = stateSignal(meta, state, season);
+      dom.detailTitle.textContent = meta.zh;
+      dom.detailSub.textContent = `${formatDateLabel(APP.data.recentStart)}-${formatDateLabel(APP.data.recentEnd)} 回看 ｜ ${formatDateLabel(APP.data.forecastStart)}-${formatDateLabel(APP.data.forecastEnd)} 预报`;
+      dom.detailSignal.style.color = getToneColor(signal.tone);
+      dom.detailSignalText.textContent = signal.label;
+
+      const maxF = Math.max(...(state.recent.maxF || []));
+      const minF = Math.min(...(state.recent.minF || []));
+      const metrics = [
+        {
+          k: "近7天均温",
+          v: displayTemp(stats.windowTempF, 1),
+          s: stats.tempAnomF !== null ? `同期 ${displaySignedTemp(stats.tempAnomF, 1)}` : "历史同步中",
+          tone: stats.tempAnomF === null ? "text" : stats.tempAnomF > 0 ? "amber" : "blue"
+        },
+        {
+          k: "近7天降水",
+          v: displayRain(stats.windowPrecipIn, 2),
+          s: stats.precipAnomIn !== null ? `同期 ${displaySignedRain(stats.precipAnomIn, 1)}` : "历史同步中",
+          tone: stats.precipAnomIn === null ? "text" : stats.precipAnomIn > 0 ? "blue" : "green"
+        },
+        {
+          k: "高低温范围",
+          v: `${displayTemp(maxF, 0)} / ${displayTemp(minF, 0)}`,
+          s: "近7天极值",
+          tone: "text"
+        },
+        {
+          k: "未来7天降水",
+          v: displayRain(stats.forecastPrecipIn, 2),
+          s: "预报累计",
+          tone: stats.forecastPrecipIn > 1 ? "blue" : "green"
+        }
+      ];
+
+      dom.stateMetrics.innerHTML = metrics.map((item) => `
+        <div class="item">
+          <div class="item-k">${item.k}</div>
+          <div class="item-v tone-${item.tone}">${item.v}</div>
+          <div class="item-s">${item.s}</div>
+        </div>
+      `).join("");
+
+      renderTempChart(state);
+      renderRainChart(state);
+      renderForecast(state);
+    }
+
+    function renderForecast(state) {
+      dom.forecastWindowNote.textContent = `${formatDateLabel(APP.data.forecastStart)}-${formatDateLabel(APP.data.forecastEnd)}`;
+      dom.forecastRow.innerHTML = state.forecast.dates.map((date, index) => `
+        <div class="forecast-card">
+          <div class="forecast-date">${formatDateLabel(date)}</div>
+          <div class="forecast-temp">${displayTemp(state.forecast.meanF[index], 0)}</div>
+          <div class="forecast-rain">雨 ${displayRain(state.forecast.precipIn[index], 2)}</div>
+          <div class="forecast-pop">概率 ${state.forecast.pop[index]}%</div>
+        </div>
+      `).join("");
+    }
+
+    function renderBoard() {
+      const rows = STATE_META.map((meta) => {
+        const state = APP.data.states[meta.id];
+        const stats = stateWindowStats(state);
+        const signal = stateSignal(meta, state, getSeason());
+        const tempTrack = clamp(((stats.tempAnomF ?? stats.windowTempF) + 10) / 20, 0, 1) * 100;
+        const rainTrack = clamp(((stats.precipAnomIn ?? stats.windowPrecipIn) + 1.5) / 3, 0, 1) * 100;
+        return `
+          <div class="board-row">
+            <div class="board-left">
+              <div class="board-title">
+                <span>${meta.zh}</span>
+                <span class="status-pill" style="color:${getToneColor(signal.tone)};">
+                  <span class="signal-dot"></span>${signal.label}
+                </span>
+              </div>
+              <div class="board-metrics">
+                <div class="board-cell">
+                  <div class="board-k">温度偏离</div>
+                  <div class="board-v tone-${stats.tempAnomF === null ? "text" : (stats.tempAnomF > 0 ? "amber" : "blue")}">
+                    ${stats.tempAnomF !== null ? displaySignedTemp(stats.tempAnomF, 1) : displayTemp(stats.windowTempF, 1)}
+                  </div>
+                  <div class="track"><div class="fill" style="width:${tempTrack}%;background:${stats.tempAnomF !== null && stats.tempAnomF < 0 ? "var(--blue)" : "var(--amber)"};"></div></div>
+                </div>
+                <div class="board-cell">
+                  <div class="board-k">降水偏离</div>
+                  <div class="board-v tone-${stats.precipAnomIn === null ? "text" : (stats.precipAnomIn > 0 ? "blue" : "green")}">
+                    ${stats.precipAnomIn !== null ? displaySignedRain(stats.precipAnomIn, 1) : displayRain(stats.windowPrecipIn, 2)}
+                  </div>
+                  <div class="track"><div class="fill" style="width:${rainTrack}%;background:${stats.precipAnomIn !== null && stats.precipAnomIn < 0 ? "var(--green)" : "var(--blue)"};"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="board-right">
+              <div class="label">未来7天</div>
+              <div class="value tone-${stats.forecastPrecipIn > 1 ? "blue" : "text"}">${displayRain(stats.forecastPrecipIn, 2)}</div>
+              <div class="sub">${meta.code}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      dom.boardList.innerHTML = rows;
+    }
+
+    function renderTempChart(state) {
+      if (APP.view === "forecast") {
+        dom.tempHeading.textContent = "未来7天均温";
+        dom.tempLegend.innerHTML = `<span><i class="legend-dot" style="background:#66b8ff;"></i>未来7天</span>`;
+        dom.tempChart.innerHTML = lineChartSvg(
+          state.forecast.dates.map(formatDateLabel),
+          state.forecast.meanF || [],
+          [],
+          {
+            primary: "#66b8ff",
+            secondary: "#97a4ba"
+          }
+        );
+        return;
+      }
+
+      dom.tempHeading.textContent = "均温对比";
+      dom.tempLegend.innerHTML = `
+        <span><i class="legend-dot" style="background:#66b8ff;"></i>近7天</span>
+        <span><i class="legend-dot" style="background:#8f9bb0;"></i>10年同期均值</span>
+      `;
+      const recent = state.recent.meanF || [];
+      const hist = state.hist ? state.hist.dailyTempAvgF : [];
+      const labels = state.recent.dates.map(formatDateLabel);
+      dom.tempChart.innerHTML = lineChartSvg(labels, recent, hist, {
+        primary: "#66b8ff",
+        secondary: "#97a4ba"
+      });
+    }
+
+    function renderRainChart(state) {
+      if (APP.view === "forecast") {
+        dom.rainHeading.textContent = "未来7天降水";
+        dom.rainLegend.innerHTML = `<span><i class="legend-dot" style="background:#3bd7c4;"></i>未来7天</span>`;
+        dom.rainChart.innerHTML = barChartSvg(
+          state.forecast.dates.map(formatDateLabel),
+          state.forecast.precipIn || [],
+          [],
+          {
+            primary: "#3bd7c4",
+            secondary: "#8f9bb0"
+          }
+        );
+        return;
+      }
+
+      dom.rainHeading.textContent = "降水对比";
+      dom.rainLegend.innerHTML = `
+        <span><i class="legend-dot" style="background:#3bd7c4;"></i>近7天</span>
+        <span><i class="legend-dot" style="background:#8f9bb0;"></i>10年同期均值</span>
+      `;
+      const recent = state.recent.precipIn || [];
+      const hist = state.hist ? state.hist.dailyPrecipAvgIn : [];
+      const labels = state.recent.dates.map(formatDateLabel);
+      dom.rainChart.innerHTML = barChartSvg(labels, recent, hist, {
+        primary: "#3bd7c4",
+        secondary: "#8f9bb0"
+      });
+    }
+
+    function lineChartSvg(labels, primaryData, secondaryData, opts) {
+      if (!primaryData.length) return `<div class="chart-placeholder">暂无数据</div>`;
+      const width = 360;
+      const height = 176;
+      const padding = { top: 18, right: 12, bottom: 30, left: 14 };
+      const all = primaryData.concat(secondaryData || []);
+      const min = Math.min(...all);
+      const max = Math.max(...all);
+      const range = Math.max(1, max - min);
+      const innerW = width - padding.left - padding.right;
+      const innerH = height - padding.top - padding.bottom;
+      const step = labels.length > 1 ? innerW / (labels.length - 1) : innerW;
+      const yPos = (value) => padding.top + innerH - ((value - min) / range) * innerH;
+
+      const toPath = (data) => data.map((value, index) => `${index === 0 ? "M" : "L"} ${padding.left + step * index} ${yPos(value)}`).join(" ");
+      const grid = [0, 0.5, 1].map((ratio) => {
+        const y = padding.top + innerH * ratio;
+        return `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="rgba(255,255,255,0.08)" />`;
+      }).join("");
+
+      const secondaryPath = secondaryData && secondaryData.length ? `<path d="${toPath(secondaryData)}" fill="none" stroke="${opts.secondary}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9" />` : "";
+      const primaryPath = `<path d="${toPath(primaryData)}" fill="none" stroke="${opts.primary}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />`;
+      const points = primaryData.map((value, index) => `
+        <g>
+          <circle cx="${padding.left + step * index}" cy="${yPos(value)}" r="3.5" fill="${opts.primary}" />
+          <text x="${padding.left + step * index}" y="${height - 10}" text-anchor="middle" fill="rgba(243,247,255,0.62)" font-size="10">${labels[index]}</text>
+        </g>
+      `).join("");
+
+      return `
+        <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="temperature chart">
+          ${grid}
+          ${secondaryPath}
+          ${primaryPath}
+          ${points}
+        </svg>
+      `;
+    }
+
+    function barChartSvg(labels, primaryData, secondaryData, opts) {
+      if (!primaryData.length) return `<div class="chart-placeholder">暂无数据</div>`;
+      const width = 360;
+      const height = 176;
+      const padding = { top: 18, right: 12, bottom: 30, left: 14 };
+      const max = Math.max(...primaryData, ...(secondaryData || [0]), 0.2);
+      const innerW = width - padding.left - padding.right;
+      const innerH = height - padding.top - padding.bottom;
+      const step = innerW / labels.length;
+      const barW = step * 0.32;
+      const yPos = (value) => padding.top + innerH - (value / max) * innerH;
+      const grid = [0, 0.5, 1].map((ratio) => {
+        const y = padding.top + innerH * ratio;
+        return `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="rgba(255,255,255,0.08)" />`;
+      }).join("");
+      const bars = primaryData.map((value, index) => {
+        const x = padding.left + step * index + step * 0.18;
+        const hx = x + barW + 5;
+        const ph = padding.top + innerH - yPos(value);
+        const hh = secondaryData && secondaryData.length ? padding.top + innerH - yPos(secondaryData[index]) : 0;
+        return `
+          ${secondaryData && secondaryData.length ? `<rect x="${hx}" y="${yPos(secondaryData[index])}" width="${barW}" height="${hh}" rx="3" fill="${opts.secondary}" opacity="0.75" />` : ""}
+          <rect x="${x}" y="${yPos(value)}" width="${barW}" height="${ph}" rx="3" fill="${opts.primary}" />
+          <text x="${padding.left + step * index + step * 0.5}" y="${height - 10}" text-anchor="middle" fill="rgba(243,247,255,0.62)" font-size="10">${labels[index]}</text>
+        `;
+      }).join("");
+      return `
+        <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="precip chart">
+          ${grid}
+          ${bars}
+        </svg>
+      `;
+    }
+
+    function render() {
+      const season = getSeason();
+      dom.syncText.textContent = APP.liveMode === "live" ? "实时已同步" : APP.liveMode === "syncing" ? "实时同步中" : "快照载入";
+      dom.updateText.textContent = `更新至 ${APP.data.generatedAt}`;
+      buildTabs();
+      renderHero();
+      renderSelectedState();
+      renderBoard();
+
+      dom.seasonSeg.querySelectorAll("button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === APP.view);
+      });
+      dom.unitSeg.querySelectorAll("button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.unit === APP.unit);
+      });
+    }
+
+    async function fetchJson(url) {
+      const response = await fetch(url, { mode: "cors" });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response.json();
+    }
+
+    async function loadLiveData() {
+      const recentWindow = getRecentWindow();
+      const forecastWindow = getForecastWindow();
+      const lats = STATE_META.map((item) => item.lat).join(",");
+      const lons = STATE_META.map((item) => item.lon).join(",");
+      const recentUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${lats}&longitude=${lons}&start_date=${recentWindow.start}&end_date=${recentWindow.end}&daily=temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto`;
+      const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&daily=temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_mean&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto&forecast_days=7`;
+
+      const historyYears = Array.from({ length: 10 }, (_, index) => 2016 + index);
+      const historyUrls = historyYears.map((year) => {
+        const start = `${year}-${recentWindow.start.slice(5)}`;
+        const end = `${year}-${recentWindow.end.slice(5)}`;
+        return `https://archive-api.open-meteo.com/v1/archive?latitude=${lats}&longitude=${lons}&start_date=${start}&end_date=${end}&daily=temperature_2m_mean,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto`;
+      });
+
+      const [recentJson, forecastJson, ...historyJson] = await Promise.all([
+        fetchJson(recentUrl),
+        fetchJson(forecastUrl),
+        ...historyUrls.map(fetchJson)
+      ]);
+
+      const recent = parseBatchResponse(recentJson);
+      const forecast = parseBatchResponse(forecastJson);
+      const historyPerYear = historyJson.map(parseBatchResponse);
+
+      const states = {};
+      STATE_META.forEach((meta) => {
+        const histTempDaily = [];
+        const histRainDaily = [];
+        const histWindowTemps = [];
+        const histWindowRains = [];
+
+        historyPerYear.forEach((yearData) => {
+          const hist = yearData[meta.id];
+          if (!hist) return;
+          histWindowTemps.push(mean(hist.temperature_2m_mean));
+          histWindowRains.push(sum(hist.precipitation_sum));
+          hist.temperature_2m_mean.forEach((value, index) => {
+            histTempDaily[index] = (histTempDaily[index] || 0) + value;
+          });
+          hist.precipitation_sum.forEach((value, index) => {
+            histRainDaily[index] = (histRainDaily[index] || 0) + value;
+          });
+        });
+
+        states[meta.id] = {
+          recent: {
+            dates: recent[meta.id].time,
+            meanF: recent[meta.id].temperature_2m_mean,
+            maxF: recent[meta.id].temperature_2m_max,
+            minF: recent[meta.id].temperature_2m_min,
+            precipIn: recent[meta.id].precipitation_sum
+          },
+          forecast: {
+            dates: forecast[meta.id].time,
+            meanF: forecast[meta.id].temperature_2m_mean,
+            maxF: forecast[meta.id].temperature_2m_max,
+            minF: forecast[meta.id].temperature_2m_min,
+            precipIn: forecast[meta.id].precipitation_sum,
+            pop: forecast[meta.id].precipitation_probability_mean
+          },
+          hist: {
+            dailyTempAvgF: histTempDaily.map((value) => value / historyPerYear.length),
+            dailyPrecipAvgIn: histRainDaily.map((value) => value / historyPerYear.length),
+            windowTempAvgF: mean(histWindowTemps),
+            windowPrecipAvgIn: mean(histWindowRains)
+          }
+        };
+      });
+
+      return {
+        generatedAt: `${recentWindow.end} / 实时`,
+        recentStart: recentWindow.start,
+        recentEnd: recentWindow.end,
+        forecastStart: forecastWindow.start,
+        forecastEnd: forecastWindow.end,
+        states
+      };
+    }
+
+    function bindEvents() {
+      dom.refreshBtn.addEventListener("click", refreshLive);
+      dom.seasonSeg.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          APP.view = button.dataset.view;
+          document.querySelector(".panel").scrollIntoView({ behavior: "smooth", block: "start" });
+          render();
+        });
+      });
+      dom.unitSeg.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          APP.unit = button.dataset.unit;
+          render();
+        });
+      });
+    }
+
+    async function refreshLive() {
+      APP.liveMode = "syncing";
+      render();
+      try {
+        const liveData = await loadLiveData();
+        APP.data = liveData;
+        APP.liveMode = "live";
+      } catch (error) {
+        APP.liveMode = "snapshot";
+      }
+      render();
+    }
+
+    bindEvents();
+    render();
+    refreshLive();
+  </script>
+</body>
+</html>
