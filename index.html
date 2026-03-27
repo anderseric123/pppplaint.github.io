@@ -683,17 +683,19 @@
     .chart-wrap {
       position: relative;
       width: 100%;
-      min-height: 176px;
+      min-height: 208px;
+      height: 208px;
       border: 1px solid rgba(153, 176, 219, 0.08);
       border-radius: 16px;
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
       overflow: hidden;
     }
 
-    .chart-wrap svg {
+    .chart-wrap svg,
+    .chart-wrap canvas {
       display: block;
       width: 100%;
-      height: auto;
+      height: 100%;
     }
 
     .chart-placeholder {
@@ -730,18 +732,28 @@
       margin-bottom: 8px;
     }
 
-    .forecast-temp {
-      font-size: 18px;
+    .forecast-hi {
+      font-size: 19px;
       font-weight: 700;
       line-height: 1;
-      margin-bottom: 7px;
+      margin-bottom: 5px;
     }
 
+    .forecast-lo,
+    .forecast-mean,
     .forecast-rain,
     .forecast-pop {
       font-size: 11px;
       color: var(--muted);
       line-height: 1.5;
+    }
+
+    .forecast-lo {
+      margin-bottom: 2px;
+    }
+
+    .forecast-mean {
+      margin-bottom: 6px;
     }
 
     .board {
@@ -947,7 +959,7 @@
           <div class="meta">
             <span class="status-dot"></span>
             <span id="syncText">快照载入</span>
-            <span id="updateText">更新至 2026-03-27</span>
+            <span id="updateText">更新至 北京时间 2026-03-27 22:28</span>
           </div>
         </div>
         <div class="top-actions">
@@ -1087,20 +1099,21 @@
     <button class="refresh" id="refreshBtn">刷新</button>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <script>
     const STATE_META = [
-      { id: "illinois", zh: "伊利诺伊", en: "Illinois", code: "IL", lat: 40.6331, lon: -89.3985, region: "east" },
-      { id: "iowa", zh: "爱荷华", en: "Iowa", code: "IA", lat: 42.0329, lon: -93.5815, region: "west" },
-      { id: "indiana", zh: "印第安纳", en: "Indiana", code: "IN", lat: 39.7684, lon: -86.1581, region: "east" },
-      { id: "minnesota", zh: "明尼苏达", en: "Minnesota", code: "MN", lat: 46.7296, lon: -94.6859, region: "north" },
-      { id: "nebraska", zh: "内布拉斯加", en: "Nebraska", code: "NE", lat: 41.4925, lon: -99.9018, region: "west" },
-      { id: "ohio", zh: "俄亥俄", en: "Ohio", code: "OH", lat: 40.4173, lon: -82.9071, region: "east" },
-      { id: "missouri", zh: "密苏里", en: "Missouri", code: "MO", lat: 38.5767, lon: -92.1735, region: "south" },
-      { id: "south_dakota", zh: "南达科他", en: "South Dakota", code: "SD", lat: 44.3683, lon: -100.351, region: "west" }
+      { id: "illinois", zh: "伊利诺伊", en: "Illinois", code: "IL", lat: 40.4842, lon: -88.9937, region: "east" },
+      { id: "iowa", zh: "爱荷华", en: "Iowa", code: "IA", lat: 42.0308, lon: -93.6319, region: "west" },
+      { id: "indiana", zh: "印第安纳", en: "Indiana", code: "IN", lat: 40.4167, lon: -86.8753, region: "east" },
+      { id: "minnesota", zh: "明尼苏达", en: "Minnesota", code: "MN", lat: 44.1636, lon: -93.9994, region: "north" },
+      { id: "nebraska", zh: "内布拉斯加", en: "Nebraska", code: "NE", lat: 40.9264, lon: -98.3420, region: "west" },
+      { id: "ohio", zh: "俄亥俄", en: "Ohio", code: "OH", lat: 41.0442, lon: -83.6499, region: "east" },
+      { id: "missouri", zh: "密苏里", en: "Missouri", code: "MO", lat: 38.9517, lon: -92.3341, region: "south" },
+      { id: "south_dakota", zh: "南达科他", en: "South Dakota", code: "SD", lat: 44.3114, lon: -96.7984, region: "west" }
     ];
 
     const BOOTSTRAP = {
-      generatedAt: "2026-03-27 17:36",
+      generatedAt: "北京时间 2026-03-27 22:28",
       recentStart: "2026-03-20",
       recentEnd: "2026-03-26",
       forecastStart: "2026-03-27",
@@ -1109,151 +1122,151 @@
         illinois: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [60.0,62.1,57.1,37.6,43.1,56.0,63.9],
-            maxF: [76.8,79.6,68.9,46.3,57.4,72.2,85.8],
-            minF: [45.5,45.6,37.2,30.1,31.3,40.6,47.2],
-            precipIn: [0,0,0.020,0,0,0,1.437]
+            meanF: [60.6,61.3,57.2,37.1,42.1,55.5,63.8],
+            maxF: [75.3,77.6,71.2,45.4,56.1,70.3,85.0],
+            minF: [47.6,45.8,36.7,30.4,29.7,40.8,44.7],
+            precipIn: [0,0,0.091,0,0,0.028,1.303]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [36.8,38.0,50.5,65.3,68.8,45.8,38.3],
-            maxF: [45.4,49.3,60.6,76.1,80.4,50.7,42.8],
-            minF: [31.1,29.8,39.5,57.0,51.8,40.1,34.1],
-            precipIn: [0.020,0,0,0.059,0.319,0.055,0.154],
-            pop: [7,0,0,9,33,42,43]
+            meanF: [37.2,36.9,49.0,64.1,69.2,46.0,40.6],
+            maxF: [44.4,46.4,59.8,75.8,80.3,51.1,45.5],
+            minF: [31.9,29.5,38.9,54.9,53.5,41.6,36.1],
+            precipIn: [0.177,0,0,0,0.748,0.169,0.067],
+            pop: [8,0,1,8,34,39,46]
           }
         },
         iowa: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [58.4,66.2,49.5,38.6,45.6,56.1,55.2],
-            maxF: [74.7,88.2,68.9,48.7,57.3,75.2,64.0],
-            minF: [49.0,48.6,37.0,26.8,34.7,40.7,40.8],
-            precipIn: [0,0,0,0.004,0,0,0.020]
+            meanF: [59.1,66.8,49.0,38.5,45.6,56.7,55.6],
+            maxF: [74.7,88.1,68.9,48.7,56.9,75.6,64.3],
+            minF: [50.6,50.4,36.7,26.9,35.1,41.6,40.8],
+            precipIn: [0,0,0,0.012,0,0,0]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [38.7,40.5,56.2,66.1,63.8,42.9,36.1],
-            maxF: [46.9,57.2,70.4,80.9,77.3,50.1,43.8],
-            minF: [30.9,23.4,42.7,53.2,47.5,34.4,32.1],
-            precipIn: [0,0,0,0,0.055,0,0.272],
-            pop: [0,0,0,8,24,31,27]
+            meanF: [37.9,39.4,55.4,65.9,62.2,43.9,45.0],
+            maxF: [46.9,56.0,72.3,79.5,75.6,52.2,52.5],
+            minF: [29.2,23.1,38.5,52.9,45.6,33.6,39.6],
+            precipIn: [0,0,0,0,0.177,0,0],
+            pop: [0,0,1,5,23,25,31]
           }
         },
         indiana: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [59.9,58.8,66.2,39.6,40.0,54.0,68.3],
-            maxF: [74.9,72.5,85.1,48.4,52.6,68.9,82.2],
-            minF: [49.5,44.7,50.5,33.6,28.3,39.8,58.2],
-            precipIn: [0,0,0.602,0,0,0,0.181]
+            meanF: [60.0,57.0,59.3,36.3,38.6,53.2,65.9],
+            maxF: [77.4,72.9,73.5,43.3,52.4,67.6,82.2],
+            minF: [48.9,42.4,38.1,30.6,26.5,38.5,52.1],
+            precipIn: [0,0,0.154,0,0,0,1.228]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [42.1,36.8,48.9,61.5,69.1,54.5,43.2],
-            maxF: [55.9,44.7,57.2,72.0,78.4,69.3,48.9],
-            minF: [33.0,31.7,38.3,55.6,62.8,44.1,37.6],
-            precipIn: [0.807,0,0,0,0,0.094,0.035],
-            pop: [28,0,2,10,22,35,44]
+            meanF: [37.4,35.2,45.5,59.8,68.5,49.5,40.1],
+            maxF: [49.0,42.7,54.4,69.6,77.5,67.6,45.7],
+            minF: [31.7,30.7,34.8,51.9,62.0,39.9,35.5],
+            precipIn: [0.512,0,0,0.004,0.047,0.295,0.071],
+            pop: [19,0,1,6,28,40,43]
           }
         },
         minnesota: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [46.2,47.0,30.9,32.7,39.4,48.4,32.8],
-            maxF: [60.6,64.7,34.2,43.1,49.5,64.4,40.3],
-            minF: [33.8,33.9,28.0,22.3,29.3,38.7,23.3],
-            precipIn: [0,0,0,0,0,0,0.035]
+            meanF: [50.8,58.8,38.7,36.1,44.5,53.3,46.6],
+            maxF: [61.3,78.1,48.0,45.6,53.4,71.1,54.7],
+            minF: [41.6,45.1,33.1,25.1,36.0,39.7,33.4],
+            precipIn: [0,0,0.004,0.008,0,0,0.004]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [22.7,36.9,41.0,42.7,34.2,29.7,29.8],
-            maxF: [28.2,57.9,55.0,54.4,39.5,38.0,31.6],
-            minF: [16.2,17.1,28.5,34.6,26.5,21.8,27.9],
-            precipIn: [0,0,0,0,0.004,0,0.083],
-            pop: [1,1,0,6,13,12,15]
+            meanF: [30.9,39.5,54.2,65.2,50.7,37.9,44.7],
+            maxF: [37.9,57.9,67.9,83.4,64.9,45.7,54.3],
+            minF: [24.7,23.9,41.1,51.9,39.1,28.5,36.3],
+            precipIn: [0,0,0,0,0.043,0,0],
+            pop: [0,0,0,5,14,14,24]
           }
         },
         nebraska: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [65.3,69.0,45.1,39.9,50.5,66.0,53.0],
-            maxF: [82.0,89.6,68.7,53.0,68.9,84.8,68.1],
-            minF: [48.8,48.9,34.8,28.7,36.5,49.5,34.1],
-            precipIn: [0,0,0,0,0,0,0.020]
+            meanF: [68.0,72.3,50.9,38.6,51.1,68.4,59.7],
+            maxF: [86.1,94.8,75.6,52.1,70.3,87.4,68.4],
+            minF: [46.8,51.4,38.8,27.2,34.2,52.7,36.9],
+            precipIn: [0,0,0,0.051,0,0,0.004]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [36.6,47.9,63.7,70.6,55.1,42.2,42.4],
-            maxF: [48.8,66.9,80.7,86.8,74.8,52.1,53.5],
-            minF: [26.9,33.3,49.6,54.4,41.7,31.4,36.6],
-            precipIn: [0,0,0,0,0,0.004,0.150],
-            pop: [0,1,2,3,10,29,19]
+            meanF: [38.7,46.7,64.8,72.3,56.2,44.9,43.8],
+            maxF: [50.6,63.0,85.4,91.8,71.3,56.2,47.8],
+            minF: [27.8,31.0,49.9,59.5,42.3,32.5,40.9],
+            precipIn: [0,0,0,0,0.047,0,0],
+            pop: [1,0,4,3,10,24,23]
           }
         },
         ohio: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [53.6,47.9,58.8,36.3,34.8,48.5,62.2],
-            maxF: [66.3,60.3,79.7,39.8,45.5,59.8,77.7],
-            minF: [40.5,34.5,40.1,32.3,24.1,35.8,51.3],
-            precipIn: [0.008,0,1.075,0.240,0,0,0.831]
+            meanF: [55.9,46.4,57.8,35.8,35.1,49.3,62.9],
+            maxF: [71.7,59.4,75.2,40.1,47.3,64.6,80.9],
+            minF: [38.4,34.1,37.0,31.4,23.5,34.5,47.8],
+            precipIn: [0.004,0,0.051,0,0,0,0.638]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [35.8,33.0,43.6,55.8,64.8,52.0,39.1],
-            maxF: [51.1,38.3,56.0,63.7,74.2,66.4,48.6],
-            minF: [30.7,29.2,32.7,47.0,57.6,38.5,28.4],
-            precipIn: [0.757,0.016,0,0.024,0.004,0.094,0],
-            pop: [26,0,2,14,31,31,37]
+            meanF: [33.9,32.7,44.1,57.8,66.7,50.3,36.1],
+            maxF: [47.9,39.5,56.4,66.8,75.7,68.5,41.4],
+            minF: [29.3,26.3,32.3,51.9,60.9,40.4,31.0],
+            precipIn: [0.295,0.016,0,0.028,0.098,0.094,0],
+            pop: [19,0,0,9,31,38,35]
           }
         },
         missouri: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [66.0,68.8,66.8,43.8,52.5,64.5,77.4],
-            maxF: [86.4,87.3,82.5,51.2,65.0,84.3,92.2],
-            minF: [48.5,54.6,47.0,35.4,41.2,47.7,57.9],
-            precipIn: [0,0,0,0,0,0,0.067]
+            meanF: [65.5,70.1,64.6,42.6,52.0,65.0,76.6],
+            maxF: [85.9,87.7,79.9,50.5,63.9,85.0,92.8],
+            minF: [50.0,56.8,44.2,33.4,39.9,47.8,54.8],
+            precipIn: [0,0,0,0,0,0,0.043]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [49.1,45.6,55.5,68.6,71.2,51.2,47.2],
-            maxF: [57.0,60.4,70.6,82.1,82.5,57.1,56.0],
-            minF: [40.0,31.9,41.8,57.0,54.6,44.9,42.9],
-            precipIn: [0.189,0,0,0,0.280,0.024,0.531],
-            pop: [16,0,0,4,19,40,42]
+            meanF: [47.7,44.2,56.0,67.8,70.4,49.6,43.4],
+            maxF: [54.2,58.3,71.4,80.1,82.6,57.0,45.5],
+            minF: [41.2,30.1,43.3,56.1,51.8,43.5,41.8],
+            precipIn: [0.083,0,0,0,0.669,0.079,0.248],
+            pop: [16,0,1,4,26,42,45]
           }
         },
         south_dakota: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [55.1,56.5,37.2,42.0,47.2,56.5,39.1],
-            maxF: [78.3,76.4,45.6,61.1,62.2,74.7,56.8],
-            minF: [36.4,40.6,32.1,28.2,35.1,42.1,28.6],
-            precipIn: [0,0,0.020,0,0,0,0]
+            meanF: [52.9,54.3,33.5,33.3,42.4,53.3,38.1],
+            maxF: [72.9,76.5,37.8,44.5,55.0,76.1,52.8],
+            minF: [37.1,38.0,26.9,21.6,32.6,34.8,27.5],
+            precipIn: [0,0,0.020,0.051,0,0,0.106]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [32.7,53.1,57.8,64.9,51.0,40.8,37.5],
-            maxF: [48.4,77.0,71.6,81.2,67.8,52.7,48.4],
-            minF: [20.1,33.8,43.9,52.0,39.1,28.8,34.8],
-            precipIn: [0,0,0,0,0,0,0.165],
-            pop: [0,0,0,2,9,22,20]
+            meanF: [29.6,42.4,53.4,62.4,46.9,35.6,46.0],
+            maxF: [40.3,60.7,67.4,77.7,61.5,45.9,56.4],
+            minF: [19.6,24.8,40.2,49.6,34.8,24.4,36.8],
+            precipIn: [0,0,0,0,0.087,0,0],
+            pop: [0,0,0,2,8,15,22]
           }
         }
       }
     };
 
     const BOOTSTRAP_HIST = {
-      illinois: { dailyTempAvgF: [41.3, 41.9, 42.9, 44.5, 44.8, 44.0, 43.8], dailyPrecipAvgIn: [0.060, 0.021, 0.139, 0.135, 0.259, 0.248, 0.093], windowTempAvgF: 43.3, windowPrecipAvgIn: 0.955 },
-      iowa: { dailyTempAvgF: [39.7, 43.1, 41.8, 40.5, 41.0, 42.3, 40.6], dailyPrecipAvgIn: [0.011, 0.009, 0.150, 0.196, 0.212, 0.090, 0.112], windowTempAvgF: 41.3, windowPrecipAvgIn: 0.779 },
-      indiana: { dailyTempAvgF: [41.9, 41.1, 42.8, 45.6, 47.0, 46.3, 46.3], dailyPrecipAvgIn: [0.141, 0.034, 0.221, 0.182, 0.265, 0.215, 0.155], windowTempAvgF: 44.4, windowPrecipAvgIn: 1.212 },
-      minnesota: { dailyTempAvgF: [29.6, 30.3, 30.5, 30.4, 30.9, 32.1, 28.9], dailyPrecipAvgIn: [0.011, 0.038, 0.113, 0.057, 0.083, 0.060, 0.075], windowTempAvgF: 30.4, windowPrecipAvgIn: 0.438 },
-      nebraska: { dailyTempAvgF: [38.7, 41.8, 42.7, 39.5, 41.0, 40.3, 38.1], dailyPrecipAvgIn: [0.004, 0.014, 0.065, 0.217, 0.180, 0.071, 0.027], windowTempAvgF: 40.3, windowPrecipAvgIn: 0.579 },
-      ohio: { dailyTempAvgF: [40.6, 39.2, 40.7, 43.5, 45.9, 45.4, 44.6], dailyPrecipAvgIn: [0.128, 0.044, 0.094, 0.232, 0.139, 0.132, 0.145], windowTempAvgF: 42.9, windowPrecipAvgIn: 0.913 },
-      missouri: { dailyTempAvgF: [46.8, 47.3, 50.1, 50.9, 49.3, 48.8, 49.8], dailyPrecipAvgIn: [0.011, 0.076, 0.103, 0.195, 0.234, 0.272, 0.037], windowTempAvgF: 49.0, windowPrecipAvgIn: 0.928 },
-      south_dakota: { dailyTempAvgF: [36.4, 37.0, 37.1, 38.8, 39.0, 37.6, 36.3], dailyPrecipAvgIn: [0.000, 0.031, 0.003, 0.027, 0.012, 0.032, 0.033], windowTempAvgF: 37.5, windowPrecipAvgIn: 0.138 }
+      illinois: { dailyTempAvgF: [41.4, 41.6, 42.9, 44.8, 44.8, 44.1, 44.2], dailyPrecipAvgIn: [0.045, 0.020, 0.122, 0.105, 0.311, 0.254, 0.076], windowTempAvgF: 43.4, windowPrecipAvgIn: 0.933 },
+      iowa: { dailyTempAvgF: [39.6, 43.0, 41.6, 40.3, 40.8, 42.1, 40.4], dailyPrecipAvgIn: [0.012, 0.014, 0.170, 0.213, 0.237, 0.134, 0.098], windowTempAvgF: 41.1, windowPrecipAvgIn: 0.877 },
+      indiana: { dailyTempAvgF: [41.7, 40.6, 42.5, 44.7, 46.2, 45.5, 45.4], dailyPrecipAvgIn: [0.074, 0.023, 0.185, 0.143, 0.123, 0.169, 0.193], windowTempAvgF: 43.8, windowPrecipAvgIn: 0.909 },
+      minnesota: { dailyTempAvgF: [35.1, 38.8, 36.7, 36.8, 36.9, 36.9, 36.0], dailyPrecipAvgIn: [0.015, 0.022, 0.127, 0.153, 0.302, 0.102, 0.144], windowTempAvgF: 36.7, windowPrecipAvgIn: 0.866 },
+      nebraska: { dailyTempAvgF: [41.2, 45.0, 44.4, 44.2, 43.6, 42.9, 40.5], dailyPrecipAvgIn: [0.007, 0.021, 0.156, 0.276, 0.238, 0.096, 0.077], windowTempAvgF: 43.1, windowPrecipAvgIn: 0.871 },
+      ohio: { dailyTempAvgF: [40.1, 39.2, 40.3, 42.6, 45.5, 43.4, 44.2], dailyPrecipAvgIn: [0.149, 0.044, 0.059, 0.130, 0.104, 0.185, 0.112], windowTempAvgF: 42.2, windowPrecipAvgIn: 0.782 },
+      missouri: { dailyTempAvgF: [45.9, 46.7, 49.1, 49.6, 48.0, 48.3, 48.5], dailyPrecipAvgIn: [0.009, 0.061, 0.121, 0.149, 0.212, 0.213, 0.082], windowTempAvgF: 48.0, windowPrecipAvgIn: 0.847 },
+      south_dakota: { dailyTempAvgF: [32.9, 34.8, 33.9, 33.3, 34.9, 34.6, 31.9], dailyPrecipAvgIn: [0.019, 0.023, 0.010, 0.136, 0.105, 0.073, 0.059], windowTempAvgF: 33.8, windowPrecipAvgIn: 0.425 }
     };
 
     Object.keys(BOOTSTRAP_HIST).forEach((id) => {
@@ -1265,6 +1278,10 @@
       view: "recent",
       selected: "illinois",
       liveMode: "snapshot",
+      charts: {
+        temp: null,
+        rain: null
+      },
       data: JSON.parse(JSON.stringify(BOOTSTRAP))
     };
 
@@ -1388,6 +1405,18 @@
       return `${fmtNumber(value, digits)}${rainUnitLabel()}`;
     }
 
+    function convertTempValue(valueF) {
+      return APP.unit === "metric" ? toMetricTemp(valueF) : valueF;
+    }
+
+    function convertRainValue(valueIn) {
+      return APP.unit === "metric" ? toMetricRain(valueIn) : valueIn;
+    }
+
+    function chartAxisNumber(value, digits = 0) {
+      return Number(value).toFixed(digits);
+    }
+
     function tempBiasText(valueF, digits = 1) {
       if (valueF === null || Number.isNaN(valueF)) return "--";
       return `${valueF >= 0 ? "偏暖" : "偏冷"} ${displayDeltaTemp(valueF, digits)}`;
@@ -1436,6 +1465,23 @@
       const copy = new Date(date);
       copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
       return copy.toISOString().slice(0, 10);
+    }
+
+    function formatBeijingStamp(date = new Date()) {
+      const parts = new Intl.DateTimeFormat("zh-CN", {
+        timeZone: "Asia/Shanghai",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).formatToParts(date);
+      const values = {};
+      parts.forEach((part) => {
+        if (part.type !== "literal") values[part.type] = part.value;
+      });
+      return `北京时间 ${values.year}-${values.month}-${values.day} ${values.hour}:${values.minute}`;
     }
 
     function parseBatchResponse(json) {
@@ -1755,7 +1801,7 @@
       const season = getSeason();
       const signal = stateSignal(meta, state, season);
       dom.detailTitle.textContent = meta.zh;
-      dom.detailSub.textContent = `${formatDateLabel(APP.data.recentStart)}-${formatDateLabel(APP.data.recentEnd)} 回看 ｜ ${formatDateLabel(APP.data.forecastStart)}-${formatDateLabel(APP.data.forecastEnd)} 预报`;
+      dom.detailSub.textContent = `${formatDateLabel(APP.data.recentStart)}-${formatDateLabel(APP.data.recentEnd)} 回看（日均温） ｜ ${formatDateLabel(APP.data.forecastStart)}-${formatDateLabel(APP.data.forecastEnd)} 预报（高/低温）`;
       dom.detailSignal.style.color = getToneColor(signal.tone);
       dom.detailSignalText.textContent = signal.label;
 
@@ -1798,15 +1844,18 @@
 
       renderTempChart(state);
       renderRainChart(state);
+      renderEcharts(state);
       renderForecast(state);
     }
 
     function renderForecast(state) {
-      dom.forecastWindowNote.textContent = `${formatDateLabel(APP.data.forecastStart)}-${formatDateLabel(APP.data.forecastEnd)}`;
+      dom.forecastWindowNote.textContent = `${formatDateLabel(APP.data.forecastStart)}-${formatDateLabel(APP.data.forecastEnd)} · 高/低温`;
       dom.forecastRow.innerHTML = state.forecast.dates.map((date, index) => `
         <div class="forecast-card">
           <div class="forecast-date">${formatDateLabel(date)}</div>
-          <div class="forecast-temp">${displayTemp(state.forecast.meanF[index], 0)}</div>
+          <div class="forecast-hi">高 ${displayTemp(state.forecast.maxF[index], 0)}</div>
+          <div class="forecast-lo">低 ${displayTemp(state.forecast.minF[index], 0)}</div>
+          <div class="forecast-mean">均 ${displayTemp(state.forecast.meanF[index], 0)}</div>
           <div class="forecast-rain">雨 ${displayRain(state.forecast.precipIn[index], 2)}</div>
           <div class="forecast-pop">概率 ${state.forecast.pop[index]}%</div>
         </div>
@@ -1847,7 +1896,7 @@
               </div>
             </div>
             <div class="board-right">
-              <div class="label">未来7天</div>
+              <div class="label">未来7天雨量</div>
               <div class="value tone-${stats.forecastPrecipIn > 1 ? "blue" : "text"}">${displayRain(stats.forecastPrecipIn, 2)}</div>
               <div class="sub">${meta.code}</div>
             </div>
@@ -1860,135 +1909,199 @@
 
     function renderTempChart(state) {
       if (APP.view === "forecast") {
-        dom.tempHeading.textContent = "未来7天均温";
-        dom.tempLegend.innerHTML = `<span><i class="legend-dot" style="background:#66b8ff;"></i>未来7天</span>`;
-        dom.tempChart.innerHTML = lineChartSvg(
-          state.forecast.dates.map(formatDateLabel),
-          state.forecast.meanF || [],
-          [],
-          {
-            primary: "#66b8ff",
-            secondary: "#97a4ba"
-          }
-        );
-        return;
+        dom.tempHeading.textContent = "未来7天日均温";
+        dom.tempLegend.innerHTML = `<span><i class="legend-dot" style="background:#66b8ff;"></i>未来7天日均温</span>`;
+      } else {
+        dom.tempHeading.textContent = "均温对比";
+        dom.tempLegend.innerHTML = `
+          <span><i class="legend-dot" style="background:#66b8ff;"></i>近7天</span>
+          <span><i class="legend-dot" style="background:#8f9bb0;"></i>10年同期均值</span>
+        `;
       }
 
-      dom.tempHeading.textContent = "均温对比";
-      dom.tempLegend.innerHTML = `
-        <span><i class="legend-dot" style="background:#66b8ff;"></i>近7天</span>
-        <span><i class="legend-dot" style="background:#8f9bb0;"></i>10年同期均值</span>
-      `;
-      const recent = state.recent.meanF || [];
-      const hist = state.hist ? state.hist.dailyTempAvgF : [];
-      const labels = state.recent.dates.map(formatDateLabel);
-      dom.tempChart.innerHTML = lineChartSvg(labels, recent, hist, {
-        primary: "#66b8ff",
-        secondary: "#97a4ba"
-      });
     }
 
     function renderRainChart(state) {
       if (APP.view === "forecast") {
-        dom.rainHeading.textContent = "未来7天降水";
+        dom.rainHeading.textContent = `未来7天降水 (${rainUnitLabel()})`;
         dom.rainLegend.innerHTML = `<span><i class="legend-dot" style="background:#3bd7c4;"></i>未来7天</span>`;
-        dom.rainChart.innerHTML = barChartSvg(
-          state.forecast.dates.map(formatDateLabel),
-          state.forecast.precipIn || [],
-          [],
-          {
-            primary: "#3bd7c4",
-            secondary: "#8f9bb0"
-          }
-        );
-        return;
-      }
-
-      dom.rainHeading.textContent = "降水对比";
-      dom.rainLegend.innerHTML = `
-        <span><i class="legend-dot" style="background:#3bd7c4;"></i>近7天</span>
-        <span><i class="legend-dot" style="background:#8f9bb0;"></i>10年同期均值</span>
-      `;
-      const recent = state.recent.precipIn || [];
-      const hist = state.hist ? state.hist.dailyPrecipAvgIn : [];
-      const labels = state.recent.dates.map(formatDateLabel);
-      dom.rainChart.innerHTML = barChartSvg(labels, recent, hist, {
-        primary: "#3bd7c4",
-        secondary: "#8f9bb0"
-      });
-    }
-
-    function lineChartSvg(labels, primaryData, secondaryData, opts) {
-      if (!primaryData.length) return `<div class="chart-placeholder">暂无数据</div>`;
-      const width = 360;
-      const height = 176;
-      const padding = { top: 18, right: 12, bottom: 30, left: 14 };
-      const all = primaryData.concat(secondaryData || []);
-      const min = Math.min(...all);
-      const max = Math.max(...all);
-      const range = Math.max(1, max - min);
-      const innerW = width - padding.left - padding.right;
-      const innerH = height - padding.top - padding.bottom;
-      const step = labels.length > 1 ? innerW / (labels.length - 1) : innerW;
-      const yPos = (value) => padding.top + innerH - ((value - min) / range) * innerH;
-
-      const toPath = (data) => data.map((value, index) => `${index === 0 ? "M" : "L"} ${padding.left + step * index} ${yPos(value)}`).join(" ");
-      const grid = [0, 0.5, 1].map((ratio) => {
-        const y = padding.top + innerH * ratio;
-        return `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="rgba(255,255,255,0.08)" />`;
-      }).join("");
-
-      const secondaryPath = secondaryData && secondaryData.length ? `<path d="${toPath(secondaryData)}" fill="none" stroke="${opts.secondary}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9" />` : "";
-      const primaryPath = `<path d="${toPath(primaryData)}" fill="none" stroke="${opts.primary}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />`;
-      const points = primaryData.map((value, index) => `
-        <g>
-          <circle cx="${padding.left + step * index}" cy="${yPos(value)}" r="3.5" fill="${opts.primary}" />
-          <text x="${padding.left + step * index}" y="${height - 10}" text-anchor="middle" fill="rgba(243,247,255,0.62)" font-size="10">${labels[index]}</text>
-        </g>
-      `).join("");
-
-      return `
-        <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="temperature chart">
-          ${grid}
-          ${secondaryPath}
-          ${primaryPath}
-          ${points}
-        </svg>
-      `;
-    }
-
-    function barChartSvg(labels, primaryData, secondaryData, opts) {
-      if (!primaryData.length) return `<div class="chart-placeholder">暂无数据</div>`;
-      const width = 360;
-      const height = 176;
-      const padding = { top: 18, right: 12, bottom: 30, left: 14 };
-      const max = Math.max(...primaryData, ...(secondaryData || [0]), 0.2);
-      const innerW = width - padding.left - padding.right;
-      const innerH = height - padding.top - padding.bottom;
-      const step = innerW / labels.length;
-      const barW = step * 0.32;
-      const yPos = (value) => padding.top + innerH - (value / max) * innerH;
-      const grid = [0, 0.5, 1].map((ratio) => {
-        const y = padding.top + innerH * ratio;
-        return `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="rgba(255,255,255,0.08)" />`;
-      }).join("");
-      const bars = primaryData.map((value, index) => {
-        const x = padding.left + step * index + step * 0.18;
-        const hx = x + barW + 5;
-        const ph = padding.top + innerH - yPos(value);
-        const hh = secondaryData && secondaryData.length ? padding.top + innerH - yPos(secondaryData[index]) : 0;
-        return `
-          ${secondaryData && secondaryData.length ? `<rect x="${hx}" y="${yPos(secondaryData[index])}" width="${barW}" height="${hh}" rx="3" fill="${opts.secondary}" opacity="0.75" />` : ""}
-          <rect x="${x}" y="${yPos(value)}" width="${barW}" height="${ph}" rx="3" fill="${opts.primary}" />
-          <text x="${padding.left + step * index + step * 0.5}" y="${height - 10}" text-anchor="middle" fill="rgba(243,247,255,0.62)" font-size="10">${labels[index]}</text>
+      } else {
+        dom.rainHeading.textContent = `降水对比 (${rainUnitLabel()})`;
+        dom.rainLegend.innerHTML = `
+          <span><i class="legend-dot" style="background:#3bd7c4;"></i>近7天</span>
+          <span><i class="legend-dot" style="background:#8f9bb0;"></i>10年同期均值</span>
         `;
-      }).join("");
-      return `
-        <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="precip chart">
-          ${grid}
-          ${bars}
-        </svg>
-      `;
+      }
+    }
+
+    function ensureChart(key, element) {
+      if (!window.echarts) {
+        element.innerHTML = `<div class="chart-placeholder">图表组件加载中</div>`;
+        return null;
+      }
+      if (!APP.charts[key]) {
+        APP.charts[key] = window.echarts.init(element, null, { renderer: "canvas" });
+      }
+      return APP.charts[key];
+    }
+
+    function tooltipFormatter(unit, digits = 1) {
+      return (items) => {
+        const rows = items.map((item) => {
+          const value = Array.isArray(item.value) ? item.value[1] : item.value;
+          return `${item.marker}${item.seriesName} ${chartAxisNumber(value, digits)}${unit}`;
+        });
+        return [`<div style="margin-bottom:4px;">${items[0]?.axisValueLabel || ""}</div>`, ...rows].join("<br/>");
+      };
+    }
+
+    function baseAxisStyle() {
+      return {
+        axisLine: { lineStyle: { color: "rgba(153,176,219,0.18)" } },
+        axisTick: { show: false },
+        axisLabel: { color: "rgba(243,247,255,0.62)", fontSize: 10 },
+        splitLine: { lineStyle: { color: "rgba(255,255,255,0.08)" } }
+      };
+    }
+
+    function renderEcharts(state) {
+      const tempChart = ensureChart("temp", dom.tempChart);
+      const rainChart = ensureChart("rain", dom.rainChart);
+      if (!tempChart || !rainChart) return;
+
+      const axis = baseAxisStyle();
+      const labels = (APP.view === "forecast" ? state.forecast.dates : state.recent.dates).map(formatDateLabel);
+      const tempPrimaryRaw = APP.view === "forecast" ? state.forecast.meanF || [] : state.recent.meanF || [];
+      const tempSecondaryRaw = APP.view === "forecast" ? [] : (state.hist ? state.hist.dailyTempAvgF : []);
+      const rainPrimaryRaw = APP.view === "forecast" ? state.forecast.precipIn || [] : state.recent.precipIn || [];
+      const rainSecondaryRaw = APP.view === "forecast" ? [] : (state.hist ? state.hist.dailyPrecipAvgIn : []);
+      const tempPrimary = tempPrimaryRaw.map(convertTempValue);
+      const tempSecondary = tempSecondaryRaw.map(convertTempValue);
+      const rainPrimary = rainPrimaryRaw.map(convertRainValue);
+      const rainSecondary = rainSecondaryRaw.map(convertRainValue);
+      const tempUnit = tempUnitLabel();
+      const rainUnit = rainUnitLabel();
+      const rainDigits = APP.unit === "metric" ? 1 : 2;
+
+      tempChart.setOption({
+        animationDuration: 500,
+        animationDurationUpdate: 300,
+        grid: { top: 18, left: 38, right: 12, bottom: 26 },
+        tooltip: {
+          trigger: "axis",
+          backgroundColor: "rgba(9,19,32,0.94)",
+          borderColor: "rgba(153,176,219,0.18)",
+          textStyle: { color: "#f3f7ff", fontSize: 11 },
+          axisPointer: { type: "line", lineStyle: { color: "rgba(102,184,255,0.3)" } },
+          formatter: tooltipFormatter(tempUnit, 1)
+        },
+        xAxis: {
+          type: "category",
+          data: labels,
+          boundaryGap: false,
+          axisLine: axis.axisLine,
+          axisTick: axis.axisTick,
+          axisLabel: axis.axisLabel
+        },
+        yAxis: {
+          type: "value",
+          min: (value) => Math.floor(value.min - 2),
+          max: (value) => Math.ceil(value.max + 2),
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: {
+            color: "rgba(243,247,255,0.62)",
+            fontSize: 10,
+            formatter: (value) => `${chartAxisNumber(value, 0)}${tempUnit}`
+          },
+          splitLine: axis.splitLine
+        },
+        series: [
+          {
+            name: APP.view === "forecast" ? "未来7天日均温" : "近7天",
+            type: "line",
+            smooth: 0.35,
+            symbol: "circle",
+            symbolSize: 6,
+            lineStyle: { width: 3, color: "#66b8ff" },
+            itemStyle: { color: "#66b8ff" },
+            areaStyle: {
+              color: new window.echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: "rgba(102,184,255,0.24)" },
+                { offset: 1, color: "rgba(102,184,255,0.02)" }
+              ])
+            },
+            data: tempPrimary
+          },
+          ...(tempSecondary.length ? [{
+            name: "10年同期均值",
+            type: "line",
+            smooth: 0.3,
+            symbol: "none",
+            lineStyle: { width: 2, color: "#8f9bb0", type: "dashed" },
+            itemStyle: { color: "#8f9bb0" },
+            data: tempSecondary
+          }] : [])
+        ]
+      }, true);
+
+      rainChart.setOption({
+        animationDuration: 500,
+        animationDurationUpdate: 300,
+        grid: { top: 18, left: 42, right: 12, bottom: 26 },
+        tooltip: {
+          trigger: "axis",
+          backgroundColor: "rgba(9,19,32,0.94)",
+          borderColor: "rgba(153,176,219,0.18)",
+          textStyle: { color: "#f3f7ff", fontSize: 11 },
+          axisPointer: { type: "shadow", shadowStyle: { color: "rgba(255,255,255,0.04)" } },
+          formatter: tooltipFormatter(rainUnit, rainDigits)
+        },
+        xAxis: {
+          type: "category",
+          data: labels,
+          axisLine: axis.axisLine,
+          axisTick: axis.axisTick,
+          axisLabel: axis.axisLabel
+        },
+        yAxis: {
+          type: "value",
+          min: 0,
+          axisLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: {
+            color: "rgba(243,247,255,0.62)",
+            fontSize: 10,
+            formatter: (value) => `${chartAxisNumber(value, rainDigits)}`
+          },
+          splitLine: axis.splitLine
+        },
+        series: [
+          {
+            name: APP.view === "forecast" ? "未来7天" : "近7天",
+            type: "bar",
+            barMaxWidth: 14,
+            itemStyle: {
+              color: new window.echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: "rgba(59,215,196,0.95)" },
+                { offset: 1, color: "rgba(59,215,196,0.35)" }
+              ]),
+              borderRadius: [5, 5, 0, 0]
+            },
+            data: rainPrimary
+          },
+          ...(rainSecondary.length ? [{
+            name: "10年同期均值",
+            type: "bar",
+            barMaxWidth: 14,
+            itemStyle: {
+              color: "rgba(143,155,176,0.7)",
+              borderRadius: [5, 5, 0, 0]
+            },
+            data: rainSecondary
+          }] : [])
+        ]
+      }, true);
     }
 
     function render() {
@@ -2087,7 +2200,7 @@
       });
 
       return {
-        generatedAt: `${recentWindow.end} / 实时`,
+        generatedAt: formatBeijingStamp(),
         recentStart: recentWindow.start,
         recentEnd: recentWindow.end,
         forecastStart: forecastWindow.start,
@@ -2110,6 +2223,10 @@
           APP.unit = button.dataset.unit;
           render();
         });
+      });
+      window.addEventListener("resize", () => {
+        if (APP.charts.temp) APP.charts.temp.resize();
+        if (APP.charts.rain) APP.charts.rain.resize();
       });
     }
 
