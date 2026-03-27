@@ -1616,6 +1616,19 @@
             return window.innerWidth <= 430;
         }
 
+        function rightPinnedTooltipPosition(point, params, dom, rect, size) {
+            const viewportWidth = size.viewSize[0];
+            const viewportHeight = size.viewSize[1];
+            const tooltipWidth = size.contentSize[0];
+            const tooltipHeight = size.contentSize[1];
+            const x = Math.max(8, viewportWidth - tooltipWidth - 8);
+            const y = Math.min(
+                Math.max(8, point[1] - tooltipHeight / 2),
+                Math.max(8, viewportHeight - tooltipHeight - 8)
+            );
+            return [x, y];
+        }
+
         function renderAcreageChart() {
             const compactMobile = isCompactMobile();
             const crop = acreageSeries[activeCrop];
@@ -1634,9 +1647,11 @@
                 tooltip: {
                     trigger: "axis",
                     axisPointer: { type: "shadow" },
+                    confine: true,
                     backgroundColor: "#FFFFFF",
                     borderColor: "#e5e7eb",
                     textStyle: { color: "#111827", fontFamily: 'Noto Sans SC' },
+                    position: compactMobile ? rightPinnedTooltipPosition : null,
                     formatter: function(params) {
                         const validItems = params.filter(item => item.data != null);
                         if (!validItems.length) {
@@ -1705,9 +1720,11 @@
                 tooltip: {
                     trigger: "axis",
                     axisPointer: { type: "shadow" },
+                    confine: true,
                     backgroundColor: "#FFFFFF",
                     borderColor: "#e5e7eb",
                     textStyle: { color: "#111827", fontFamily: 'Noto Sans SC' },
+                    position: compactMobile ? rightPinnedTooltipPosition : null,
                     formatter: function(params) {
                         if (!params || params.length === 0) {
                             return "";
