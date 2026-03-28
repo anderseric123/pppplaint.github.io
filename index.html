@@ -122,6 +122,51 @@
       flex-shrink: 0;
     }
 
+    .region-switch {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .region-switch::-webkit-scrollbar {
+      display: none;
+    }
+
+    .region-pill {
+      min-width: 104px;
+      padding: 10px 12px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      transition: all 0.22s ease;
+      text-align: left;
+    }
+
+    .region-pill.active {
+      color: var(--text);
+      border-color: rgba(102, 184, 255, 0.34);
+      background: linear-gradient(180deg, rgba(102, 184, 255, 0.16), rgba(102, 184, 255, 0.05));
+      box-shadow: 0 10px 24px rgba(16, 58, 102, 0.22);
+    }
+
+    .region-pill strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .region-pill span {
+      display: block;
+      font-size: 10px;
+      line-height: 1.4;
+      color: inherit;
+      opacity: 0.82;
+    }
+
     button {
       border: 0;
       background: none;
@@ -390,6 +435,81 @@
       border: 1px solid rgba(153, 176, 219, 0.12);
       background: rgba(255, 255, 255, 0.03);
       color: var(--muted);
+    }
+
+    .global-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .global-row {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 0;
+      border-top: 1px solid rgba(153, 176, 219, 0.08);
+      text-align: left;
+    }
+
+    .global-row:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .global-flag {
+      min-width: 42px;
+      height: 26px;
+      padding: 0 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(153, 176, 219, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .global-main {
+      min-width: 0;
+    }
+
+    .global-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+
+    .global-sub {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.45;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .global-side {
+      text-align: right;
+      min-width: 78px;
+    }
+
+    .global-signal {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .global-side-note {
+      font-size: 10px;
+      color: var(--muted-2);
+      line-height: 1.4;
     }
 
     .tone-green { color: var(--green); }
@@ -954,33 +1074,31 @@
     <header class="topbar">
       <div class="topbar-row">
         <div class="brand">
-          <div class="eyebrow">US Soybean Weather Monitor</div>
-          <h1 class="title">美国大豆主产区天气</h1>
+          <h1 class="title">全球大豆产区天气</h1>
           <div class="meta">
-            <span class="status-dot"></span>
-            <span id="syncText">快照载入</span>
             <span id="updateText">更新至 北京时间 2026-03-27 22:28</span>
           </div>
         </div>
         <div class="top-actions">
-          <button class="chip-btn" id="historyMeta">2016-2025 同期</button>
+          <button class="chip-btn" id="historyMeta">大豆 2025/26</button>
         </div>
       </div>
+      <div class="region-switch" id="regionSwitch"></div>
     </header>
 
     <section class="hero">
       <div class="hero-grid"></div>
       <div class="hero-head">
         <div class="hero-copy">
-          <div class="hero-label" id="heroLabel">大豆带综合状态</div>
-          <h2 class="hero-title" id="heroTitle">播前分化</h2>
-          <div class="hero-subtitle" id="heroSubtitle">东部雨带偏强，西部升温更快，田间窗口并不一致。</div>
+          <div class="hero-label" id="heroLabel">全球大豆总览</div>
+          <h2 class="hero-title" id="heroTitle">南美收割主导</h2>
+          <div class="hero-subtitle" id="heroSubtitle">巴西收获推进，美国进入播前天气交易，阿根廷处于单产兑现阶段。</div>
         </div>
         <div class="hero-side">
           <div class="phase-box">
-            <div class="phase-k">当前农时</div>
-            <div class="phase-v" id="phaseName">播前</div>
-            <div class="phase-s" id="phaseFocus">关注土温与作业窗口</div>
+            <div class="phase-k">当前区域</div>
+            <div class="phase-v" id="phaseName">美国</div>
+            <div class="phase-s" id="phaseFocus">播前 / 土温与作业窗口</div>
           </div>
         </div>
       </div>
@@ -990,38 +1108,46 @@
       <div class="mini-panels">
         <div class="mini-panel">
           <div class="section-head">
-            <h3 class="section-title">美豆生长周期</h3>
+            <h3 class="section-title" id="seasonPanelTitle">当前区域周期</h3>
             <div class="section-note" id="seasonDetail">当前阶段</div>
           </div>
           <div class="season-track" id="seasonTrack"></div>
         </div>
-        <div class="mini-panel">
+        <div class="mini-panel" id="summaryPanel">
           <div class="section-head">
-            <h3 class="section-title">产区天气总结</h3>
-            <div class="section-note">一眼看全局</div>
+            <h3 class="section-title" id="summaryPanelTitle">三地产区概况</h3>
+            <div class="section-note" id="summaryPanelNote">天气总览</div>
           </div>
-          <div class="summary-lead" id="summaryLead">整体偏暖，东部雨量更强。</div>
-          <div class="summary-tags" id="summaryTags"></div>
+          <div class="summary-lead" id="summaryLead">同步三大产区天气。</div>
+          <div class="global-grid" id="globalGrid"></div>
+        </div>
+        <div class="mini-panel" id="macroPanel">
+          <div class="section-head">
+            <h3 class="section-title" id="macroPanelTitle">大豆基本面</h3>
+            <div class="section-note">2025/26</div>
+          </div>
+          <div class="summary-lead" id="macroLead">全球供给仍不紧张。</div>
+          <div class="summary-tags" id="macroTags"></div>
         </div>
       </div>
 
       <div class="belt-overview">
         <div class="section-head">
-          <h3 class="section-title">8州热区</h3>
+          <h3 class="section-title" id="beltTitle">美国产区热区</h3>
           <div class="section-note" id="beltWindowNote">近7天 vs 10年同期</div>
         </div>
         <div class="belt-map" id="beltMap"></div>
       </div>
     </section>
 
-    <div class="sticky-tabs">
+    <div class="sticky-tabs" id="stickyTabs">
       <div class="tabs-scroll">
         <div class="tabs" id="stateTabs"></div>
       </div>
     </div>
 
     <main class="content">
-      <section class="panel">
+      <section class="panel" id="detailPanel">
         <div class="detail-head">
           <div>
             <h2 class="detail-title" id="detailTitle">伊利诺伊</h2>
@@ -1068,10 +1194,10 @@
         </div>
       </section>
 
-      <section class="board">
+      <section class="board" id="stateBoard">
         <div class="board-head">
           <div class="section-head" style="margin-bottom:0;">
-            <h3 class="section-title">州级监控</h3>
+            <h3 class="section-title">州 / 省级监控</h3>
             <div class="section-note">较常年偏暖偏冷 / 偏湿偏干 / 未来7天雨量</div>
           </div>
         </div>
@@ -1083,7 +1209,13 @@
       数据源：
       <a href="https://open-meteo.com/en/docs" target="_blank" rel="noreferrer">Open-Meteo</a>
       /
-      <a href="https://www.nass.usda.gov/Charts_and_Maps/Crop_Progress_%26_Condition/2025/index.php" target="_blank" rel="noreferrer">USDA NASS Crop Progress</a>
+      <a href="https://www.usda.gov/oce/commodity/wasde" target="_blank" rel="noreferrer">USDA WASDE</a>
+      /
+      <a href="https://ipad.fas.usda.gov/countrysummary/default.aspx" target="_blank" rel="noreferrer">USDA IPAD</a>
+      /
+      <a href="https://www.fas.usda.gov/data/export-sales-report" target="_blank" rel="noreferrer">USDA FAS</a>
+      /
+      <a href="https://cast.conab.gov.br/post/2026-03-13_6_lev_graos/" target="_blank" rel="noreferrer">CONAB</a>
     </div>
   </div>
 
@@ -1113,7 +1245,7 @@
     ];
 
     const BOOTSTRAP = {
-      generatedAt: "北京时间 2026-03-27 22:28",
+      generatedAt: "北京时间 2026-03-28 最新快照",
       recentStart: "2026-03-20",
       recentEnd: "2026-03-26",
       forecastStart: "2026-03-27",
@@ -1122,137 +1254,137 @@
         illinois: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [60.6,61.3,57.2,37.1,42.1,55.5,63.8],
-            maxF: [75.3,77.6,71.2,45.4,56.1,70.3,85.0],
-            minF: [47.6,45.8,36.7,30.4,29.7,40.8,44.7],
-            precipIn: [0,0,0.091,0,0,0.028,1.303]
+            meanF: [60.0,62.1,57.1,37.6,43.1,56.0,63.9],
+            maxF: [76.8,79.6,68.9,46.3,57.4,72.2,85.8],
+            minF: [45.5,45.6,37.2,30.1,31.3,40.6,47.2],
+            precipIn: [0,0,0.020,0,0,0,1.437]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [37.2,36.9,49.0,64.1,69.2,46.0,40.6],
-            maxF: [44.4,46.4,59.8,75.8,80.3,51.1,45.5],
-            minF: [31.9,29.5,38.9,54.9,53.5,41.6,36.1],
-            precipIn: [0.177,0,0,0,0.748,0.169,0.067],
-            pop: [8,0,1,8,34,39,46]
+            meanF: [38.6,37.1,50.0,65.2,64.6,46.7,43.4],
+            maxF: [48.0,48.3,60.6,77.3,75.2,52.8,54.2],
+            minF: [32.0,25.0,38.9,55.5,51.8,39.0,33.5],
+            precipIn: [0.020,0,0,0,0.146,0.055,0],
+            pop: [6,0,0,5,44,37,35]
           }
         },
         iowa: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [59.1,66.8,49.0,38.5,45.6,56.7,55.6],
-            maxF: [74.7,88.1,68.9,48.7,56.9,75.6,64.3],
-            minF: [50.6,50.4,36.7,26.9,35.1,41.6,40.8],
-            precipIn: [0,0,0,0.012,0,0,0]
+            meanF: [58.4,66.2,49.5,38.6,45.6,56.1,55.2],
+            maxF: [74.7,88.2,68.9,48.7,57.3,75.2,64.0],
+            minF: [49.0,48.6,37.0,26.8,34.7,40.7,40.8],
+            precipIn: [0,0,0,0.004,0,0,0.020]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [37.9,39.4,55.4,65.9,62.2,43.9,45.0],
-            maxF: [46.9,56.0,72.3,79.5,75.6,52.2,52.5],
-            minF: [29.2,23.1,38.5,52.9,45.6,33.6,39.6],
-            precipIn: [0,0,0,0,0.177,0,0],
-            pop: [0,0,1,5,23,25,31]
+            meanF: [38.9,38.8,54.5,67.1,61.5,43.7,47.6],
+            maxF: [48.5,55.4,72.6,82.7,70.6,53.5,59.1],
+            minF: [28.9,22.8,37.1,52.6,49.0,32.6,36.8],
+            precipIn: [0,0,0,0,0,0,0],
+            pop: [0,0,0,6,25,13,23]
           }
         },
         indiana: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [60.0,57.0,59.3,36.3,38.6,53.2,65.9],
-            maxF: [77.4,72.9,73.5,43.3,52.4,67.6,82.2],
-            minF: [48.9,42.4,38.1,30.6,26.5,38.5,52.1],
-            precipIn: [0,0,0.154,0,0,0,1.228]
+            meanF: [59.9,58.8,66.2,39.6,40.0,54.0,68.3],
+            maxF: [74.9,72.5,85.1,48.4,52.6,68.9,82.2],
+            minF: [49.5,44.7,50.5,33.6,28.3,39.8,58.2],
+            precipIn: [0,0,0.602,0,0,0,0.181]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [37.4,35.2,45.5,59.8,68.5,49.5,40.1],
-            maxF: [49.0,42.7,54.4,69.6,77.5,67.6,45.7],
-            minF: [31.7,30.7,34.8,51.9,62.0,39.9,35.5],
-            precipIn: [0.512,0,0,0.004,0.047,0.295,0.071],
-            pop: [19,0,1,6,28,40,43]
+            meanF: [43.3,36.9,45.4,61.4,69.0,51.6,45.6],
+            maxF: [55.9,44.5,55.1,72.5,78.4,66.4,54.0],
+            minF: [35.0,31.5,34.2,53.8,62.8,44.8,38.5],
+            precipIn: [0.484,0,0,0,0.008,0.602,0],
+            pop: [26,0,1,4,20,53,43]
           }
         },
         minnesota: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [50.8,58.8,38.7,36.1,44.5,53.3,46.6],
-            maxF: [61.3,78.1,48.0,45.6,53.4,71.1,54.7],
-            minF: [41.6,45.1,33.1,25.1,36.0,39.7,33.4],
-            precipIn: [0,0,0.004,0.008,0,0,0.004]
+            meanF: [46.2,47.0,30.9,32.7,39.4,48.4,32.8],
+            maxF: [60.6,64.7,34.2,43.1,49.5,64.4,40.3],
+            minF: [33.8,33.9,28.0,22.3,29.3,38.7,23.3],
+            precipIn: [0,0,0,0,0,0,0.035]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [30.9,39.5,54.2,65.2,50.7,37.9,44.7],
-            maxF: [37.9,57.9,67.9,83.4,64.9,45.7,54.3],
-            minF: [24.7,23.9,41.1,51.9,39.1,28.5,36.3],
-            precipIn: [0,0,0,0,0.043,0,0],
-            pop: [0,0,0,5,14,14,24]
+            meanF: [21.6,35.2,45.6,42.9,35.4,30.9,40.6],
+            maxF: [25.1,56.9,58.4,53.3,43.6,40.0,52.2],
+            minF: [15.7,14.2,31.1,35.0,25.1,22.6,28.4],
+            precipIn: [0,0,0,0,0.051,0,0],
+            pop: [0,2,0,6,9,3,11]
           }
         },
         nebraska: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [68.0,72.3,50.9,38.6,51.1,68.4,59.7],
-            maxF: [86.1,94.8,75.6,52.1,70.3,87.4,68.4],
-            minF: [46.8,51.4,38.8,27.2,34.2,52.7,36.9],
-            precipIn: [0,0,0,0.051,0,0,0.004]
+            meanF: [65.3,69.0,45.1,39.9,50.5,66.0,53.0],
+            maxF: [82.0,89.6,68.7,53.0,68.9,84.8,68.1],
+            minF: [48.8,48.9,34.8,28.7,36.5,49.5,34.1],
+            precipIn: [0,0,0,0,0,0,0.020]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [38.7,46.7,64.8,72.3,56.2,44.9,43.8],
-            maxF: [50.6,63.0,85.4,91.8,71.3,56.2,47.8],
-            minF: [27.8,31.0,49.9,59.5,42.3,32.5,40.9],
-            precipIn: [0,0,0,0,0.047,0,0],
-            pop: [1,0,4,3,10,24,23]
+            meanF: [36.3,47.9,65.3,70.8,48.6,41.9,51.3],
+            maxF: [48.6,67.2,80.5,85.8,69.9,54.9,64.3],
+            minF: [24.8,32.3,52.6,58.4,38.2,30.1,38.3],
+            precipIn: [0,0,0,0,0.008,0,0],
+            pop: [0,0,1,4,18,21,19]
           }
         },
         ohio: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [55.9,46.4,57.8,35.8,35.1,49.3,62.9],
-            maxF: [71.7,59.4,75.2,40.1,47.3,64.6,80.9],
-            minF: [38.4,34.1,37.0,31.4,23.5,34.5,47.8],
-            precipIn: [0.004,0,0.051,0,0,0,0.638]
+            meanF: [53.6,47.9,58.8,36.3,34.8,48.5,62.2],
+            maxF: [66.3,60.3,79.7,39.8,45.5,59.8,77.7],
+            minF: [40.5,34.5,40.1,32.3,24.1,35.8,51.3],
+            precipIn: [0.008,0,1.075,0.240,0,0,0.831]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [33.9,32.7,44.1,57.8,66.7,50.3,36.1],
-            maxF: [47.9,39.5,56.4,66.8,75.7,68.5,41.4],
-            minF: [29.3,26.3,32.3,51.9,60.9,40.4,31.0],
-            precipIn: [0.295,0.016,0,0.028,0.098,0.094,0],
-            pop: [19,0,0,9,31,38,35]
+            meanF: [36.8,33.4,42.2,56.3,65.3,48.6,38.6],
+            maxF: [51.1,38.6,54.7,64.3,74.7,66.8,48.8],
+            minF: [31.3,30.2,32.2,49.5,58.2,35.3,29.3],
+            precipIn: [0.681,0,0,0,0.067,0.488,0],
+            pop: [26,0,1,10,20,50,38]
           }
         },
         missouri: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [65.5,70.1,64.6,42.6,52.0,65.0,76.6],
-            maxF: [85.9,87.7,79.9,50.5,63.9,85.0,92.8],
-            minF: [50.0,56.8,44.2,33.4,39.9,47.8,54.8],
-            precipIn: [0,0,0,0,0,0,0.043]
+            meanF: [66.0,68.8,66.8,43.8,52.5,64.5,77.4],
+            maxF: [86.4,87.3,82.5,51.2,65.0,84.3,92.2],
+            minF: [48.5,54.6,47.0,35.4,41.2,47.7,57.9],
+            precipIn: [0,0,0,0,0,0,0.067]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [47.7,44.2,56.0,67.8,70.4,49.6,43.4],
-            maxF: [54.2,58.3,71.4,80.1,82.6,57.0,45.5],
-            minF: [41.2,30.1,43.3,56.1,51.8,43.5,41.8],
-            precipIn: [0.083,0,0,0,0.669,0.079,0.248],
-            pop: [16,0,1,4,26,42,45]
+            meanF: [49.6,44.8,55.6,68.6,69.9,50.4,48.1],
+            maxF: [57.0,59.9,71.4,81.3,82.7,57.1,55.9],
+            minF: [41.7,31.8,42.3,57.7,54.4,45.0,43.5],
+            precipIn: [0.098,0,0,0,0.319,0.303,0],
+            pop: [17,0,0,2,32,52,44]
           }
         },
         south_dakota: {
           recent: {
             dates: ["2026-03-20","2026-03-21","2026-03-22","2026-03-23","2026-03-24","2026-03-25","2026-03-26"],
-            meanF: [52.9,54.3,33.5,33.3,42.4,53.3,38.1],
-            maxF: [72.9,76.5,37.8,44.5,55.0,76.1,52.8],
-            minF: [37.1,38.0,26.9,21.6,32.6,34.8,27.5],
-            precipIn: [0,0,0.020,0.051,0,0,0.106]
+            meanF: [55.1,56.5,37.2,42.0,47.2,56.5,39.1],
+            maxF: [78.3,76.4,45.6,61.1,62.2,74.7,56.8],
+            minF: [36.4,40.6,32.1,28.2,35.1,42.1,28.6],
+            precipIn: [0,0,0.020,0,0,0,0]
           },
           forecast: {
             dates: ["2026-03-27","2026-03-28","2026-03-29","2026-03-30","2026-03-31","2026-04-01","2026-04-02"],
-            meanF: [29.6,42.4,53.4,62.4,46.9,35.6,46.0],
-            maxF: [40.3,60.7,67.4,77.7,61.5,45.9,56.4],
-            minF: [19.6,24.8,40.2,49.6,34.8,24.4,36.8],
-            precipIn: [0,0,0,0,0.087,0,0],
-            pop: [0,0,0,2,8,15,22]
+            meanF: [32.8,42.6,57.6,62.5,46.2,42.7,60.4],
+            maxF: [47.9,75.3,74.0,76.5,61.5,57.5,74.9],
+            minF: [21.3,33.0,38.3,51.8,37.4,29.0,47.2],
+            precipIn: [0,0,0,0,0,0,0],
+            pop: [0,0,0,2,6,9,17]
           }
         }
       }
@@ -1273,35 +1405,175 @@
       BOOTSTRAP.states[id].hist = BOOTSTRAP_HIST[id];
     });
 
+    const BRAZIL_META = [
+      { id: "mato_grosso", zh: "马托格罗索", en: "Mato Grosso", code: "MT", lat: -12.5425, lon: -55.7211, region: "central" },
+      { id: "parana", zh: "巴拉那", en: "Parana", code: "PR", lat: -23.3106, lon: -51.1628, region: "south" },
+      { id: "goias", zh: "戈亚斯", en: "Goias", code: "GO", lat: -17.7920, lon: -50.9191, region: "central" },
+      { id: "rio_grande_do_sul", zh: "南里奥格兰德", en: "Rio Grande do Sul", code: "RS", lat: -28.2628, lon: -52.4064, region: "south" },
+      { id: "mato_grosso_do_sul", zh: "南马托格罗索", en: "Mato Grosso do Sul", code: "MS", lat: -22.2231, lon: -54.8120, region: "central" },
+      { id: "bahia", zh: "巴伊亚", en: "Bahia", code: "BA", lat: -12.0889, lon: -45.7930, region: "north" }
+    ];
+
+    const ARGENTINA_META = [
+      { id: "buenos_aires", zh: "布宜诺斯艾利斯", en: "Buenos Aires", code: "BA", lat: -33.8922, lon: -60.5736, region: "core" },
+      { id: "cordoba", zh: "科尔多瓦", en: "Cordoba", code: "CB", lat: -32.6978, lon: -62.1067, region: "core" },
+      { id: "santa_fe", zh: "圣菲", en: "Santa Fe", code: "SF", lat: -33.7456, lon: -61.9688, region: "core" },
+      { id: "santiago_del_estero", zh: "圣地亚哥-德尔埃斯特罗", en: "Santiago del Estero", code: "SE", lat: -28.8889, lon: -62.2690, region: "north" },
+      { id: "entre_rios", zh: "恩特雷里奥斯", en: "Entre Rios", code: "ER", lat: -32.9996, lon: -59.2860, region: "east" },
+      { id: "la_pampa", zh: "拉潘帕", en: "La Pampa", code: "LP", lat: -35.6566, lon: -63.7568, region: "west" }
+    ];
+
+    const REGION_CONFIG = {
+      overview: {
+        key: "overview",
+        label: "总览",
+        short: "GL",
+        title: "全球大豆总览",
+        beltTitle: "三大产区",
+        switchNote: "三地产区 + 基本面",
+        phaseShort: "总览",
+        defaultSelected: null,
+        subregions: [],
+        fetchWeather: false,
+        fundamentalsNote: "USDA 3月供需",
+        seasonSteps: []
+      },
+      us: {
+        key: "us",
+        label: "美国产区",
+        short: "US",
+        title: "美国大豆带",
+        beltTitle: "美国产区热区",
+        switchNote: "播前天气交易",
+        phaseShort: "美国",
+        defaultSelected: "illinois",
+        subregions: STATE_META,
+        fetchWeather: true,
+        bootstrap: BOOTSTRAP,
+        fundamentalsNote: "USDA 库存 350 mbu (3/10)",
+        seasonSteps: [
+          { key: "preplant", label: "播前", range: "3-4月", focus: "土温 / 下地窗口", start: 301, end: 415 },
+          { key: "planting", label: "播种", range: "4-6月", focus: "播种 / 进度", start: 416, end: 610 },
+          { key: "growth", label: "生长", range: "6-9月", focus: "热量 / 墒情", start: 611, end: 915 },
+          { key: "harvest", label: "收获", range: "9-11月", focus: "干燥 / 雨带", start: 916, end: 1130 }
+        ]
+      },
+      brazil: {
+        key: "brazil",
+        label: "巴西产区",
+        short: "BR",
+        title: "巴西大豆带",
+        beltTitle: "巴西产区热区",
+        switchNote: "收获推进",
+        phaseShort: "巴西",
+        defaultSelected: "mato_grosso",
+        subregions: BRAZIL_META,
+        fetchWeather: true,
+        bootstrap: null,
+        fundamentalsNote: "CONAB 已收 50.6% (3/13)",
+        seasonSteps: [
+          { key: "preplant", label: "播前", range: "7-8月", focus: "墒情 / 开播准备", start: 701, end: 831 },
+          { key: "planting", label: "播种", range: "9-11月", focus: "播种 / 出苗", start: 901, end: 1130 },
+          { key: "growth", label: "生长", range: "12-2月", focus: "开花 / 结荚", start: 1201, end: 228 },
+          { key: "harvest", label: "收获", range: "3-4月", focus: "收割 / 物流", start: 301, end: 430 }
+        ]
+      },
+      argentina: {
+        key: "argentina",
+        label: "阿根廷产区",
+        short: "AR",
+        title: "阿根廷大豆带",
+        beltTitle: "阿根廷产区热区",
+        switchNote: "鼓粒后段",
+        phaseShort: "阿根廷",
+        defaultSelected: "buenos_aires",
+        subregions: ARGENTINA_META,
+        fetchWeather: true,
+        bootstrap: null,
+        fundamentalsNote: "USDA 产量 4800万吨 (3/10)",
+        seasonSteps: [
+          { key: "preplant", label: "播前", range: "8-9月", focus: "墒情 / 备播", start: 801, end: 930 },
+          { key: "planting", label: "播种", range: "10-12月", focus: "播种 / 苗情", start: 1001, end: 1231 },
+          { key: "growth", label: "生长", range: "1-3月", focus: "鼓粒 / 单产兑现", start: 101, end: 331 },
+          { key: "harvest", label: "收获", range: "4-6月", focus: "收割 / 品质", start: 401, end: 630 }
+        ]
+      }
+    };
+
+    const GLOBAL_FUNDAMENTALS = {
+      lead: "USDA 3月10日仍给出 12530万吨全球期末库存，南美收割仍是供给主线，美国暂处播前天气交易阶段。",
+      hero: [
+        { k: "全球库存", v: "12530万吨", s: "USDA WASDE 3/10", tone: "text" },
+        { k: "巴西产量", v: "18000万吨", s: "USDA 2025/26", tone: "green" },
+        { k: "阿根廷产量", v: "4800万吨", s: "USDA 2025/26", tone: "amber" },
+        { k: "美豆库存", v: "350 mbu", s: "USDA WASDE 3/10", tone: "blue" }
+      ],
+      tags: [
+        { text: "全球产量 42080万吨", tone: "text" },
+        { text: "巴西 Conab 收获 50.6% (3/13)", tone: "green" },
+        { text: "阿根廷较5年均值高 13%", tone: "amber" },
+        { text: "美豆累计销售 2715万吨 (3/5)", tone: "blue" },
+        { text: "当前主线：南美收割 + 美国天气", tone: "green" }
+      ]
+    };
+
     const APP = {
+      regionKey: "overview",
       unit: "metric",
       view: "recent",
-      selected: "illinois",
       liveMode: "snapshot",
       charts: {
         temp: null,
         rain: null
       },
-      data: JSON.parse(JSON.stringify(BOOTSTRAP))
+      selectedByRegion: {
+        overview: null,
+        us: "illinois",
+        brazil: "mato_grosso",
+        argentina: "buenos_aires"
+      },
+      loadedRegions: {
+        overview: true,
+        us: true,
+        brazil: false,
+        argentina: false
+      },
+      dataByRegion: {
+        overview: { generatedAt: "等待同步", recentStart: "", recentEnd: "", forecastStart: "", forecastEnd: "", states: {} },
+        us: JSON.parse(JSON.stringify(BOOTSTRAP)),
+        brazil: null,
+        argentina: null
+      }
     };
 
     const dom = {
-      syncText: document.getElementById("syncText"),
       updateText: document.getElementById("updateText"),
       historyMeta: document.getElementById("historyMeta"),
+      regionSwitch: document.getElementById("regionSwitch"),
       heroLabel: document.getElementById("heroLabel"),
       heroTitle: document.getElementById("heroTitle"),
       heroSubtitle: document.getElementById("heroSubtitle"),
       phaseName: document.getElementById("phaseName"),
       phaseFocus: document.getElementById("phaseFocus"),
       heroKpis: document.getElementById("heroKpis"),
+      seasonPanelTitle: document.getElementById("seasonPanelTitle"),
       seasonDetail: document.getElementById("seasonDetail"),
       seasonTrack: document.getElementById("seasonTrack"),
+      summaryPanel: document.getElementById("summaryPanel"),
+      summaryPanelTitle: document.getElementById("summaryPanelTitle"),
+      summaryPanelNote: document.getElementById("summaryPanelNote"),
       summaryLead: document.getElementById("summaryLead"),
-      summaryTags: document.getElementById("summaryTags"),
+      globalGrid: document.getElementById("globalGrid"),
+      macroPanel: document.getElementById("macroPanel"),
+      macroPanelTitle: document.getElementById("macroPanelTitle"),
+      macroLead: document.getElementById("macroLead"),
+      macroTags: document.getElementById("macroTags"),
+      beltTitle: document.getElementById("beltTitle"),
       beltWindowNote: document.getElementById("beltWindowNote"),
       beltMap: document.getElementById("beltMap"),
+      stickyTabs: document.getElementById("stickyTabs"),
       stateTabs: document.getElementById("stateTabs"),
+      detailPanel: document.getElementById("detailPanel"),
       detailTitle: document.getElementById("detailTitle"),
       detailSub: document.getElementById("detailSub"),
       detailSignal: document.getElementById("detailSignal"),
@@ -1315,6 +1587,7 @@
       rainChart: document.getElementById("rainChart"),
       forecastWindowNote: document.getElementById("forecastWindowNote"),
       forecastRow: document.getElementById("forecastRow"),
+      stateBoard: document.getElementById("stateBoard"),
       boardList: document.getElementById("boardList"),
       refreshBtn: document.getElementById("refreshBtn"),
       seasonSeg: document.getElementById("seasonSeg"),
@@ -1335,7 +1608,58 @@
       return Math.max(min, Math.min(max, value));
     }
 
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function blankState() {
+      return {
+        recent: { dates: [], meanF: [], maxF: [], minF: [], precipIn: [] },
+        forecast: { dates: [], meanF: [], maxF: [], minF: [], precipIn: [], pop: [] },
+        hist: null
+      };
+    }
+
+    function emptyRegionData(regionKey) {
+      const region = REGION_CONFIG[regionKey];
+      return {
+        generatedAt: "等待同步",
+        recentStart: "",
+        recentEnd: "",
+        forecastStart: "",
+        forecastEnd: "",
+        states: Object.fromEntries(region.subregions.map((meta) => [meta.id, blankState()]))
+      };
+    }
+
+    Object.keys(REGION_CONFIG).forEach((regionKey) => {
+      if (!APP.dataByRegion[regionKey]) {
+        APP.dataByRegion[regionKey] = emptyRegionData(regionKey);
+      }
+    });
+
+    function getRegionData(regionKey = APP.regionKey) {
+      return APP.dataByRegion[regionKey] || emptyRegionData(regionKey);
+    }
+
+    function getSubregions(regionKey = APP.regionKey) {
+      return REGION_CONFIG[regionKey].subregions;
+    }
+
+    function getSelectedId(regionKey = APP.regionKey) {
+      return APP.selectedByRegion[regionKey] || REGION_CONFIG[regionKey].defaultSelected;
+    }
+
+    function setSelectedId(regionKey, id) {
+      APP.selectedByRegion[regionKey] = id;
+    }
+
+    function getMeta(regionKey, id) {
+      return getSubregions(regionKey).find((item) => item.id === id);
+    }
+
     function formatDateLabel(iso) {
+      if (!iso) return "--";
       return iso.slice(5).replace("-", "/");
     }
 
@@ -1427,44 +1751,44 @@
       return `${valueIn >= 0 ? "偏湿" : "偏干"} ${displayDeltaRain(valueIn, digits)}`;
     }
 
-    function getSeason(now = new Date()) {
-      const month = now.getMonth() + 1;
-      const day = now.getDate();
-      const md = month * 100 + day;
-      if (md < 415) {
-        return { key: "preplant", label: "播前", focus: "关注土温与作业窗口" };
-      }
-      if (md <= 610) {
-        return { key: "planting", label: "播种", focus: "关注降水对播种进度影响" };
-      }
-      if (md <= 915) {
-        return { key: "growth", label: "生长", focus: "关注热量与降水平衡" };
-      }
-      if (md <= 1130) {
-        return { key: "harvest", label: "收获", focus: "关注干燥窗口与雨带回摆" };
-      }
-      return { key: "offseason", label: "休整", focus: "关注冬春墒情与下季准备" };
-    }
-
-    function getRecentWindow(reference = new Date()) {
-      const end = new Date(reference);
-      end.setDate(end.getDate() - 1);
-      const start = new Date(reference);
-      start.setDate(start.getDate() - 7);
-      return { start: isoDate(start), end: isoDate(end) };
-    }
-
-    function getForecastWindow(reference = new Date()) {
-      const start = new Date(reference);
-      const end = new Date(reference);
-      end.setDate(end.getDate() + 6);
-      return { start: isoDate(start), end: isoDate(end) };
-    }
-
     function isoDate(date) {
       const copy = new Date(date);
       copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
       return copy.toISOString().slice(0, 10);
+    }
+
+    function shanghaiDateKey(reference = new Date()) {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Shanghai",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(reference);
+      const values = {};
+      parts.forEach((part) => {
+        if (part.type !== "literal") values[part.type] = part.value;
+      });
+      return `${values.year}-${values.month}-${values.day}`;
+    }
+
+    function addDaysToIso(iso, days) {
+      const date = new Date(`${iso}T00:00:00Z`);
+      date.setUTCDate(date.getUTCDate() + days);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function getRecentWindow(reference = new Date()) {
+      const todayBj = shanghaiDateKey(reference);
+      const end = addDaysToIso(todayBj, -2);
+      const start = addDaysToIso(end, -6);
+      return { start, end };
+    }
+
+    function getForecastWindow(reference = new Date()) {
+      const todayBj = shanghaiDateKey(reference);
+      const start = addDaysToIso(todayBj, -1);
+      const end = addDaysToIso(start, 6);
+      return { start, end };
     }
 
     function formatBeijingStamp(date = new Date()) {
@@ -1484,11 +1808,11 @@
       return `北京时间 ${values.year}-${values.month}-${values.day} ${values.hour}:${values.minute}`;
     }
 
-    function parseBatchResponse(json) {
+    function parseBatchResponse(json, subregions) {
       const list = Array.isArray(json) ? json : [json];
       const data = {};
       list.forEach((item, index) => {
-        const meta = STATE_META[index];
+        const meta = subregions[index];
         if (!meta) return;
         data[meta.id] = item.daily;
       });
@@ -1496,9 +1820,9 @@
     }
 
     function stateWindowStats(state) {
-      const recent = state.recent || {};
-      const forecast = state.forecast || {};
-      const hist = state.hist || null;
+      const recent = state?.recent || {};
+      const forecast = state?.forecast || {};
+      const hist = state?.hist || null;
       const windowTempF = mean(recent.meanF || []);
       const windowPrecipIn = sum(recent.precipIn || []);
       const forecastPrecipIn = sum(forecast.precipIn || []);
@@ -1508,47 +1832,20 @@
         forecastPrecipIn,
         histTempF: hist ? hist.windowTempAvgF : null,
         histPrecipIn: hist ? hist.windowPrecipAvgIn : null,
-        tempAnomF: hist ? windowTempF - hist.windowTempAvgF : null,
-        precipAnomIn: hist ? windowPrecipIn - hist.windowPrecipAvgIn : null
+        tempAnomF: hist && windowTempF !== null ? windowTempF - hist.windowTempAvgF : null,
+        precipAnomIn: hist && windowPrecipIn !== null ? windowPrecipIn - hist.windowPrecipAvgIn : null
       };
     }
 
-    function stateSignal(meta, state, season) {
-      const stats = stateWindowStats(state);
-      const tempAnom = stats.tempAnomF;
-      const precipAnom = stats.precipAnomIn;
-      const nextRain = stats.forecastPrecipIn || 0;
-      if (season.key === "preplant" || season.key === "planting") {
-        if (nextRain > 1.0 || precipAnom > 0.55) {
-          return { tone: "red", label: "偏湿拖慢" };
-        }
-        if (tempAnom < -4) {
-          return { tone: "blue", label: "偏冷偏慢" };
-        }
-        if (tempAnom > 3 && precipAnom < 0.15) {
-          return { tone: "green", label: "窗口偏好" };
-        }
-        return { tone: "amber", label: "分化观察" };
-      }
-      if (season.key === "growth") {
-        if (tempAnom > 4 && precipAnom < -0.4) {
-          return { tone: "red", label: "热压偏强" };
-        }
-        if (precipAnom > 0.8) {
-          return { tone: "amber", label: "偏湿积水" };
-        }
-        return { tone: "green", label: "长势平稳" };
-      }
-      if (season.key === "harvest") {
-        if (nextRain > 1.2 || precipAnom > 0.6) {
-          return { tone: "red", label: "收割受扰" };
-        }
-        if (precipAnom < -0.25) {
-          return { tone: "green", label: "利于推进" };
-        }
-        return { tone: "amber", label: "关注雨带" };
-      }
-      return { tone: "amber", label: "继续跟踪" };
+    function inMdRange(md, start, end) {
+      return start <= end ? md >= start && md <= end : md >= start || md <= end;
+    }
+
+    function getRegionSeason(regionKey, now = new Date()) {
+      const md = (now.getMonth() + 1) * 100 + now.getDate();
+      const region = REGION_CONFIG[regionKey];
+      const active = region.seasonSteps.find((step) => inMdRange(md, step.start, step.end));
+      return active || { key: "offseason", label: "过渡期", focus: "关注天气切换" };
     }
 
     function getToneColor(tone) {
@@ -1558,89 +1855,182 @@
       return "var(--amber)";
     }
 
-    function beltStats() {
-      const states = STATE_META.map((meta) => APP.data.states[meta.id]).filter(Boolean);
-      const temps = states.map((state) => stateWindowStats(state).windowTempF).filter((v) => v !== null);
-      const rains = states.map((state) => stateWindowStats(state).windowPrecipIn).filter((v) => v !== null);
-      const tempAnoms = states.map((state) => stateWindowStats(state).tempAnomF).filter((v) => v !== null);
-      const rainAnoms = states.map((state) => stateWindowStats(state).precipAnomIn).filter((v) => v !== null);
-      const eastIds = ["illinois", "indiana", "ohio"];
-      const westIds = ["iowa", "nebraska", "south_dakota", "minnesota"];
-      const eastRain = mean(eastIds.map((id) => stateWindowStats(APP.data.states[id]).windowPrecipIn));
-      const westRain = mean(westIds.map((id) => stateWindowStats(APP.data.states[id]).windowPrecipIn));
-      const eastTemp = mean(eastIds.map((id) => stateWindowStats(APP.data.states[id]).windowTempF));
-      const westTemp = mean(westIds.map((id) => stateWindowStats(APP.data.states[id]).windowTempF));
+    function currentRegionStats(regionKey = APP.regionKey) {
+      if (regionKey === "overview") {
+        return { loaded: false, avgTempF: null, avgRainIn: null, avgTempAnomF: null, avgRainAnomIn: null, avgForecastRainIn: null };
+      }
+      const data = getRegionData(regionKey);
+      const states = getSubregions(regionKey)
+        .map((meta) => data.states[meta.id])
+        .filter(Boolean);
+      const temps = states.map((state) => stateWindowStats(state).windowTempF).filter((value) => value !== null);
+      const rains = states.map((state) => stateWindowStats(state).windowPrecipIn).filter((value) => value !== null);
+      const tempAnoms = states.map((state) => stateWindowStats(state).tempAnomF).filter((value) => value !== null);
+      const rainAnoms = states.map((state) => stateWindowStats(state).precipAnomIn).filter((value) => value !== null);
+      const nextRain = states.map((state) => stateWindowStats(state).forecastPrecipIn).filter((value) => value !== null);
       return {
+        loaded: temps.length > 0,
         avgTempF: mean(temps),
         avgRainIn: mean(rains),
         avgTempAnomF: tempAnoms.length ? mean(tempAnoms) : null,
         avgRainAnomIn: rainAnoms.length ? mean(rainAnoms) : null,
-        eastRain,
-        westRain,
-        eastTemp,
-        westTemp
+        avgForecastRainIn: nextRain.length ? mean(nextRain) : null
       };
     }
 
-    function headlineForBelt(season) {
-      const belt = beltStats();
-      if (belt.avgTempAnomF === null || belt.avgRainAnomIn === null) {
-        return {
-          title: `${season.label}监控`,
-          subtitle: "快照已载入，历史同期对比同步中。"
-        };
-      }
-      const eastWet = belt.eastRain - belt.westRain > 0.5;
-      const westWarmer = belt.westTemp - belt.eastTemp > 4;
-      if (season.key === "preplant" || season.key === "planting") {
-        if (eastWet && westWarmer) {
-          return {
-            title: "播前分化",
-            subtitle: "东部雨带偏强，西部升温更快，田间窗口并不一致。"
-          };
-        }
-        if (belt.avgRainAnomIn > 0.4) {
-          return {
-            title: "播前偏湿",
-            subtitle: "近7天降水高于同期，播种准备与下地节奏偏慢。"
-          };
-        }
-        if (belt.avgTempAnomF > 2.5 && belt.avgRainAnomIn < 0.15) {
-          return {
-            title: "播前偏暖",
-            subtitle: "热量抬升更快，整地与播前准备窗口改善。"
-          };
-        }
+    function regionWeatherText(regionKey) {
+      const stats = currentRegionStats(regionKey);
+      if (!stats.loaded) return "天气同步中";
+      const tempText = stats.avgTempAnomF === null ? "温度同步中" : stats.avgTempAnomF > 2 ? "偏暖" : stats.avgTempAnomF < -2 ? "偏冷" : "温度近常年";
+      const rainText = stats.avgRainAnomIn === null ? "" : stats.avgRainAnomIn > 0.25 ? "偏湿" : stats.avgRainAnomIn < -0.25 ? "偏干" : "雨量近常年";
+      return rainText ? `${tempText} / ${rainText}` : tempText;
+    }
+
+    function regionTone(regionKey) {
+      const season = getRegionSeason(regionKey);
+      const stats = currentRegionStats(regionKey);
+      if (!stats.loaded) return "amber";
+      if (season.key === "harvest") {
+        if ((stats.avgForecastRainIn || 0) > 0.8 || (stats.avgRainAnomIn || 0) > 0.35) return "red";
+        if ((stats.avgRainAnomIn || 0) < -0.15) return "green";
+        return "amber";
       }
       if (season.key === "growth") {
-        if (belt.avgTempAnomF > 3 && belt.avgRainAnomIn < -0.35) {
-          return {
-            title: "生长偏热干",
-            subtitle: "热量偏高但水分回补偏弱，关注墒情压力。"
-          };
-        }
+        if ((stats.avgTempAnomF || 0) > 3 && (stats.avgRainAnomIn || 0) < -0.25) return "red";
+        if ((stats.avgRainAnomIn || 0) > 0.45) return "amber";
+        return "green";
       }
+      if (season.key === "preplant" || season.key === "planting") {
+        if ((stats.avgRainAnomIn || 0) > 0.35) return "red";
+        if ((stats.avgTempAnomF || 0) < -3) return "blue";
+        if ((stats.avgTempAnomF || 0) > 1.5 && (stats.avgRainAnomIn || 0) < 0.1) return "green";
+        return "amber";
+      }
+      return "amber";
+    }
+
+    function regionSignalLabel(regionKey) {
+      const season = getRegionSeason(regionKey);
+      const tone = regionTone(regionKey);
       if (season.key === "harvest") {
-        if (belt.avgRainAnomIn < -0.2) {
-          return {
-            title: "收获窗口偏开",
-            subtitle: "近7天偏干，机械收获节奏相对顺畅。"
-          };
-        }
+        if (tone === "red") return "收获受扰";
+        if (tone === "green") return "收割顺畅";
+        return "收获观察";
+      }
+      if (season.key === "growth") {
+        if (tone === "red") return "热干压力";
+        if (tone === "green") return "长势平稳";
+        return "墒情观察";
+      }
+      if (season.key === "preplant" || season.key === "planting") {
+        if (tone === "red") return "偏湿拖慢";
+        if (tone === "blue") return "偏冷偏慢";
+        if (tone === "green") return "窗口偏好";
+        return "分化观察";
+      }
+      return "继续跟踪";
+    }
+
+    function stateSignal(regionKey, state) {
+      const season = getRegionSeason(regionKey);
+      const stats = stateWindowStats(state);
+      if (stats.windowTempF === null) {
+        return { tone: "amber", label: "同步中" };
+      }
+      const nextRain = stats.forecastPrecipIn || 0;
+      if (season.key === "harvest") {
+        if (nextRain > 1.2 || (stats.precipAnomIn || 0) > 0.45) return { tone: "red", label: "收获受扰" };
+        if ((stats.precipAnomIn || 0) < -0.2) return { tone: "green", label: "收割顺畅" };
+        return { tone: "amber", label: "收获观察" };
+      }
+      if (season.key === "growth") {
+        if ((stats.tempAnomF || 0) > 3.5 && (stats.precipAnomIn || 0) < -0.25) return { tone: "red", label: "热干压力" };
+        if ((stats.precipAnomIn || 0) > 0.55) return { tone: "amber", label: "偏湿观察" };
+        return { tone: "green", label: "长势平稳" };
+      }
+      if (season.key === "preplant" || season.key === "planting") {
+        if (nextRain > 0.9 || (stats.precipAnomIn || 0) > 0.4) return { tone: "red", label: "偏湿拖慢" };
+        if ((stats.tempAnomF || 0) < -4) return { tone: "blue", label: "偏冷偏慢" };
+        if ((stats.tempAnomF || 0) > 2 && (stats.precipAnomIn || 0) < 0.1) return { tone: "green", label: "窗口偏好" };
+        return { tone: "amber", label: "分化观察" };
+      }
+      return { tone: "amber", label: "继续跟踪" };
+    }
+
+    function globalHeroSummary() {
+      const usSeason = getRegionSeason("us");
+      const brSeason = getRegionSeason("brazil");
+      const arSeason = getRegionSeason("argentina");
+      const title = "南美收割主导";
+      const subtitle = `美国 ${usSeason.label}期 ${regionWeatherText("us")}；巴西 ${brSeason.label}期 ${regionWeatherText("brazil")}；阿根廷 ${arSeason.label}期 ${regionWeatherText("argentina")}。`;
+      return { title, subtitle };
+    }
+
+    function regionHeroSummary(regionKey) {
+      const region = REGION_CONFIG[regionKey];
+      const season = getRegionSeason(regionKey);
+      const stats = currentRegionStats(regionKey);
+      if (!stats.loaded) {
+        return { title: region.title, subtitle: `${region.label}天气同步中。` };
+      }
+      const tempText = stats.avgTempAnomF === null ? "温度同步中" : tempBiasText(stats.avgTempAnomF, 1);
+      const rainText = stats.avgRainAnomIn === null ? "雨量同步中" : rainBiasText(stats.avgRainAnomIn, 1);
+      let title = `${region.label}${season.label}`;
+      if (season.key === "harvest") {
+        title = stats.avgRainAnomIn > 0.25 ? `${region.label}收获承压` : `${region.label}收获推进`;
+      } else if (season.key === "growth") {
+        title = stats.avgTempAnomF > 2.5 && stats.avgRainAnomIn < -0.2 ? `${region.label}热干观察` : `${region.label}生长跟踪`;
+      } else if (season.key === "preplant" || season.key === "planting") {
+        title = stats.avgRainAnomIn > 0.25 ? `${region.label}窗口分化` : `${region.label}播种观察`;
       }
       return {
-        title: `${season.label}平衡`,
-        subtitle: "主产区整体接近常态，重点看区域性冷热与雨带差异。"
+        title,
+        subtitle: `${season.label}期，区域整体 ${tempText}、${rainText}。`
       };
     }
 
-    function renderSeasonModule(season) {
-      const steps = [
-        { key: "preplant", label: "播前", range: "3-4月", focus: "整地 / 土温" },
-        { key: "planting", label: "播种", range: "4-6月", focus: "下地 / 进度" },
-        { key: "growth", label: "生长", range: "6-9月", focus: "热量 / 墒情" },
-        { key: "harvest", label: "收获", range: "9-11月", focus: "干燥 / 雨带" }
-      ];
+    function findExtreme(regionKey, kind) {
+      const scored = getSubregions(regionKey).map((meta) => {
+        const state = getRegionData(regionKey).states[meta.id] || blankState();
+        const stats = stateWindowStats(state);
+        return { meta, stats };
+      }).filter((item) => item.stats.windowTempF !== null);
+
+      if (!scored.length) {
+        return { label: "--", sub: "--" };
+      }
+
+      if (kind === "wet") {
+        scored.sort((a, b) => (b.stats.windowPrecipIn || 0) - (a.stats.windowPrecipIn || 0));
+        return { label: scored[0].meta.zh, sub: displayRain(scored[0].stats.windowPrecipIn, 2) };
+      }
+
+      scored.sort((a, b) => (b.stats.windowTempF || -999) - (a.stats.windowTempF || -999));
+      return { label: scored[0].meta.zh, sub: displayTemp(scored[0].stats.windowTempF, 1) };
+    }
+
+    function renderRegionSwitch() {
+      dom.regionSwitch.innerHTML = Object.values(REGION_CONFIG).map((region) => `
+        <button class="region-pill ${APP.regionKey === region.key ? "active" : ""}" data-region="${region.key}">
+          <strong>${region.label}</strong>
+          <span>${region.switchNote}</span>
+        </button>
+      `).join("");
+
+      dom.regionSwitch.querySelectorAll(".region-pill").forEach((button) => {
+        button.addEventListener("click", async () => {
+          APP.regionKey = button.dataset.region;
+          if (REGION_CONFIG[APP.regionKey].fetchWeather && !APP.loadedRegions[APP.regionKey]) {
+            await refreshRegion(APP.regionKey);
+          }
+          render();
+        });
+      });
+    }
+
+    function renderSeasonModule(regionKey) {
+      const season = getRegionSeason(regionKey);
+      const steps = REGION_CONFIG[regionKey].seasonSteps;
       dom.seasonDetail.textContent = `当前：${season.label}`;
       dom.seasonTrack.innerHTML = steps.map((step) => `
         <div class="season-step ${step.key === season.key ? "active" : ""}">
@@ -1651,109 +2041,174 @@
       `).join("");
     }
 
-    function summaryForBelt() {
-      const belt = beltStats();
-      const season = getSeason();
-      const eastWet = belt.eastRain - belt.westRain > 0.5;
-      const warmState = findExtreme("warm");
-      const wetState = findExtreme("wet");
-      let lead = "热量偏暖，雨量分布分化。";
-      if (eastWet && belt.avgTempAnomF > 1.5) {
-        lead = "西部升温快，东部雨量更强。";
-      } else if (belt.avgRainAnomIn > 0.25) {
-        lead = "整体偏湿，田间作业节奏偏慢。";
-      } else if (belt.avgTempAnomF > 1.5 && belt.avgRainAnomIn < 0.1) {
-        lead = "整体偏暖偏干，播前窗口改善。";
-      }
-      const tags = [
-        { text: `温度 ${tempBiasText(belt.avgTempAnomF, 1)}`, tone: belt.avgTempAnomF >= 0 ? "amber" : "blue" },
-        { text: `降水 ${rainBiasText(belt.avgRainAnomIn, 1)}`, tone: belt.avgRainAnomIn >= 0 ? "blue" : "green" },
-        { text: `最湿 ${wetState.label}`, tone: "blue" },
-        { text: `最暖 ${warmState.label}`, tone: "amber" },
-        { text: season.key === "preplant" || season.key === "planting" ? "关注下地窗口" : season.key === "growth" ? "关注热量墒情" : "关注收割窗口", tone: "green" }
-      ];
-      return { lead, tags };
-    }
-
-    function buildTabs() {
-      dom.stateTabs.innerHTML = STATE_META.map((meta) => {
-        const signal = stateSignal(meta, APP.data.states[meta.id], getSeason());
+    function renderGlobalGrid() {
+      dom.summaryLead.textContent = `美国 ${regionWeatherText("us")} · 巴西 ${regionWeatherText("brazil")} · 阿根廷 ${regionWeatherText("argentina")}`;
+      dom.globalGrid.innerHTML = Object.values(REGION_CONFIG).filter((region) => region.fetchWeather).map((region) => {
+        const season = getRegionSeason(region.key);
+        const tone = regionTone(region.key);
         return `
-          <button class="state-tab ${APP.selected === meta.id ? "active" : ""}" data-state="${meta.id}">
-            <strong>${meta.zh}</strong>
-            <span>${signal.label}</span>
-            <i style="background:${getToneColor(signal.tone)};"></i>
+          <button class="global-row" data-region-row="${region.key}">
+            <span class="global-flag">${region.short}</span>
+            <span class="global-main">
+              <span class="global-title">${region.label}</span>
+              <span class="global-sub">${season.label} · ${regionWeatherText(region.key)}</span>
+            </span>
+            <span class="global-side">
+              <span class="global-signal" style="color:${getToneColor(tone)};">${regionSignalLabel(region.key)}</span>
+              <span class="global-side-note">${region.fundamentalsNote}</span>
+            </span>
           </button>
         `;
       }).join("");
 
-      dom.stateTabs.querySelectorAll(".state-tab").forEach((button) => {
-        button.addEventListener("click", () => {
-          APP.selected = button.dataset.state;
+      dom.globalGrid.querySelectorAll("[data-region-row]").forEach((row) => {
+        row.addEventListener("click", async () => {
+          APP.regionKey = row.dataset.regionRow;
+          if (!APP.loadedRegions[APP.regionKey]) {
+            await refreshRegion(APP.regionKey);
+          }
           render();
         });
       });
     }
 
-    function renderHero() {
-      const season = getSeason();
-      const belt = beltStats();
-      const headline = headlineForBelt(season);
-      const summary = summaryForBelt();
-      dom.heroLabel.textContent = "大豆带综合状态";
-      dom.heroTitle.textContent = headline.title;
-      dom.heroSubtitle.textContent = headline.subtitle;
-      dom.phaseName.textContent = season.label;
-      dom.phaseFocus.textContent = season.focus;
-      renderSeasonModule(season);
-      dom.summaryLead.textContent = summary.lead;
-      dom.summaryTags.innerHTML = summary.tags.map((tag) => `
+    function renderRegionSummary(regionKey) {
+      const region = REGION_CONFIG[regionKey];
+      const stats = currentRegionStats(regionKey);
+      const season = getRegionSeason(regionKey);
+      const wet = findExtreme(regionKey, "wet");
+      const warm = findExtreme(regionKey, "warm");
+      dom.summaryLead.textContent = `${region.label} ${season.label}期，${regionWeatherText(regionKey)}。`;
+      dom.globalGrid.innerHTML = [
+        { title: "温度状态", sub: stats.avgTempAnomF !== null ? tempBiasText(stats.avgTempAnomF, 1) : "同步中", side: "近7天 vs 常年", tone: stats.avgTempAnomF > 0 ? "amber" : stats.avgTempAnomF < 0 ? "blue" : "text" },
+        { title: "雨量状态", sub: stats.avgRainAnomIn !== null ? rainBiasText(stats.avgRainAnomIn, 1) : "同步中", side: "近7天 vs 常年", tone: stats.avgRainAnomIn > 0 ? "blue" : stats.avgRainAnomIn < 0 ? "green" : "text" },
+        { title: "最湿分区", sub: wet.label, side: wet.sub, tone: "blue" },
+        { title: "最暖分区", sub: warm.label, side: warm.sub, tone: "amber" }
+      ].map((item) => `
+        <div class="global-row">
+          <span class="global-flag">${region.short}</span>
+          <span class="global-main">
+            <span class="global-title">${item.title}</span>
+            <span class="global-sub">${item.sub}</span>
+          </span>
+          <span class="global-side">
+            <span class="global-signal" style="color:${getToneColor(item.tone)};">${item.side}</span>
+          </span>
+        </div>
+      `).join("");
+    }
+
+    function renderMacroPanel() {
+      dom.macroLead.textContent = GLOBAL_FUNDAMENTALS.lead;
+      dom.macroTags.innerHTML = GLOBAL_FUNDAMENTALS.tags.map((tag) => `
         <span class="summary-tag" style="color:${getToneColor(tag.tone)};">${tag.text}</span>
       `).join("");
-      dom.beltWindowNote.textContent = `${formatDateLabel(APP.data.recentStart)}-${formatDateLabel(APP.data.recentEnd)} vs 2016-2025`;
+    }
+
+    function renderHero() {
+      if (APP.regionKey === "overview") {
+        const summary = globalHeroSummary();
+        dom.heroLabel.textContent = "全球大豆总览";
+        dom.heroTitle.textContent = summary.title;
+        dom.heroSubtitle.textContent = summary.subtitle;
+        dom.phaseName.textContent = "总览";
+        dom.phaseFocus.textContent = "三地产区 / 天气与基本面";
+        dom.historyMeta.textContent = "大豆 2025/26";
+        dom.heroKpis.innerHTML = GLOBAL_FUNDAMENTALS.hero.map((row) => `
+          <div class="kpi">
+            <div class="kpi-k">${row.k}</div>
+            <div class="kpi-v tone-${row.tone}">${row.v}</div>
+            <div class="kpi-s">${row.s}</div>
+          </div>
+        `).join("");
+        dom.seasonPanelTitle.textContent = "产区节奏";
+        dom.summaryPanelTitle.textContent = "三地产区概况";
+        dom.summaryPanelNote.textContent = "天气总览";
+        dom.macroPanel.style.display = "";
+        renderGlobalGrid();
+        renderMacroPanel();
+        dom.seasonDetail.textContent = "当前：跨区域";
+        dom.seasonTrack.innerHTML = Object.values(REGION_CONFIG).filter((region) => region.fetchWeather).map((region) => {
+          const season = getRegionSeason(region.key);
+          return `
+            <div class="season-step active">
+              <div class="season-name">${region.label}</div>
+              <div class="season-range">${season.label}</div>
+              <div class="season-focus">${season.focus}</div>
+            </div>
+          `;
+        }).join("");
+        return;
+      }
+
+      const summary = regionHeroSummary(APP.regionKey);
+      const selectedSeason = getRegionSeason(APP.regionKey);
+      const region = REGION_CONFIG[APP.regionKey];
+      const stats = currentRegionStats(APP.regionKey);
+      dom.heroLabel.textContent = `${region.label}天气监控`;
+      dom.heroTitle.textContent = summary.title;
+      dom.heroSubtitle.textContent = summary.subtitle;
+      dom.phaseName.textContent = region.phaseShort;
+      dom.phaseFocus.textContent = `${selectedSeason.label} / ${selectedSeason.focus}`;
       dom.historyMeta.textContent = "2016-2025 同期";
-
-      const rows = [
-        {
-          k: "8州温度状态",
-          v: belt.avgTempAnomF !== null ? tempBiasText(belt.avgTempAnomF, 1) : displayTemp(belt.avgTempF, 1),
-          s: belt.avgTempAnomF !== null ? "近7天较常年" : "近7天均值",
-          tone: belt.avgTempAnomF === null ? "text" : belt.avgTempAnomF > 0 ? "amber" : "blue"
-        },
-        {
-          k: "8州雨量状态",
-          v: belt.avgRainAnomIn !== null ? rainBiasText(belt.avgRainAnomIn, 1) : displayRain(belt.avgRainIn, 2),
-          s: belt.avgRainAnomIn !== null ? "近7天较常年" : "近7天均值",
-          tone: belt.avgRainAnomIn === null ? "text" : belt.avgRainAnomIn > 0 ? "blue" : "green"
-        },
-        {
-          k: "最湿州",
-          v: findExtreme("wet").label,
-          s: findExtreme("wet").sub,
-          tone: "blue"
-        },
-        {
-          k: "最暖州",
-          v: findExtreme("warm").label,
-          s: findExtreme("warm").sub,
-          tone: "amber"
-        }
-      ];
-
-      dom.heroKpis.innerHTML = rows.map((row) => `
+      dom.heroKpis.innerHTML = [
+        { k: `${region.label}温度`, v: stats.avgTempAnomF !== null ? tempBiasText(stats.avgTempAnomF, 1) : "--", s: "近7天较常年", tone: stats.avgTempAnomF > 0 ? "amber" : stats.avgTempAnomF < 0 ? "blue" : "text" },
+        { k: `${region.label}雨量`, v: stats.avgRainAnomIn !== null ? rainBiasText(stats.avgRainAnomIn, 1) : "--", s: "近7天较常年", tone: stats.avgRainAnomIn > 0 ? "blue" : stats.avgRainAnomIn < 0 ? "green" : "text" },
+        { k: "最湿分区", v: findExtreme(APP.regionKey, "wet").label, s: findExtreme(APP.regionKey, "wet").sub, tone: "blue" },
+        { k: "最暖分区", v: findExtreme(APP.regionKey, "warm").label, s: findExtreme(APP.regionKey, "warm").sub, tone: "amber" }
+      ].map((row) => `
         <div class="kpi">
           <div class="kpi-k">${row.k}</div>
           <div class="kpi-v tone-${row.tone}">${row.v}</div>
           <div class="kpi-s">${row.s}</div>
         </div>
       `).join("");
+      dom.seasonPanelTitle.textContent = "当前区域周期";
+      dom.summaryPanelTitle.textContent = "当前区域天气";
+      dom.summaryPanelNote.textContent = "区域摘要";
+      dom.macroPanel.style.display = "none";
+      renderSeasonModule(APP.regionKey);
+      renderRegionSummary(APP.regionKey);
+    }
 
-      dom.beltMap.innerHTML = STATE_META.map((meta) => {
-        const state = APP.data.states[meta.id];
+    function renderBeltOverview() {
+      if (APP.regionKey === "overview") {
+        dom.beltTitle.textContent = "三大产区";
+        dom.beltWindowNote.textContent = "点击进入区域";
+        dom.beltMap.innerHTML = Object.values(REGION_CONFIG).filter((region) => region.fetchWeather).map((region) => {
+          const stats = currentRegionStats(region.key);
+          const tone = regionTone(region.key);
+          const season = getRegionSeason(region.key);
+          return `
+            <button class="belt-node tone-${tone}" data-open-region="${region.key}">
+              <div class="belt-code">${region.short}</div>
+              <div class="belt-main">${stats.avgTempAnomF !== null ? tempBiasText(stats.avgTempAnomF, 0) : regionSignalLabel(region.key)}</div>
+              <div class="belt-mini">${season.label}<br>${regionWeatherText(region.key)}</div>
+            </button>
+          `;
+        }).join("");
+        dom.beltMap.querySelectorAll("[data-open-region]").forEach((node) => {
+          node.addEventListener("click", async () => {
+            APP.regionKey = node.dataset.openRegion;
+            if (!APP.loadedRegions[APP.regionKey]) {
+              await refreshRegion(APP.regionKey);
+            }
+            render();
+          });
+        });
+        return;
+      }
+
+      const region = REGION_CONFIG[APP.regionKey];
+      const data = getRegionData(APP.regionKey);
+      dom.beltTitle.textContent = region.beltTitle;
+      dom.beltWindowNote.textContent = data.recentStart ? `${formatDateLabel(data.recentStart)}-${formatDateLabel(data.recentEnd)} vs 2016-2025` : "近7天 vs 2016-2025";
+      dom.beltMap.innerHTML = getSubregions(APP.regionKey).map((meta) => {
+        const state = data.states[meta.id] || blankState();
         const stats = stateWindowStats(state);
-        const signal = stateSignal(meta, state, season);
-        const mainValue = stats.tempAnomF !== null ? displaySignedTemp(stats.tempAnomF, 1) : displayTemp(stats.windowTempF, 0);
-        const mini = stats.precipAnomIn !== null ? `雨 ${displaySignedRain(stats.precipAnomIn, 1)}` : `雨 ${displayRain(stats.windowPrecipIn, 2)}`;
+        const signal = stateSignal(APP.regionKey, state);
+        const mainValue = stats.tempAnomF !== null ? displaySignedTemp(stats.tempAnomF, 1) : stats.windowTempF !== null ? displayTemp(stats.windowTempF, 0) : "--";
+        const mini = stats.precipAnomIn !== null ? `雨 ${displaySignedRain(stats.precipAnomIn, 1)}` : stats.windowPrecipIn !== null ? `雨 ${displayRain(stats.windowPrecipIn, 2)}` : "天气同步中";
         return `
           <button class="belt-node tone-${signal.tone}" data-jump="${meta.id}">
             <div class="belt-code">${meta.code}</div>
@@ -1765,72 +2220,79 @@
 
       dom.beltMap.querySelectorAll(".belt-node").forEach((node) => {
         node.addEventListener("click", () => {
-          APP.selected = node.dataset.jump;
+          setSelectedId(APP.regionKey, node.dataset.jump);
           render();
           window.scrollTo({ top: 0, behavior: "smooth" });
         });
       });
     }
 
-    function findExtreme(kind) {
-      const scored = STATE_META.map((meta) => {
-        const state = APP.data.states[meta.id];
-        const stats = stateWindowStats(state);
-        return { meta, state, stats };
-      });
-
-      if (kind === "wet") {
-        scored.sort((a, b) => (b.stats.windowPrecipIn || 0) - (a.stats.windowPrecipIn || 0));
-        return {
-          label: scored[0].meta.zh,
-          sub: displayRain(scored[0].stats.windowPrecipIn, 2)
-        };
+    function buildStateTabs() {
+      if (APP.regionKey === "overview") {
+        dom.stateTabs.innerHTML = "";
+        return;
       }
+      const data = getRegionData(APP.regionKey);
+      const season = getRegionSeason(APP.regionKey);
+      dom.stateTabs.innerHTML = getSubregions(APP.regionKey).map((meta) => {
+        const signal = stateSignal(APP.regionKey, data.states[meta.id] || blankState(), season);
+        return `
+          <button class="state-tab ${getSelectedId(APP.regionKey) === meta.id ? "active" : ""}" data-state="${meta.id}">
+            <strong>${meta.zh}</strong>
+            <span>${signal.label}</span>
+            <i style="background:${getToneColor(signal.tone)};"></i>
+          </button>
+        `;
+      }).join("");
 
-      scored.sort((a, b) => (b.stats.windowTempF || -999) - (a.stats.windowTempF || -999));
-      return {
-        label: scored[0].meta.zh,
-        sub: displayTemp(scored[0].stats.windowTempF, 1)
-      };
+      dom.stateTabs.querySelectorAll(".state-tab").forEach((button) => {
+        button.addEventListener("click", () => {
+          setSelectedId(APP.regionKey, button.dataset.state);
+          render();
+        });
+      });
     }
 
     function renderSelectedState() {
-      const meta = STATE_META.find((item) => item.id === APP.selected);
-      const state = APP.data.states[APP.selected];
+      const data = getRegionData(APP.regionKey);
+      const selectedId = getSelectedId(APP.regionKey);
+      const meta = getMeta(APP.regionKey, selectedId) || getSubregions(APP.regionKey)[0];
+      const state = data.states[meta.id] || blankState();
       const stats = stateWindowStats(state);
-      const season = getSeason();
-      const signal = stateSignal(meta, state, season);
+      const signal = stateSignal(APP.regionKey, state);
       dom.detailTitle.textContent = meta.zh;
-      dom.detailSub.textContent = `${formatDateLabel(APP.data.recentStart)}-${formatDateLabel(APP.data.recentEnd)} 回看（日均温） ｜ ${formatDateLabel(APP.data.forecastStart)}-${formatDateLabel(APP.data.forecastEnd)} 预报（高/低温）`;
+      dom.detailSub.textContent = data.recentStart
+        ? `${REGION_CONFIG[APP.regionKey].label} ｜ ${formatDateLabel(data.recentStart)}-${formatDateLabel(data.recentEnd)} 回看（当地完整日） ｜ ${formatDateLabel(data.forecastStart)}-${formatDateLabel(data.forecastEnd)} 预报（当地日）`
+        : `${REGION_CONFIG[APP.regionKey].label} ｜ 天气同步中`;
       dom.detailSignal.style.color = getToneColor(signal.tone);
       dom.detailSignalText.textContent = signal.label;
 
-      const maxF = Math.max(...(state.recent.maxF || []));
-      const minF = Math.min(...(state.recent.minF || []));
+      const recentMax = state.recent.maxF?.length ? Math.max(...state.recent.maxF) : null;
+      const recentMin = state.recent.minF?.length ? Math.min(...state.recent.minF) : null;
       const metrics = [
         {
           k: "近7天均温",
-          v: displayTemp(stats.windowTempF, 1),
+          v: stats.windowTempF !== null ? displayTemp(stats.windowTempF, 1) : "--",
           s: stats.tempAnomF !== null ? `较常年${tempBiasText(stats.tempAnomF, 1)}` : "历史同步中",
           tone: stats.tempAnomF === null ? "text" : stats.tempAnomF > 0 ? "amber" : "blue"
         },
         {
           k: "近7天降水",
-          v: displayRain(stats.windowPrecipIn, 2),
+          v: stats.windowPrecipIn !== null ? displayRain(stats.windowPrecipIn, 2) : "--",
           s: stats.precipAnomIn !== null ? `较常年${rainBiasText(stats.precipAnomIn, 1)}` : "历史同步中",
           tone: stats.precipAnomIn === null ? "text" : stats.precipAnomIn > 0 ? "blue" : "green"
         },
         {
           k: "高低温范围",
-          v: `${displayTemp(maxF, 0)} / ${displayTemp(minF, 0)}`,
+          v: recentMax !== null ? `${displayTemp(recentMax, 0)} / ${displayTemp(recentMin, 0)}` : "--",
           s: "近7天极值",
           tone: "text"
         },
         {
           k: "未来7天降水",
-          v: displayRain(stats.forecastPrecipIn, 2),
+          v: stats.forecastPrecipIn !== null ? displayRain(stats.forecastPrecipIn, 2) : "--",
           s: "预报累计",
-          tone: stats.forecastPrecipIn > 1 ? "blue" : "green"
+          tone: stats.forecastPrecipIn !== null && stats.forecastPrecipIn > 1 ? "blue" : "green"
         }
       ];
 
@@ -1842,14 +2304,18 @@
         </div>
       `).join("");
 
-      renderTempChart(state);
-      renderRainChart(state);
+      renderTempChart();
+      renderRainChart();
       renderEcharts(state);
-      renderForecast(state);
+      renderForecast(state, data);
     }
 
-    function renderForecast(state) {
-      dom.forecastWindowNote.textContent = `${formatDateLabel(APP.data.forecastStart)}-${formatDateLabel(APP.data.forecastEnd)} · 高/低温`;
+    function renderForecast(state, data) {
+      dom.forecastWindowNote.textContent = data.forecastStart ? `${formatDateLabel(data.forecastStart)}-${formatDateLabel(data.forecastEnd)} · 高/低温` : "天气同步中";
+      if (!state.forecast.dates?.length) {
+        dom.forecastRow.innerHTML = `<div class="forecast-card"><div class="forecast-date">等待</div><div class="forecast-mean">同步中</div></div>`;
+        return;
+      }
       dom.forecastRow.innerHTML = state.forecast.dates.map((date, index) => `
         <div class="forecast-card">
           <div class="forecast-date">${formatDateLabel(date)}</div>
@@ -1863,12 +2329,13 @@
     }
 
     function renderBoard() {
-      const rows = STATE_META.map((meta) => {
-        const state = APP.data.states[meta.id];
+      const data = getRegionData(APP.regionKey);
+      dom.boardList.innerHTML = getSubregions(APP.regionKey).map((meta) => {
+        const state = data.states[meta.id] || blankState();
         const stats = stateWindowStats(state);
-        const signal = stateSignal(meta, state, getSeason());
-        const tempTrack = clamp(((stats.tempAnomF ?? stats.windowTempF) + 10) / 20, 0, 1) * 100;
-        const rainTrack = clamp(((stats.precipAnomIn ?? stats.windowPrecipIn) + 1.5) / 3, 0, 1) * 100;
+        const signal = stateSignal(APP.regionKey, state);
+        const tempTrack = clamp(((stats.tempAnomF ?? 0) + 10) / 20, 0, 1) * 100;
+        const rainTrack = clamp(((stats.precipAnomIn ?? 0) + 1.5) / 3, 0, 1) * 100;
         return `
           <div class="board-row">
             <div class="board-left">
@@ -1882,14 +2349,14 @@
                 <div class="board-cell">
                   <div class="board-k">较常年温度</div>
                   <div class="board-v tone-${stats.tempAnomF === null ? "text" : (stats.tempAnomF > 0 ? "amber" : "blue")}">
-                    ${stats.tempAnomF !== null ? tempBiasText(stats.tempAnomF, 1) : displayTemp(stats.windowTempF, 1)}
+                    ${stats.tempAnomF !== null ? tempBiasText(stats.tempAnomF, 1) : stats.windowTempF !== null ? displayTemp(stats.windowTempF, 1) : "--"}
                   </div>
                   <div class="track"><div class="fill" style="width:${tempTrack}%;background:${stats.tempAnomF !== null && stats.tempAnomF < 0 ? "var(--blue)" : "var(--amber)"};"></div></div>
                 </div>
                 <div class="board-cell">
                   <div class="board-k">较常年雨量</div>
                   <div class="board-v tone-${stats.precipAnomIn === null ? "text" : (stats.precipAnomIn > 0 ? "blue" : "green")}">
-                    ${stats.precipAnomIn !== null ? rainBiasText(stats.precipAnomIn, 1) : displayRain(stats.windowPrecipIn, 2)}
+                    ${stats.precipAnomIn !== null ? rainBiasText(stats.precipAnomIn, 1) : stats.windowPrecipIn !== null ? displayRain(stats.windowPrecipIn, 2) : "--"}
                   </div>
                   <div class="track"><div class="fill" style="width:${rainTrack}%;background:${stats.precipAnomIn !== null && stats.precipAnomIn < 0 ? "var(--green)" : "var(--blue)"};"></div></div>
                 </div>
@@ -1897,17 +2364,15 @@
             </div>
             <div class="board-right">
               <div class="label">未来7天雨量</div>
-              <div class="value tone-${stats.forecastPrecipIn > 1 ? "blue" : "text"}">${displayRain(stats.forecastPrecipIn, 2)}</div>
+              <div class="value tone-${stats.forecastPrecipIn !== null && stats.forecastPrecipIn > 1 ? "blue" : "text"}">${stats.forecastPrecipIn !== null ? displayRain(stats.forecastPrecipIn, 2) : "--"}</div>
               <div class="sub">${meta.code}</div>
             </div>
           </div>
         `;
       }).join("");
-
-      dom.boardList.innerHTML = rows;
     }
 
-    function renderTempChart(state) {
+    function renderTempChart() {
       if (APP.view === "forecast") {
         dom.tempHeading.textContent = "未来7天日均温";
         dom.tempLegend.innerHTML = `<span><i class="legend-dot" style="background:#66b8ff;"></i>未来7天日均温</span>`;
@@ -1918,10 +2383,9 @@
           <span><i class="legend-dot" style="background:#8f9bb0;"></i>10年同期均值</span>
         `;
       }
-
     }
 
-    function renderRainChart(state) {
+    function renderRainChart() {
       if (APP.view === "forecast") {
         dom.rainHeading.textContent = `未来7天降水 (${rainUnitLabel()})`;
         dom.rainLegend.innerHTML = `<span><i class="legend-dot" style="background:#3bd7c4;"></i>未来7天</span>`;
@@ -1964,13 +2428,39 @@
       };
     }
 
+    function setEmptyChart(chart, text) {
+      chart.clear();
+      chart.setOption({
+        animation: false,
+        xAxis: { show: false },
+        yAxis: { show: false },
+        series: [],
+        graphic: {
+          type: "text",
+          left: "center",
+          top: "middle",
+          style: {
+            text,
+            fill: "rgba(243,247,255,0.58)",
+            fontSize: 12
+          }
+        }
+      });
+    }
+
     function renderEcharts(state) {
       const tempChart = ensureChart("temp", dom.tempChart);
       const rainChart = ensureChart("rain", dom.rainChart);
       if (!tempChart || !rainChart) return;
 
-      const axis = baseAxisStyle();
       const labels = (APP.view === "forecast" ? state.forecast.dates : state.recent.dates).map(formatDateLabel);
+      if (!labels.length) {
+        setEmptyChart(tempChart, "天气同步中");
+        setEmptyChart(rainChart, "天气同步中");
+        return;
+      }
+
+      const axis = baseAxisStyle();
       const tempPrimaryRaw = APP.view === "forecast" ? state.forecast.meanF || [] : state.recent.meanF || [];
       const tempSecondaryRaw = APP.view === "forecast" ? [] : (state.hist ? state.hist.dailyTempAvgF : []);
       const rainPrimaryRaw = APP.view === "forecast" ? state.forecast.precipIn || [] : state.recent.precipIn || [];
@@ -2104,39 +2594,23 @@
       }, true);
     }
 
-    function render() {
-      const season = getSeason();
-      dom.syncText.textContent = APP.liveMode === "live" ? "实时已同步" : APP.liveMode === "syncing" ? "实时同步中" : "快照载入";
-      dom.updateText.textContent = `更新至 ${APP.data.generatedAt}`;
-      buildTabs();
-      renderHero();
-      renderSelectedState();
-      renderBoard();
-
-      dom.seasonSeg.querySelectorAll("button").forEach((button) => {
-        button.classList.toggle("active", button.dataset.view === APP.view);
-      });
-      dom.unitSeg.querySelectorAll("button").forEach((button) => {
-        button.classList.toggle("active", button.dataset.unit === APP.unit);
-      });
-    }
-
     async function fetchJson(url) {
       const response = await fetch(url, { mode: "cors" });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return response.json();
     }
 
-    async function loadLiveData() {
+    async function loadRegionData(regionKey) {
+      const region = REGION_CONFIG[regionKey];
+      if (!region.fetchWeather) {
+        return emptyRegionData(regionKey);
+      }
       const recentWindow = getRecentWindow();
       const forecastWindow = getForecastWindow();
-      const lats = STATE_META.map((item) => item.lat).join(",");
-      const lons = STATE_META.map((item) => item.lon).join(",");
+      const lats = region.subregions.map((item) => item.lat).join(",");
+      const lons = region.subregions.map((item) => item.lon).join(",");
       const recentUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${lats}&longitude=${lons}&start_date=${recentWindow.start}&end_date=${recentWindow.end}&daily=temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto`;
       const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&daily=temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_mean&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto&forecast_days=7`;
-
       const historyYears = Array.from({ length: 10 }, (_, index) => 2016 + index);
       const historyUrls = historyYears.map((year) => {
         const start = `${year}-${recentWindow.start.slice(5)}`;
@@ -2150,12 +2624,12 @@
         ...historyUrls.map(fetchJson)
       ]);
 
-      const recent = parseBatchResponse(recentJson);
-      const forecast = parseBatchResponse(forecastJson);
-      const historyPerYear = historyJson.map(parseBatchResponse);
+      const recent = parseBatchResponse(recentJson, region.subregions);
+      const forecast = parseBatchResponse(forecastJson, region.subregions);
+      const historyPerYear = historyJson.map((json) => parseBatchResponse(json, region.subregions));
 
       const states = {};
-      STATE_META.forEach((meta) => {
+      region.subregions.forEach((meta) => {
         const histTempDaily = [];
         const histRainDaily = [];
         const histWindowTemps = [];
@@ -2209,8 +2683,55 @@
       };
     }
 
+    async function refreshRegion(regionKey) {
+      try {
+        const data = await loadRegionData(regionKey);
+        APP.dataByRegion[regionKey] = data;
+        APP.loadedRegions[regionKey] = true;
+      } catch (error) {
+        if (!APP.dataByRegion[regionKey]) {
+          APP.dataByRegion[regionKey] = emptyRegionData(regionKey);
+        }
+      }
+    }
+
+    async function refreshAllRegions() {
+      APP.liveMode = "syncing";
+      render();
+      await Promise.all(Object.values(REGION_CONFIG).filter((region) => region.fetchWeather).map((region) => refreshRegion(region.key)));
+      APP.liveMode = Object.entries(APP.loadedRegions).filter(([key]) => key !== "overview").every(([, loaded]) => loaded) ? "live" : "snapshot";
+      render();
+    }
+
+    function render() {
+      const currentData = APP.regionKey === "overview" ? getRegionData("us") : getRegionData(APP.regionKey);
+      dom.updateText.textContent = `更新至 ${currentData.generatedAt || "等待同步"}`;
+      renderRegionSwitch();
+      renderHero();
+      renderBeltOverview();
+      if (APP.regionKey === "overview") {
+        dom.stickyTabs.style.display = "none";
+        dom.detailPanel.style.display = "none";
+        dom.stateBoard.style.display = "none";
+      } else {
+        dom.stickyTabs.style.display = "";
+        dom.detailPanel.style.display = "";
+        dom.stateBoard.style.display = "";
+        buildStateTabs();
+        renderSelectedState();
+        renderBoard();
+      }
+
+      dom.seasonSeg.querySelectorAll("button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === APP.view);
+      });
+      dom.unitSeg.querySelectorAll("button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.unit === APP.unit);
+      });
+    }
+
     function bindEvents() {
-      dom.refreshBtn.addEventListener("click", refreshLive);
+      dom.refreshBtn.addEventListener("click", refreshAllRegions);
       dom.seasonSeg.querySelectorAll("button").forEach((button) => {
         button.addEventListener("click", () => {
           APP.view = button.dataset.view;
@@ -2230,22 +2751,9 @@
       });
     }
 
-    async function refreshLive() {
-      APP.liveMode = "syncing";
-      render();
-      try {
-        const liveData = await loadLiveData();
-        APP.data = liveData;
-        APP.liveMode = "live";
-      } catch (error) {
-        APP.liveMode = "snapshot";
-      }
-      render();
-    }
-
     bindEvents();
     render();
-    refreshLive();
+    refreshAllRegions();
   </script>
 </body>
 </html>
