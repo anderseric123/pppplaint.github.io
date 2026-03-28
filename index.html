@@ -576,9 +576,10 @@
     .belt-node.tone-blue::after { background: linear-gradient(90deg, #184f7a, #66b8ff); }
 
     .belt-code {
-      font-size: 12px;
+      font-size: 10px;
       font-weight: 700;
       margin-bottom: 8px;
+      letter-spacing: 0.02em;
     }
 
     .belt-main {
@@ -1131,7 +1132,7 @@
         </div>
       </div>
 
-      <div class="belt-overview">
+      <div class="belt-overview" id="beltOverview">
         <div class="section-head">
           <h3 class="section-title" id="beltTitle">美国产区热区</h3>
           <div class="section-note" id="beltWindowNote">近7天 vs 10年同期</div>
@@ -1566,6 +1567,7 @@
       summaryPanelNote: document.getElementById("summaryPanelNote"),
       summaryLead: document.getElementById("summaryLead"),
       globalGrid: document.getElementById("globalGrid"),
+      beltOverview: document.getElementById("beltOverview"),
       macroPanel: document.getElementById("macroPanel"),
       macroPanelTitle: document.getElementById("macroPanelTitle"),
       macroLead: document.getElementById("macroLead"),
@@ -2124,6 +2126,7 @@
         `).join("");
         dom.summaryPanelTitle.textContent = "三地产区概况";
         dom.summaryPanelNote.textContent = "天气总览";
+        dom.summaryPanel.style.display = "";
         dom.macroPanel.style.display = "";
         renderGlobalGrid();
         renderMacroPanel();
@@ -2156,9 +2159,9 @@
       dom.seasonPanelTitle.textContent = "农时周期";
       dom.summaryPanelTitle.textContent = "区域天气";
       dom.summaryPanelNote.textContent = "区域摘要";
+      dom.summaryPanel.style.display = "none";
       dom.macroPanel.style.display = "none";
       renderSeasonModule(APP.regionKey);
-      renderRegionSummary(APP.regionKey);
     }
 
     function renderBeltOverview() {
@@ -2171,7 +2174,7 @@
           const season = getRegionSeason(region.key);
           return `
             <button class="belt-node tone-${tone}" data-open-region="${region.key}">
-              <div class="belt-code">${region.short}</div>
+              <div class="belt-code">${region.label.replace("产区", "")}</div>
               <div class="belt-main">${stats.avgTempAnomF !== null ? tempBiasText(stats.avgTempAnomF, 0) : regionSignalLabel(region.key)}</div>
               <div class="belt-mini">${season.label}<br>${regionWeatherText(region.key)}</div>
             </button>
@@ -2201,7 +2204,7 @@
         const mini = stats.precipAnomIn !== null ? `雨 ${displaySignedRain(stats.precipAnomIn, 1)}` : stats.windowPrecipIn !== null ? `雨 ${displayRain(stats.windowPrecipIn, 2)}` : "天气同步中";
         return `
           <button class="belt-node tone-${signal.tone}" data-jump="${meta.id}">
-            <div class="belt-code">${meta.code}</div>
+            <div class="belt-code">${meta.zh}</div>
             <div class="belt-main">${mainValue}</div>
             <div class="belt-mini">${signal.label}<br>${mini}</div>
           </button>
@@ -2213,32 +2216,6 @@
           setSelectedId(APP.regionKey, node.dataset.jump);
           render();
           window.scrollTo({ top: 0, behavior: "smooth" });
-        });
-      });
-    }
-
-    function buildStateTabs() {
-      if (APP.regionKey === "overview") {
-        dom.stateTabs.innerHTML = "";
-        return;
-      }
-      const data = getRegionData(APP.regionKey);
-      const season = getRegionSeason(APP.regionKey);
-      dom.stateTabs.innerHTML = getSubregions(APP.regionKey).map((meta) => {
-        const signal = stateSignal(APP.regionKey, data.states[meta.id] || blankState(), season);
-        return `
-          <button class="state-tab ${getSelectedId(APP.regionKey) === meta.id ? "active" : ""}" data-state="${meta.id}">
-            <strong>${meta.zh}</strong>
-            <span>${signal.label}</span>
-            <i style="background:${getToneColor(signal.tone)};"></i>
-          </button>
-        `;
-      }).join("");
-
-      dom.stateTabs.querySelectorAll(".state-tab").forEach((button) => {
-        button.addEventListener("click", () => {
-          setSelectedId(APP.regionKey, button.dataset.state);
-          render();
         });
       });
     }
@@ -2700,16 +2677,17 @@
       renderHero();
       renderBeltOverview();
       if (APP.regionKey === "overview") {
+        dom.beltOverview.style.display = "none";
         dom.seasonPanel.style.display = "none";
         dom.stickyTabs.style.display = "none";
         dom.detailPanel.style.display = "none";
         dom.stateBoard.style.display = "none";
       } else {
+        dom.beltOverview.style.display = "";
         dom.seasonPanel.style.display = "";
-        dom.stickyTabs.style.display = "";
+        dom.stickyTabs.style.display = "none";
         dom.detailPanel.style.display = "";
         dom.stateBoard.style.display = "";
-        buildStateTabs();
         renderSelectedState();
         renderBoard();
       }
