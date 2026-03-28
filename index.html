@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>美国大豆主产区天气监测</title>
+  <title>全球农作物产区天气</title>
   <style>
     :root {
       --bg: #06101d;
@@ -122,10 +122,37 @@
       flex-shrink: 0;
     }
 
+    .crop-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 4px;
+      border-radius: 999px;
+      border: 1px solid rgba(153, 176, 219, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .crop-pill {
+      min-width: 74px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      transition: all 0.22s ease;
+    }
+
+    .crop-pill.active {
+      color: var(--text);
+      background: linear-gradient(180deg, rgba(102, 184, 255, 0.18), rgba(102, 184, 255, 0.06));
+      box-shadow: 0 10px 24px rgba(16, 58, 102, 0.18);
+    }
+
     .region-switch {
       display: flex;
       gap: 8px;
-      margin-top: 14px;
+      margin-top: 10px;
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -1075,7 +1102,7 @@
     <header class="topbar">
       <div class="topbar-row">
         <div class="brand">
-          <h1 class="title">全球大豆产区天气</h1>
+          <h1 class="title">全球农作物产区天气</h1>
           <div class="meta">
             <span id="updateText">更新至 北京时间 2026-03-27 22:28</span>
           </div>
@@ -1084,6 +1111,7 @@
           <button class="chip-btn" id="historyMeta">大豆 2025/26</button>
         </div>
       </div>
+      <div class="crop-switch" id="cropSwitch"></div>
       <div class="region-switch" id="regionSwitch"></div>
     </header>
 
@@ -1198,7 +1226,7 @@
       <section class="board" id="stateBoard">
         <div class="board-head">
           <div class="section-head" style="margin-bottom:0;">
-            <h3 class="section-title">州 / 省级监控</h3>
+            <h3 class="section-title">产区分项监控</h3>
             <div class="section-note">较常年偏暖偏冷 / 偏湿偏干 / 未来7天雨量</div>
           </div>
         </div>
@@ -1217,6 +1245,10 @@
       <a href="https://www.fas.usda.gov/data/export-sales-report" target="_blank" rel="noreferrer">USDA FAS</a>
       /
       <a href="https://cast.conab.gov.br/post/2026-03-13_6_lev_graos/" target="_blank" rel="noreferrer">CONAB</a>
+      /
+      <a href="https://www.agri.cn/zx/nyyw/202504/t20250403_8723667.htm" target="_blank" rel="noreferrer">农业农村部信息中心</a>
+      /
+      <a href="https://www.caas.cn/xwzx/mtxw/1c75324421a74eacb98162d124f88179.htm" target="_blank" rel="noreferrer">中国农科院果树所</a>
     </div>
   </div>
 
@@ -1424,8 +1456,33 @@
       { id: "la_pampa", zh: "拉潘帕", en: "La Pampa", code: "LP", lat: -35.6566, lon: -63.7568, region: "west" }
     ];
 
+    const APPLE_META = [
+      { id: "shaanxi", zh: "陕西", en: "Shaanxi", code: "陕西", lat: 35.7610, lon: 109.4330, region: "loess" },
+      { id: "shandong", zh: "山东", en: "Shandong", code: "山东", lat: 37.4630, lon: 121.4470, region: "bohai" },
+      { id: "shanxi", zh: "山西", en: "Shanxi", code: "山西", lat: 35.0260, lon: 111.0070, region: "loess" },
+      { id: "gansu", zh: "甘肃", en: "Gansu", code: "甘肃", lat: 35.7340, lon: 107.6380, region: "loess" },
+      { id: "henan", zh: "河南", en: "Henan", code: "河南", lat: 34.5210, lon: 110.8850, region: "loess" },
+      { id: "liaoning", zh: "辽宁", en: "Liaoning", code: "辽宁", lat: 40.6170, lon: 120.7290, region: "bohai" }
+    ];
+
+    const CROP_CONFIG = {
+      soybean: {
+        key: "soybean",
+        label: "大豆",
+        defaultRegion: "overview",
+        historyLabel: "大豆 2025/26"
+      },
+      apple: {
+        key: "apple",
+        label: "苹果",
+        defaultRegion: "apple_overview",
+        historyLabel: "苹果 / 中国产区"
+      }
+    };
+
     const REGION_CONFIG = {
       overview: {
+        crop: "soybean",
         key: "overview",
         label: "总览",
         short: "GL",
@@ -1440,6 +1497,7 @@
         seasonSteps: []
       },
       us: {
+        crop: "soybean",
         key: "us",
         label: "美国产区",
         short: "US",
@@ -1451,6 +1509,7 @@
         subregions: STATE_META,
         fetchWeather: true,
         bootstrap: BOOTSTRAP,
+        timeZone: "America/Chicago",
         fundamentalsNote: "USDA 库存 3.5亿蒲式耳 (3/10)",
         seasonSteps: [
           { key: "preplant", label: "播前", range: "3-4月", focus: "土温 / 下地窗口", start: 301, end: 415 },
@@ -1460,6 +1519,7 @@
         ]
       },
       brazil: {
+        crop: "soybean",
         key: "brazil",
         label: "巴西产区",
         short: "BR",
@@ -1471,6 +1531,7 @@
         subregions: BRAZIL_META,
         fetchWeather: true,
         bootstrap: null,
+        timeZone: "America/Sao_Paulo",
         fundamentalsNote: "CONAB 已收 50.6% (3/13)",
         seasonSteps: [
           { key: "preplant", label: "播前", range: "7-8月", focus: "墒情 / 开播准备", start: 701, end: 831 },
@@ -1480,6 +1541,7 @@
         ]
       },
       argentina: {
+        crop: "soybean",
         key: "argentina",
         label: "阿根廷产区",
         short: "AR",
@@ -1491,6 +1553,7 @@
         subregions: ARGENTINA_META,
         fetchWeather: true,
         bootstrap: null,
+        timeZone: "America/Argentina/Buenos_Aires",
         fundamentalsNote: "USDA 产量 4800万吨 (3/10)",
         seasonSteps: [
           { key: "preplant", label: "播前", range: "8-9月", focus: "墒情 / 备播", start: 801, end: 930 },
@@ -1498,10 +1561,47 @@
           { key: "growth", label: "生长", range: "1-3月", focus: "鼓粒 / 单产兑现", start: 101, end: 331 },
           { key: "harvest", label: "收获", range: "4-6月", focus: "收割 / 品质", start: 401, end: 630 }
         ]
+      },
+      apple_overview: {
+        crop: "apple",
+        key: "apple_overview",
+        label: "总览",
+        short: "CN",
+        title: "中国苹果总览",
+        beltTitle: "中国苹果主产区",
+        switchNote: "花前天气 + 产区格局",
+        phaseShort: "苹果",
+        defaultSelected: null,
+        subregions: [],
+        fetchWeather: false,
+        fundamentalsNote: "中国苹果主产带",
+        seasonSteps: []
+      },
+      china_apple: {
+        crop: "apple",
+        key: "china_apple",
+        label: "中国产区",
+        short: "CN",
+        title: "中国苹果主产区",
+        beltTitle: "中国苹果产区热区",
+        switchNote: "花前跟踪",
+        phaseShort: "中国",
+        defaultSelected: "shaanxi",
+        subregions: APPLE_META,
+        fetchWeather: true,
+        bootstrap: null,
+        timeZone: "Asia/Shanghai",
+        fundamentalsNote: "黄土高原 + 环渤海",
+        seasonSteps: [
+          { key: "preplant", label: "花前", range: "3-4月", focus: "低温 / 晚霜 / 大风", start: 301, end: 420 },
+          { key: "planting", label: "花期坐果", range: "4-5月", focus: "授粉 / 坐果 / 阴雨", start: 421, end: 531 },
+          { key: "growth", label: "膨果生长", range: "6-8月", focus: "热量 / 降水 / 日灼", start: 601, end: 831 },
+          { key: "harvest", label: "着色采收", range: "9-11月", focus: "采收 / 品质 / 雨带", start: 901, end: 1130 }
+        ]
       }
     };
 
-    const GLOBAL_FUNDAMENTALS = {
+    const SOYBEAN_FUNDAMENTALS = {
       lead: "USDA 3月10日仍给出 12530万吨全球期末库存，南美收割仍是供给主线，美国暂处播前天气交易阶段。",
       hero: [
         { k: "全球库存", v: "12530万吨", s: "USDA WASDE 3/10", tone: "text" },
@@ -1518,7 +1618,24 @@
       ]
     };
 
+    const APPLE_FUNDAMENTALS = {
+      lead: "中国苹果主产区主要分布在黄土高原与环渤海两大产带，当前正进入花前到初花敏感窗口，低温、晚霜、降水和大风是核心跟踪项。",
+      hero: [
+        { k: "主产带", v: "黄土高原 + 环渤海", s: "中国产区骨架", tone: "text" },
+        { k: "核心省份", v: "陕西 / 山东", s: "代表性最强", tone: "green" },
+        { k: "当前阶段", v: "花前至萌芽", s: "3月下旬", tone: "amber" },
+        { k: "关注重点", v: "低温 / 晚霜 / 大风", s: "坐果前天气", tone: "blue" }
+      ],
+      tags: [
+        { text: "主产省 陕西 山东 山西 甘肃 河南 辽宁", tone: "text" },
+        { text: "代表点 洛川 烟台 运城 庆阳 灵宝 兴城", tone: "green" },
+        { text: "当前窗口 花前到初花", tone: "amber" },
+        { text: "风险焦点 晚霜 阴雨 大风", tone: "blue" }
+      ]
+    };
+
     const APP = {
+      cropKey: "soybean",
       regionKey: "overview",
       unit: "metric",
       view: "recent",
@@ -1531,25 +1648,32 @@
         overview: null,
         us: "illinois",
         brazil: "mato_grosso",
-        argentina: "buenos_aires"
+        argentina: "buenos_aires",
+        apple_overview: null,
+        china_apple: "shaanxi"
       },
       loadedRegions: {
         overview: true,
         us: true,
         brazil: false,
-        argentina: false
+        argentina: false,
+        apple_overview: true,
+        china_apple: false
       },
       dataByRegion: {
         overview: { generatedAt: "等待同步", recentStart: "", recentEnd: "", forecastStart: "", forecastEnd: "", states: {} },
         us: JSON.parse(JSON.stringify(BOOTSTRAP)),
         brazil: null,
-        argentina: null
+        argentina: null,
+        apple_overview: { generatedAt: "等待同步", recentStart: "", recentEnd: "", forecastStart: "", forecastEnd: "", states: {} },
+        china_apple: null
       }
     };
 
     const dom = {
       updateText: document.getElementById("updateText"),
       historyMeta: document.getElementById("historyMeta"),
+      cropSwitch: document.getElementById("cropSwitch"),
       regionSwitch: document.getElementById("regionSwitch"),
       heroLabel: document.getElementById("heroLabel"),
       heroTitle: document.getElementById("heroTitle"),
@@ -1641,6 +1765,22 @@
         APP.dataByRegion[regionKey] = emptyRegionData(regionKey);
       }
     });
+
+    function getCropRegions(cropKey = APP.cropKey) {
+      return Object.values(REGION_CONFIG).filter((region) => region.crop === cropKey);
+    }
+
+    function getWeatherRegions(cropKey = APP.cropKey) {
+      return getCropRegions(cropKey).filter((region) => region.fetchWeather);
+    }
+
+    function getPrimaryWeatherRegionKey(cropKey = APP.cropKey) {
+      return getWeatherRegions(cropKey)[0]?.key || null;
+    }
+
+    function getCropFundamentals(cropKey = APP.cropKey) {
+      return cropKey === "apple" ? APPLE_FUNDAMENTALS : SOYBEAN_FUNDAMENTALS;
+    }
 
     function getRegionData(regionKey = APP.regionKey) {
       return APP.dataByRegion[regionKey] || emptyRegionData(regionKey);
@@ -1781,16 +1921,30 @@
       return date.toISOString().slice(0, 10);
     }
 
-    function getRecentWindow(reference = new Date()) {
-      const todayBj = shanghaiDateKey(reference);
-      const end = addDaysToIso(todayBj, -2);
+    function dateKeyInTimeZone(reference = new Date(), timeZone = "Asia/Shanghai") {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(reference);
+      const values = {};
+      parts.forEach((part) => {
+        if (part.type !== "literal") values[part.type] = part.value;
+      });
+      return `${values.year}-${values.month}-${values.day}`;
+    }
+
+    function getRecentWindow(timeZone = "Asia/Shanghai", reference = new Date()) {
+      const todayBj = dateKeyInTimeZone(reference, timeZone);
+      const end = addDaysToIso(todayBj, -1);
       const start = addDaysToIso(end, -6);
       return { start, end };
     }
 
-    function getForecastWindow(reference = new Date()) {
-      const todayBj = shanghaiDateKey(reference);
-      const start = addDaysToIso(todayBj, -1);
+    function getForecastWindow(timeZone = "Asia/Shanghai", reference = new Date()) {
+      const todayBj = dateKeyInTimeZone(reference, timeZone);
+      const start = todayBj;
       const end = addDaysToIso(start, 6);
       return { start, end };
     }
@@ -1860,7 +2014,7 @@
     }
 
     function currentRegionStats(regionKey = APP.regionKey) {
-      if (regionKey === "overview") {
+      if (!REGION_CONFIG[regionKey].fetchWeather) {
         return { loaded: false, avgTempF: null, avgRainIn: null, avgTempAnomF: null, avgRainAnomIn: null, avgForecastRainIn: null };
       }
       const data = getRegionData(regionKey);
@@ -1914,6 +2068,26 @@
     }
 
     function regionSignalLabel(regionKey) {
+      if (REGION_CONFIG[regionKey].crop === "apple") {
+        const season = getRegionSeason(regionKey);
+        const tone = regionTone(regionKey);
+        if (season.key === "harvest") {
+          if (tone === "red") return "采收受扰";
+          if (tone === "green") return "采收顺畅";
+          return "采收观察";
+        }
+        if (season.key === "growth") {
+          if (tone === "red") return "热旱压力";
+          if (tone === "green") return "膨果平稳";
+          return "长势观察";
+        }
+        if (season.key === "preplant" || season.key === "planting") {
+          if (tone === "red") return "花前承压";
+          if (tone === "blue") return "偏冷风险";
+          if (tone === "green") return "花前平稳";
+          return "花前观察";
+        }
+      }
       const season = getRegionSeason(regionKey);
       const tone = regionTone(regionKey);
       if (season.key === "harvest") {
@@ -1936,6 +2110,31 @@
     }
 
     function stateSignal(regionKey, state) {
+      if (REGION_CONFIG[regionKey].crop === "apple") {
+        const season = getRegionSeason(regionKey);
+        const stats = stateWindowStats(state);
+        if (stats.windowTempF === null) {
+          return { tone: "amber", label: "同步中" };
+        }
+        const nextRain = stats.forecastPrecipIn || 0;
+        if (season.key === "harvest") {
+          if (nextRain > 0.8 || (stats.precipAnomIn || 0) > 0.35) return { tone: "red", label: "采收受扰" };
+          if ((stats.precipAnomIn || 0) < -0.15) return { tone: "green", label: "采收顺畅" };
+          return { tone: "amber", label: "采收观察" };
+        }
+        if (season.key === "growth") {
+          if ((stats.tempAnomF || 0) > 3.5 && (stats.precipAnomIn || 0) < -0.25) return { tone: "red", label: "热旱压力" };
+          if ((stats.precipAnomIn || 0) > 0.45) return { tone: "amber", label: "偏湿观察" };
+          return { tone: "green", label: "膨果平稳" };
+        }
+        if (season.key === "preplant" || season.key === "planting") {
+          if ((stats.tempAnomF || 0) < -3 || nextRain > 0.7) return { tone: "blue", label: "偏冷风险" };
+          if ((stats.precipAnomIn || 0) > 0.35) return { tone: "amber", label: "花前偏湿" };
+          if ((stats.tempAnomF || 0) > 1 && (stats.precipAnomIn || 0) < 0.2) return { tone: "green", label: "花前平稳" };
+          return { tone: "amber", label: "花前观察" };
+        }
+        return { tone: "amber", label: "继续跟踪" };
+      }
       const season = getRegionSeason(regionKey);
       const stats = stateWindowStats(state);
       if (stats.windowTempF === null) {
@@ -1962,6 +2161,13 @@
     }
 
     function globalHeroSummary() {
+      if (APP.cropKey === "apple") {
+        const cnSeason = getRegionSeason("china_apple");
+        return {
+          title: "中国苹果花前跟踪",
+          subtitle: `中国产区 ${cnSeason.label}期 ${regionWeatherText("china_apple")}；花前到初花窗口重点看低温、降水与大风。`
+        };
+      }
       const usSeason = getRegionSeason("us");
       const brSeason = getRegionSeason("brazil");
       const arSeason = getRegionSeason("argentina");
@@ -2013,8 +2219,28 @@
       return { label: scored[0].meta.zh, sub: displayTemp(scored[0].stats.windowTempF, 1) };
     }
 
+    function renderCropSwitch() {
+      dom.cropSwitch.innerHTML = Object.values(CROP_CONFIG).map((crop) => `
+        <button class="crop-pill ${APP.cropKey === crop.key ? "active" : ""}" data-crop="${crop.key}">
+          ${crop.label}
+        </button>
+      `).join("");
+
+      dom.cropSwitch.querySelectorAll("[data-crop]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          APP.cropKey = button.dataset.crop;
+          APP.regionKey = CROP_CONFIG[APP.cropKey].defaultRegion;
+          const primaryRegion = getPrimaryWeatherRegionKey(APP.cropKey);
+          if (primaryRegion && !APP.loadedRegions[primaryRegion]) {
+            await refreshRegion(primaryRegion);
+          }
+          render();
+        });
+      });
+    }
+
     function renderRegionSwitch() {
-      dom.regionSwitch.innerHTML = Object.values(REGION_CONFIG).map((region) => `
+      dom.regionSwitch.innerHTML = getCropRegions(APP.cropKey).map((region) => `
         <button class="region-pill ${APP.regionKey === region.key ? "active" : ""}" data-region="${region.key}">
           <strong>${region.label}</strong>
           <span>${region.switchNote}</span>
@@ -2046,8 +2272,12 @@
     }
 
     function renderGlobalGrid() {
-      dom.summaryLead.textContent = `美国 ${regionWeatherText("us")} · 巴西 ${regionWeatherText("brazil")} · 阿根廷 ${regionWeatherText("argentina")}`;
-      dom.globalGrid.innerHTML = Object.values(REGION_CONFIG).filter((region) => region.fetchWeather).map((region) => {
+      if (APP.cropKey === "apple") {
+        dom.summaryLead.textContent = `中国苹果主产区 ${regionWeatherText("china_apple")}。`;
+      } else {
+        dom.summaryLead.textContent = `美国 ${regionWeatherText("us")} · 巴西 ${regionWeatherText("brazil")} · 阿根廷 ${regionWeatherText("argentina")}`;
+      }
+      dom.globalGrid.innerHTML = getWeatherRegions(APP.cropKey).map((region) => {
         const season = getRegionSeason(region.key);
         const tone = regionTone(region.key);
         return `
@@ -2103,28 +2333,29 @@
     }
 
     function renderMacroPanel() {
-      dom.macroLead.textContent = GLOBAL_FUNDAMENTALS.lead;
-      dom.macroTags.innerHTML = GLOBAL_FUNDAMENTALS.tags.map((tag) => `
+      const fundamentals = getCropFundamentals(APP.cropKey);
+      dom.macroLead.textContent = fundamentals.lead;
+      dom.macroTags.innerHTML = fundamentals.tags.map((tag) => `
         <span class="summary-tag" style="color:${getToneColor(tag.tone)};">${tag.text}</span>
       `).join("");
     }
 
     function renderHero() {
-      if (APP.regionKey === "overview") {
+      if (!REGION_CONFIG[APP.regionKey].fetchWeather) {
         const summary = globalHeroSummary();
-        dom.heroLabel.textContent = "全球大豆总览";
+        dom.heroLabel.textContent = APP.cropKey === "apple" ? "中国苹果总览" : "全球大豆总览";
         dom.heroTitle.textContent = summary.title;
         dom.heroSubtitle.textContent = summary.subtitle;
         dom.heroSide.style.display = "none";
-        dom.historyMeta.textContent = "大豆 2025/26";
-        dom.heroKpis.innerHTML = GLOBAL_FUNDAMENTALS.hero.map((row) => `
+        dom.historyMeta.textContent = CROP_CONFIG[APP.cropKey].historyLabel;
+        dom.heroKpis.innerHTML = getCropFundamentals(APP.cropKey).hero.map((row) => `
           <div class="kpi">
             <div class="kpi-k">${row.k}</div>
             <div class="kpi-v tone-${row.tone}">${row.v}</div>
             <div class="kpi-s">${row.s}</div>
           </div>
         `).join("");
-        dom.summaryPanelTitle.textContent = "三地产区概况";
+        dom.summaryPanelTitle.textContent = APP.cropKey === "apple" ? "苹果产区概况" : "三地产区概况";
         dom.summaryPanelNote.textContent = "天气总览";
         dom.summaryPanel.style.display = "";
         dom.macroPanel.style.display = "";
@@ -2165,10 +2396,10 @@
     }
 
     function renderBeltOverview() {
-      if (APP.regionKey === "overview") {
-        dom.beltTitle.textContent = "三大产区";
+      if (!REGION_CONFIG[APP.regionKey].fetchWeather) {
+        dom.beltTitle.textContent = APP.cropKey === "apple" ? "中国苹果主产区" : "三大产区";
         dom.beltWindowNote.textContent = "点击进入区域";
-        dom.beltMap.innerHTML = Object.values(REGION_CONFIG).filter((region) => region.fetchWeather).map((region) => {
+        dom.beltMap.innerHTML = getWeatherRegions(APP.cropKey).map((region) => {
           const stats = currentRegionStats(region.key);
           const tone = regionTone(region.key);
           const season = getRegionSeason(region.key);
@@ -2572,8 +2803,8 @@
       if (!region.fetchWeather) {
         return emptyRegionData(regionKey);
       }
-      const recentWindow = getRecentWindow();
-      const forecastWindow = getForecastWindow();
+      const recentWindow = getRecentWindow(region.timeZone || "Asia/Shanghai");
+      const forecastWindow = getForecastWindow(region.timeZone || "Asia/Shanghai");
       const lats = region.subregions.map((item) => item.lat).join(",");
       const lons = region.subregions.map((item) => item.lon).join(",");
       const recentUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${lats}&longitude=${lons}&start_date=${recentWindow.start}&end_date=${recentWindow.end}&daily=temperature_2m_mean,temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=auto`;
@@ -2666,17 +2897,21 @@
       APP.liveMode = "syncing";
       render();
       await Promise.all(Object.values(REGION_CONFIG).filter((region) => region.fetchWeather).map((region) => refreshRegion(region.key)));
-      APP.liveMode = Object.entries(APP.loadedRegions).filter(([key]) => key !== "overview").every(([, loaded]) => loaded) ? "live" : "snapshot";
+      APP.liveMode = Object.entries(APP.loadedRegions).filter(([key]) => REGION_CONFIG[key]?.fetchWeather).every(([, loaded]) => loaded) ? "live" : "snapshot";
       render();
     }
 
     function render() {
-      const currentData = APP.regionKey === "overview" ? getRegionData("us") : getRegionData(APP.regionKey);
+      const currentData = REGION_CONFIG[APP.regionKey].fetchWeather
+        ? getRegionData(APP.regionKey)
+        : getRegionData(getPrimaryWeatherRegionKey(APP.cropKey));
       dom.updateText.textContent = `更新至 ${currentData.generatedAt || "等待同步"}`;
+      dom.historyMeta.textContent = CROP_CONFIG[APP.cropKey].historyLabel;
+      renderCropSwitch();
       renderRegionSwitch();
       renderHero();
       renderBeltOverview();
-      if (APP.regionKey === "overview") {
+      if (!REGION_CONFIG[APP.regionKey].fetchWeather) {
         dom.beltOverview.style.display = "none";
         dom.seasonPanel.style.display = "none";
         dom.stickyTabs.style.display = "none";
