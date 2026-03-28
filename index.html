@@ -1094,9 +1094,9 @@
           <h2 class="hero-title" id="heroTitle">南美收割主导</h2>
           <div class="hero-subtitle" id="heroSubtitle">巴西收获推进，美国进入播前天气交易，阿根廷处于单产兑现阶段。</div>
         </div>
-        <div class="hero-side">
+        <div class="hero-side" id="heroSide">
           <div class="phase-box">
-            <div class="phase-k">当前区域</div>
+            <div class="phase-k">农时阶段</div>
             <div class="phase-v" id="phaseName">美国</div>
             <div class="phase-s" id="phaseFocus">播前 / 土温与作业窗口</div>
           </div>
@@ -1106,9 +1106,9 @@
       <div class="hero-kpis" id="heroKpis"></div>
 
       <div class="mini-panels">
-        <div class="mini-panel">
+        <div class="mini-panel" id="seasonPanel">
           <div class="section-head">
-            <h3 class="section-title" id="seasonPanelTitle">当前区域周期</h3>
+            <h3 class="section-title" id="seasonPanelTitle">农时周期</h3>
             <div class="section-note" id="seasonDetail">当前阶段</div>
           </div>
           <div class="season-track" id="seasonTrack"></div>
@@ -1450,7 +1450,7 @@
         subregions: STATE_META,
         fetchWeather: true,
         bootstrap: BOOTSTRAP,
-        fundamentalsNote: "USDA 库存 350 mbu (3/10)",
+        fundamentalsNote: "USDA 库存 3.5亿蒲式耳 (3/10)",
         seasonSteps: [
           { key: "preplant", label: "播前", range: "3-4月", focus: "土温 / 下地窗口", start: 301, end: 415 },
           { key: "planting", label: "播种", range: "4-6月", focus: "播种 / 进度", start: 416, end: 610 },
@@ -1506,7 +1506,7 @@
         { k: "全球库存", v: "12530万吨", s: "USDA WASDE 3/10", tone: "text" },
         { k: "巴西产量", v: "18000万吨", s: "USDA 2025/26", tone: "green" },
         { k: "阿根廷产量", v: "4800万吨", s: "USDA 2025/26", tone: "amber" },
-        { k: "美豆库存", v: "350 mbu", s: "USDA WASDE 3/10", tone: "blue" }
+        { k: "美豆库存", v: "3.5亿蒲式耳", s: "USDA WASDE 3/10", tone: "blue" }
       ],
       tags: [
         { text: "全球产量 42080万吨", tone: "text" },
@@ -1553,9 +1553,11 @@
       heroLabel: document.getElementById("heroLabel"),
       heroTitle: document.getElementById("heroTitle"),
       heroSubtitle: document.getElementById("heroSubtitle"),
+      heroSide: document.getElementById("heroSide"),
       phaseName: document.getElementById("phaseName"),
       phaseFocus: document.getElementById("phaseFocus"),
       heroKpis: document.getElementById("heroKpis"),
+      seasonPanel: document.getElementById("seasonPanel"),
       seasonPanelTitle: document.getElementById("seasonPanelTitle"),
       seasonDetail: document.getElementById("seasonDetail"),
       seasonTrack: document.getElementById("seasonTrack"),
@@ -2111,8 +2113,7 @@
         dom.heroLabel.textContent = "全球大豆总览";
         dom.heroTitle.textContent = summary.title;
         dom.heroSubtitle.textContent = summary.subtitle;
-        dom.phaseName.textContent = "总览";
-        dom.phaseFocus.textContent = "三地产区 / 天气与基本面";
+        dom.heroSide.style.display = "none";
         dom.historyMeta.textContent = "大豆 2025/26";
         dom.heroKpis.innerHTML = GLOBAL_FUNDAMENTALS.hero.map((row) => `
           <div class="kpi">
@@ -2121,23 +2122,11 @@
             <div class="kpi-s">${row.s}</div>
           </div>
         `).join("");
-        dom.seasonPanelTitle.textContent = "产区节奏";
         dom.summaryPanelTitle.textContent = "三地产区概况";
         dom.summaryPanelNote.textContent = "天气总览";
         dom.macroPanel.style.display = "";
         renderGlobalGrid();
         renderMacroPanel();
-        dom.seasonDetail.textContent = "当前：跨区域";
-        dom.seasonTrack.innerHTML = Object.values(REGION_CONFIG).filter((region) => region.fetchWeather).map((region) => {
-          const season = getRegionSeason(region.key);
-          return `
-            <div class="season-step active">
-              <div class="season-name">${region.label}</div>
-              <div class="season-range">${season.label}</div>
-              <div class="season-focus">${season.focus}</div>
-            </div>
-          `;
-        }).join("");
         return;
       }
 
@@ -2145,11 +2134,12 @@
       const selectedSeason = getRegionSeason(APP.regionKey);
       const region = REGION_CONFIG[APP.regionKey];
       const stats = currentRegionStats(APP.regionKey);
+      dom.heroSide.style.display = "";
       dom.heroLabel.textContent = `${region.label}天气监控`;
       dom.heroTitle.textContent = summary.title;
       dom.heroSubtitle.textContent = summary.subtitle;
-      dom.phaseName.textContent = region.phaseShort;
-      dom.phaseFocus.textContent = `${selectedSeason.label} / ${selectedSeason.focus}`;
+      dom.phaseName.textContent = selectedSeason.label;
+      dom.phaseFocus.textContent = selectedSeason.focus;
       dom.historyMeta.textContent = "2016-2025 同期";
       dom.heroKpis.innerHTML = [
         { k: `${region.label}温度`, v: stats.avgTempAnomF !== null ? tempBiasText(stats.avgTempAnomF, 1) : "--", s: "近7天较常年", tone: stats.avgTempAnomF > 0 ? "amber" : stats.avgTempAnomF < 0 ? "blue" : "text" },
@@ -2163,8 +2153,8 @@
           <div class="kpi-s">${row.s}</div>
         </div>
       `).join("");
-      dom.seasonPanelTitle.textContent = "当前区域周期";
-      dom.summaryPanelTitle.textContent = "当前区域天气";
+      dom.seasonPanelTitle.textContent = "农时周期";
+      dom.summaryPanelTitle.textContent = "区域天气";
       dom.summaryPanelNote.textContent = "区域摘要";
       dom.macroPanel.style.display = "none";
       renderSeasonModule(APP.regionKey);
@@ -2710,10 +2700,12 @@
       renderHero();
       renderBeltOverview();
       if (APP.regionKey === "overview") {
+        dom.seasonPanel.style.display = "none";
         dom.stickyTabs.style.display = "none";
         dom.detailPanel.style.display = "none";
         dom.stateBoard.style.display = "none";
       } else {
+        dom.seasonPanel.style.display = "";
         dom.stickyTabs.style.display = "";
         dom.detailPanel.style.display = "";
         dom.stateBoard.style.display = "";
