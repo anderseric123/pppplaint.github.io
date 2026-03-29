@@ -1521,6 +1521,15 @@
       { id: "liaoning", zh: "辽宁", en: "Liaoning", code: "辽宁", lat: 40.6170, lon: 120.7290, region: "bohai" }
     ];
 
+    const JUJUBE_META = [
+      { id: "xinjiang", zh: "新疆", en: "Xinjiang", code: "新疆", lat: 41.1710, lon: 80.2660, region: "southern_xj" },
+      { id: "hebei", zh: "河北", en: "Hebei", code: "河北", lat: 38.3040, lon: 116.8380, region: "north_china" },
+      { id: "shanxi_jujube", zh: "山西", en: "Shanxi", code: "山西", lat: 37.9520, lon: 110.9920, region: "loess" },
+      { id: "shaanxi_jujube", zh: "陕西", en: "Shaanxi", code: "陕西", lat: 38.0420, lon: 110.4930, region: "loess" },
+      { id: "henan_jujube", zh: "河南", en: "Henan", code: "河南", lat: 34.3960, lon: 113.7390, region: "yellow_river" },
+      { id: "shandong_jujube", zh: "山东", en: "Shandong", code: "山东", lat: 37.7420, lon: 117.6160, region: "yellow_river" }
+    ];
+
     const CROP_CONFIG = {
       soybean: {
         key: "soybean",
@@ -1533,6 +1542,12 @@
         label: "苹果",
         defaultRegion: "apple_overview",
         historyLabel: "苹果 / 中国产区"
+      },
+      jujube: {
+        key: "jujube",
+        label: "红枣",
+        defaultRegion: "jujube_overview",
+        historyLabel: "红枣 / 中国产区"
       }
     };
 
@@ -1654,6 +1669,43 @@
           { key: "growth", label: "膨果生长", range: "6-8月", focus: "热量 / 降水 / 日灼", start: 601, end: 831 },
           { key: "harvest", label: "着色采收", range: "9-11月", focus: "采收 / 品质 / 雨带", start: 901, end: 1130 }
         ]
+      },
+      jujube_overview: {
+        crop: "jujube",
+        key: "jujube_overview",
+        label: "总览",
+        short: "CN",
+        title: "中国红枣总览",
+        beltTitle: "中国红枣主产区",
+        switchNote: "萌芽前跟踪",
+        phaseShort: "红枣",
+        defaultSelected: null,
+        subregions: [],
+        fetchWeather: false,
+        fundamentalsNote: "中国产区格局",
+        seasonSteps: []
+      },
+      china_jujube: {
+        crop: "jujube",
+        key: "china_jujube",
+        label: "中国产区",
+        short: "CN",
+        title: "中国红枣主产区",
+        beltTitle: "中国红枣产区热区",
+        switchNote: "萌芽前跟踪",
+        phaseShort: "中国",
+        defaultSelected: "xinjiang",
+        subregions: JUJUBE_META,
+        fetchWeather: true,
+        bootstrap: null,
+        timeZone: "Asia/Shanghai",
+        fundamentalsNote: "新疆 + 华北黄河故道",
+        seasonSteps: [
+          { key: "preplant", label: "萌芽前", range: "3-4月", focus: "低温 / 大风 / 墒情", start: 301, end: 430 },
+          { key: "planting", label: "花期坐果", range: "5-6月", focus: "授粉 / 阴雨 / 干热风", start: 501, end: 630 },
+          { key: "growth", label: "膨果转色", range: "7-9月", focus: "热量 / 水分 / 裂果", start: 701, end: 930 },
+          { key: "harvest", label: "成熟采收", range: "10-11月", focus: "采收 / 晾晒 / 降雨", start: 1001, end: 1130 }
+        ]
       }
     };
 
@@ -1687,6 +1739,22 @@
         { text: "代表点 洛川 烟台 运城 庆阳 灵宝 兴城", tone: "green" },
         { text: "当前窗口 花前到初花", tone: "amber" },
         { text: "风险焦点 晚霜 阴雨 大风", tone: "blue" }
+      ]
+    };
+
+    const JUJUBE_FUNDAMENTALS = {
+      lead: "中国红枣主产区集中在新疆、河北、山东、山西、陕西、河南等地，当前正处于萌芽前窗口，温度回升、大风和区域墒情是春季早段的核心跟踪项。",
+      hero: [
+        { k: "主产格局", v: "新疆 + 华北黄河故道", s: "中国产区骨架", tone: "text" },
+        { k: "核心省份", v: "新疆 / 河北", s: "代表性最强", tone: "green" },
+        { k: "当前阶段", v: "萌芽前", s: "3月下旬", tone: "amber" },
+        { k: "关注重点", v: "低温 / 大风 / 墒情", s: "春季天气", tone: "blue" }
+      ],
+      tags: [
+        { text: "主产省 新疆 河北 山东 山西 陕西 河南", tone: "text" },
+        { text: "代表点 阿克苏 沧州 吕梁 榆林 新郑 滨州", tone: "green" },
+        { text: "当前窗口 萌芽前", tone: "amber" },
+        { text: "风险焦点 倒春寒 大风 干旱", tone: "blue" }
       ]
     };
 
@@ -1739,7 +1807,9 @@
         brazil: "mato_grosso",
         argentina: "buenos_aires",
         apple_overview: null,
-        china_apple: "shaanxi"
+        china_apple: "shaanxi",
+        jujube_overview: null,
+        china_jujube: "xinjiang"
       },
       loadedRegions: {
         overview: true,
@@ -1747,7 +1817,9 @@
         brazil: false,
         argentina: false,
         apple_overview: true,
-        china_apple: false
+        china_apple: false,
+        jujube_overview: true,
+        china_jujube: false
       },
       dataByRegion: {
         overview: { generatedAt: "等待同步", recentStart: "", recentEnd: "", forecastStart: "", forecastEnd: "", states: {} },
@@ -1755,7 +1827,9 @@
         brazil: null,
         argentina: null,
         apple_overview: { generatedAt: "等待同步", recentStart: "", recentEnd: "", forecastStart: "", forecastEnd: "", states: {} },
-        china_apple: null
+        china_apple: null,
+        jujube_overview: { generatedAt: "等待同步", recentStart: "", recentEnd: "", forecastStart: "", forecastEnd: "", states: {} },
+        china_jujube: null
       }
     };
 
@@ -1872,7 +1946,9 @@
     }
 
     function getCropFundamentals(cropKey = APP.cropKey) {
-      return cropKey === "apple" ? APPLE_FUNDAMENTALS : SOYBEAN_FUNDAMENTALS;
+      if (cropKey === "apple") return APPLE_FUNDAMENTALS;
+      if (cropKey === "jujube") return JUJUBE_FUNDAMENTALS;
+      return SOYBEAN_FUNDAMENTALS;
     }
 
     function getRegionData(regionKey = APP.regionKey) {
@@ -2291,6 +2367,29 @@
         if (!top) return "继续跟踪";
         return top.risk.severity === "none" ? "霜冻平稳" : top.risk.severityLabel;
       }
+      if (REGION_CONFIG[regionKey].crop === "jujube") {
+        const season = getRegionSeason(regionKey);
+        const tone = regionTone(regionKey);
+        if (season.key === "harvest") {
+          if (tone === "red") return "采收受扰";
+          if (tone === "green") return "采收平稳";
+          return "采收观察";
+        }
+        if (season.key === "growth") {
+          if (tone === "red") return "热干压力";
+          if (tone === "green") return "膨果平稳";
+          return "膨果观察";
+        }
+        if (season.key === "planting") {
+          if (tone === "red") return "花期承压";
+          if (tone === "blue") return "偏冷观察";
+          if (tone === "green") return "坐果平稳";
+          return "花期观察";
+        }
+        if (tone === "blue") return "偏冷观察";
+        if (tone === "green") return "萌芽平稳";
+        return "萌芽观察";
+      }
       const season = getRegionSeason(regionKey);
       const tone = regionTone(regionKey);
       if (season.key === "harvest") {
@@ -2320,6 +2419,34 @@
         }
         const risk = getAppleFrostRisk(state, targetId);
         return { tone: risk.tone, label: risk.severityLabel };
+      }
+      if (REGION_CONFIG[regionKey].crop === "jujube") {
+        const season = getRegionSeason(regionKey);
+        const stats = stateWindowStats(state);
+        if (stats.windowTempF === null) {
+          return { tone: "amber", label: "同步中" };
+        }
+        const nextRain = stats.forecastPrecipIn || 0;
+        if (season.key === "harvest") {
+          if (nextRain > 0.8 || (stats.precipAnomIn || 0) > 0.35) return { tone: "red", label: "采收受扰" };
+          if ((stats.precipAnomIn || 0) < -0.15) return { tone: "green", label: "采收平稳" };
+          return { tone: "amber", label: "采收观察" };
+        }
+        if (season.key === "growth") {
+          if ((stats.tempAnomF || 0) > 3 && (stats.precipAnomIn || 0) < -0.25) return { tone: "red", label: "热干压力" };
+          if ((stats.precipAnomIn || 0) > 0.45) return { tone: "amber", label: "偏湿观察" };
+          return { tone: "green", label: "膨果平稳" };
+        }
+        if (season.key === "planting") {
+          if (nextRain > 0.8 || (stats.precipAnomIn || 0) > 0.35) return { tone: "red", label: "花期承压" };
+          if ((stats.tempAnomF || 0) < -2.5) return { tone: "blue", label: "偏冷观察" };
+          if ((stats.tempAnomF || 0) > 1 && (stats.precipAnomIn || 0) < 0.1) return { tone: "green", label: "坐果平稳" };
+          return { tone: "amber", label: "花期观察" };
+        }
+        if ((stats.tempAnomF || 0) < -2.5) return { tone: "blue", label: "偏冷观察" };
+        if (nextRain > 0.6 || (stats.precipAnomIn || 0) > 0.3) return { tone: "amber", label: "春雨观察" };
+        if ((stats.tempAnomF || 0) > 1 && (stats.precipAnomIn || 0) < 0.1) return { tone: "green", label: "萌芽平稳" };
+        return { tone: "amber", label: "萌芽观察" };
       }
       const season = getRegionSeason(regionKey);
       const stats = stateWindowStats(state);
@@ -2355,6 +2482,13 @@
           subtitle: `中国产区 ${cnSeason.label}期，${frost.summaryText} 花前到初花窗口重点看低温、降水与大风。`
         };
       }
+      if (APP.cropKey === "jujube") {
+        const cnSeason = getRegionSeason("china_jujube");
+        return {
+          title: "中国红枣春季跟踪",
+          subtitle: `中国产区 ${cnSeason.label}期 ${regionWeatherText("china_jujube")}；当前重点看温度回升、大风与区域墒情。`
+        };
+      }
       const usSeason = getRegionSeason("us");
       const brSeason = getRegionSeason("brazil");
       const arSeason = getRegionSeason("argentina");
@@ -2376,6 +2510,27 @@
         return {
           title: top.risk.severity === "none" ? `${region.label}花前平稳` : `${region.label}${top.risk.severityLabel}`,
           subtitle: `${season.label}期，${frost.summaryText} 当前最高风险位于${top.meta.zh}。`
+        };
+      }
+      if (region.crop === "jujube") {
+        if (!stats.loaded) {
+          return { title: region.title, subtitle: `${region.label}天气同步中。` };
+        }
+        const tempText = stats.avgTempAnomF === null ? "温度同步中" : tempBiasText(stats.avgTempAnomF, 1);
+        const rainText = stats.avgRainAnomIn === null ? "雨量同步中" : rainBiasText(stats.avgRainAnomIn, 1);
+        let title = `${region.label}${season.label}跟踪`;
+        if (season.key === "harvest") {
+          title = stats.avgRainAnomIn > 0.25 ? `${region.label}采收承压` : `${region.label}采收观察`;
+        } else if (season.key === "growth") {
+          title = stats.avgTempAnomF > 2.5 && stats.avgRainAnomIn < -0.2 ? `${region.label}热干观察` : `${region.label}膨果跟踪`;
+        } else if (season.key === "planting") {
+          title = stats.avgRainAnomIn > 0.25 ? `${region.label}花期观察` : `${region.label}坐果跟踪`;
+        } else {
+          title = stats.avgTempAnomF < -2 ? `${region.label}偏冷观察` : `${region.label}萌芽跟踪`;
+        }
+        return {
+          title,
+          subtitle: `${season.label}期，区域整体 ${tempText}、${rainText}。`
         };
       }
       if (!stats.loaded) {
@@ -2486,6 +2641,28 @@
           </div>
         `).join("");
         return;
+      }
+      if (APP.cropKey === "jujube") {
+        const data = getRegionData("china_jujube");
+        dom.summaryLead.textContent = `中国红枣主产区 ${regionWeatherText("china_jujube")}。`;
+        dom.globalGrid.innerHTML = JUJUBE_META.map((meta) => {
+          const state = data.states[meta.id] || blankState();
+          const stats = stateWindowStats(state);
+          const signal = stateSignal("china_jujube", state, meta.id);
+          return `
+            <div class="global-row">
+              <span class="global-flag">${meta.zh}</span>
+              <span class="global-main">
+                <span class="global-title">${getRegionSeason("china_jujube").label}</span>
+                <span class="global-sub">72h雨量 ${stats.forecastPrecipIn === null ? "--" : displayRain(stats.forecastPrecipIn, 2)} · 温 ${stats.tempAnomF === null ? "--" : tempBiasText(stats.tempAnomF, 1)}</span>
+              </span>
+              <span class="global-side">
+                <span class="global-signal" style="color:${getToneColor(signal.tone)};">${signal.label}</span>
+              </span>
+            </div>
+          `;
+        }).join("");
+        return;
       } else {
         dom.summaryLead.textContent = `美国 ${regionWeatherText("us")} · 巴西 ${regionWeatherText("brazil")} · 阿根廷 ${regionWeatherText("argentina")}`;
       }
@@ -2555,7 +2732,7 @@
     function renderHero() {
       if (!REGION_CONFIG[APP.regionKey].fetchWeather) {
         const summary = globalHeroSummary();
-        dom.heroLabel.textContent = APP.cropKey === "apple" ? "中国苹果总览" : "全球大豆总览";
+        dom.heroLabel.textContent = APP.cropKey === "apple" ? "中国苹果总览" : APP.cropKey === "jujube" ? "中国红枣总览" : "全球大豆总览";
         dom.heroTitle.textContent = summary.title;
         dom.heroSubtitle.textContent = summary.subtitle;
         dom.heroSide.style.display = "none";
@@ -2567,7 +2744,7 @@
             <div class="kpi-s">${row.s}</div>
           </div>
         `).join("");
-        dom.summaryPanelTitle.textContent = APP.cropKey === "apple" ? "苹果产区概况" : "三地产区概况";
+        dom.summaryPanelTitle.textContent = APP.cropKey === "apple" ? "苹果产区概况" : APP.cropKey === "jujube" ? "红枣产区概况" : "三地产区概况";
         dom.summaryPanelNote.textContent = "天气总览";
         dom.summaryPanel.style.display = "";
         dom.macroPanel.style.display = "";
