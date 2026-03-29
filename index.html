@@ -795,6 +795,53 @@
       border-top: 1px solid rgba(153, 176, 219, 0.08);
     }
 
+    .frost-block {
+      padding: 14px 16px 16px;
+      border-top: 1px solid rgba(153, 176, 219, 0.08);
+    }
+
+    .frost-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .frost-card {
+      border: 1px solid rgba(153, 176, 219, 0.1);
+      border-radius: 16px;
+      padding: 12px 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      min-height: 88px;
+    }
+
+    .frost-k {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .frost-v {
+      font-size: 18px;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .frost-s {
+      font-size: 11px;
+      color: var(--muted-2);
+      line-height: 1.45;
+    }
+
+    .frost-tip {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
     .chart-title {
       display: flex;
       align-items: center;
@@ -1189,6 +1236,15 @@
         </div>
 
         <div class="metrics-strip" id="stateMetrics"></div>
+
+        <div class="frost-block" id="frostBlock" style="display:none;">
+          <div class="section-head">
+            <h3 class="section-title">霜冻风险</h3>
+            <div class="section-note" id="frostNote">未来72小时</div>
+          </div>
+          <div class="frost-grid" id="frostGrid"></div>
+          <div class="frost-tip" id="frostTip">按中国气象局 QX/T 88-2008 苹果阈值估计，物候期为阶段估计值。</div>
+        </div>
 
         <div class="chart-block">
           <div class="chart-title">
@@ -1634,6 +1690,39 @@
       ]
     };
 
+    const APPLE_FROST_THRESHOLDS = {
+      bud_expand: {
+        label: "花芽膨大",
+        light: [-3.0, -2.0],
+        moderate: [-4.0, -3.0],
+        severe: -4.0
+      },
+      bud_stage: {
+        label: "花蕾前期",
+        light: [-2.0, -1.0],
+        moderate: [-3.0, -2.0],
+        severe: -3.0
+      },
+      initial_bloom: {
+        label: "初花期",
+        light: [-2.0, -1.0],
+        moderate: [-2.7, -2.0],
+        severe: -2.7
+      },
+      full_bloom: {
+        label: "盛花期",
+        light: [-1.5, -0.5],
+        moderate: [-2.5, -1.5],
+        severe: -2.5
+      },
+      young_fruit: {
+        label: "幼果期",
+        light: [-1.0, -0.5],
+        moderate: [-2.0, -1.0],
+        severe: -2.0
+      }
+    };
+
     const APP = {
       cropKey: "soybean",
       regionKey: "overview",
@@ -1707,6 +1796,10 @@
       detailSignal: document.getElementById("detailSignal"),
       detailSignalText: document.getElementById("detailSignalText"),
       stateMetrics: document.getElementById("stateMetrics"),
+      frostBlock: document.getElementById("frostBlock"),
+      frostNote: document.getElementById("frostNote"),
+      frostGrid: document.getElementById("frostGrid"),
+      frostTip: document.getElementById("frostTip"),
       tempHeading: document.getElementById("tempHeading"),
       tempLegend: document.getElementById("tempLegend"),
       rainHeading: document.getElementById("rainHeading"),
@@ -1847,6 +1940,10 @@
       if (valueIn === null || Number.isNaN(valueIn)) return "--";
       const value = APP.unit === "metric" ? toMetricRain(valueIn) : valueIn;
       return `${fmtNumber(value, digits)}${rainUnitLabel()}`;
+    }
+
+    function celsiusFromF(valueF) {
+      return (valueF - 32) * 5 / 9;
     }
 
     function displaySignedTemp(valueF, digits = 1) {
@@ -1995,6 +2092,127 @@
       };
     }
 
+    function getApplePhenology(metaId, now = new Date()) {
+      const md = (now.getMonth() + 1) * 100 + now.getDate();
+      const early = {
+        shaanxi: [
+          { key: "bud_expand", label: "花芽膨大", start: 315, end: 405 },
+          { key: "bud_stage", label: "花蕾前期", start: 406, end: 420 },
+          { key: "initial_bloom", label: "初花期", start: 421, end: 430 },
+          { key: "full_bloom", label: "盛花期", start: 501, end: 510 },
+          { key: "young_fruit", label: "幼果期", start: 511, end: 531 }
+        ],
+        shandong: [
+          { key: "bud_expand", label: "花芽膨大", start: 320, end: 410 },
+          { key: "bud_stage", label: "花蕾前期", start: 411, end: 425 },
+          { key: "initial_bloom", label: "初花期", start: 426, end: 505 },
+          { key: "full_bloom", label: "盛花期", start: 506, end: 515 },
+          { key: "young_fruit", label: "幼果期", start: 516, end: 605 }
+        ],
+        shanxi: [
+          { key: "bud_stage", label: "花蕾前期", start: 320, end: 405 },
+          { key: "initial_bloom", label: "初花期", start: 406, end: 420 },
+          { key: "full_bloom", label: "盛花期", start: 421, end: 430 },
+          { key: "young_fruit", label: "幼果期", start: 501, end: 531 }
+        ],
+        gansu: [
+          { key: "bud_expand", label: "花芽膨大", start: 320, end: 410 },
+          { key: "bud_stage", label: "花蕾前期", start: 411, end: 425 },
+          { key: "initial_bloom", label: "初花期", start: 426, end: 505 },
+          { key: "full_bloom", label: "盛花期", start: 506, end: 515 },
+          { key: "young_fruit", label: "幼果期", start: 516, end: 605 }
+        ],
+        henan: [
+          { key: "bud_stage", label: "花蕾前期", start: 315, end: 405 },
+          { key: "initial_bloom", label: "初花期", start: 406, end: 420 },
+          { key: "full_bloom", label: "盛花期", start: 421, end: 430 },
+          { key: "young_fruit", label: "幼果期", start: 501, end: 531 }
+        ],
+        liaoning: [
+          { key: "bud_expand", label: "花芽膨大", start: 325, end: 415 },
+          { key: "bud_stage", label: "花蕾前期", start: 416, end: 430 },
+          { key: "initial_bloom", label: "初花期", start: 501, end: 510 },
+          { key: "full_bloom", label: "盛花期", start: 511, end: 520 },
+          { key: "young_fruit", label: "幼果期", start: 521, end: 610 }
+        ]
+      };
+      const matched = (early[metaId] || []).find((step) => md >= step.start && md <= step.end);
+      return matched || { key: "bud_expand", label: "花芽膨大" };
+    }
+
+    function getAppleFrostRisk(state, metaId) {
+      const forecastDates = state?.forecast?.dates || [];
+      const next72 = forecastDates.slice(0, 3).map((date, index) => ({
+        date,
+        minF: state.forecast.minF?.[index] ?? null
+      })).filter((item) => item.minF !== null);
+      const stage = getApplePhenology(metaId);
+      const rule = APPLE_FROST_THRESHOLDS[stage.key];
+      if (!next72.length || !rule) {
+        return {
+          stage,
+          severity: "none",
+          severityLabel: "无风险",
+          tone: "green",
+          worstDate: null,
+          lowestC: null,
+          thresholdText: "--"
+        };
+      }
+      const worst = next72.reduce((acc, item) => {
+        const minC = celsiusFromF(item.minF);
+        return !acc || minC < acc.lowestC ? { date: item.date, lowestC: minC } : acc;
+      }, null);
+      let severity = "none";
+      let severityLabel = "无风险";
+      let tone = "green";
+      if (worst.lowestC <= rule.severe) {
+        severity = "severe";
+        severityLabel = "重霜冻风险";
+        tone = "red";
+      } else if (worst.lowestC <= rule.moderate[1] && worst.lowestC > rule.severe) {
+        severity = "moderate";
+        severityLabel = "中霜冻风险";
+        tone = "amber";
+      } else if (worst.lowestC <= rule.light[1] && worst.lowestC > rule.moderate[1]) {
+        severity = "light";
+        severityLabel = "轻霜冻风险";
+        tone = "blue";
+      }
+      return {
+        stage,
+        severity,
+        severityLabel,
+        tone,
+        worstDate: worst.date,
+        lowestC: worst.lowestC
+      };
+    }
+
+    function appleThresholdLabel(stageKey) {
+      const rule = APPLE_FROST_THRESHOLDS[stageKey];
+      if (!rule) return "--";
+      return `轻 ${rule.light[0]}至${rule.light[1]}°C / 中 ${rule.moderate[0]}至${rule.moderate[1]}°C / 重 < ${rule.severe}°C`;
+    }
+
+    function getAppleFrostSummary(regionKey = "china_apple") {
+      const data = getRegionData(regionKey);
+      const rows = getSubregions(regionKey).map((meta) => {
+        const risk = getAppleFrostRisk(data.states[meta.id] || blankState(), meta.id);
+        return { meta, risk };
+      });
+      const score = { none: 0, light: 1, moderate: 2, severe: 3 };
+      rows.sort((a, b) => score[b.risk.severity] - score[a.risk.severity] || ((a.risk.lowestC ?? 99) - (b.risk.lowestC ?? 99)));
+      const top = rows[0];
+      const riskCount = rows.filter((item) => item.risk.severity !== "none").length;
+      return {
+        rows,
+        top,
+        riskCount,
+        summaryText: !top || riskCount === 0 ? "未来72小时主产区暂无霜冻风险" : `${riskCount}个产区有霜冻风险，最高 ${top.meta.zh}${top.risk.severityLabel}`
+      };
+    }
+
     function inMdRange(md, start, end) {
       return start <= end ? md >= start && md <= end : md >= start || md <= end;
     }
@@ -2069,24 +2287,9 @@
 
     function regionSignalLabel(regionKey) {
       if (REGION_CONFIG[regionKey].crop === "apple") {
-        const season = getRegionSeason(regionKey);
-        const tone = regionTone(regionKey);
-        if (season.key === "harvest") {
-          if (tone === "red") return "采收受扰";
-          if (tone === "green") return "采收顺畅";
-          return "采收观察";
-        }
-        if (season.key === "growth") {
-          if (tone === "red") return "热旱压力";
-          if (tone === "green") return "膨果平稳";
-          return "长势观察";
-        }
-        if (season.key === "preplant" || season.key === "planting") {
-          if (tone === "red") return "花前承压";
-          if (tone === "blue") return "偏冷风险";
-          if (tone === "green") return "花前平稳";
-          return "花前观察";
-        }
+        const top = getAppleFrostSummary(regionKey).top;
+        if (!top) return "继续跟踪";
+        return top.risk.severity === "none" ? "霜冻平稳" : top.risk.severityLabel;
       }
       const season = getRegionSeason(regionKey);
       const tone = regionTone(regionKey);
@@ -2109,31 +2312,14 @@
       return "继续跟踪";
     }
 
-    function stateSignal(regionKey, state) {
+    function stateSignal(regionKey, state, metaId = null) {
       if (REGION_CONFIG[regionKey].crop === "apple") {
-        const season = getRegionSeason(regionKey);
-        const stats = stateWindowStats(state);
-        if (stats.windowTempF === null) {
+        const targetId = metaId || getSelectedId(regionKey);
+        if (!targetId) {
           return { tone: "amber", label: "同步中" };
         }
-        const nextRain = stats.forecastPrecipIn || 0;
-        if (season.key === "harvest") {
-          if (nextRain > 0.8 || (stats.precipAnomIn || 0) > 0.35) return { tone: "red", label: "采收受扰" };
-          if ((stats.precipAnomIn || 0) < -0.15) return { tone: "green", label: "采收顺畅" };
-          return { tone: "amber", label: "采收观察" };
-        }
-        if (season.key === "growth") {
-          if ((stats.tempAnomF || 0) > 3.5 && (stats.precipAnomIn || 0) < -0.25) return { tone: "red", label: "热旱压力" };
-          if ((stats.precipAnomIn || 0) > 0.45) return { tone: "amber", label: "偏湿观察" };
-          return { tone: "green", label: "膨果平稳" };
-        }
-        if (season.key === "preplant" || season.key === "planting") {
-          if ((stats.tempAnomF || 0) < -3 || nextRain > 0.7) return { tone: "blue", label: "偏冷风险" };
-          if ((stats.precipAnomIn || 0) > 0.35) return { tone: "amber", label: "花前偏湿" };
-          if ((stats.tempAnomF || 0) > 1 && (stats.precipAnomIn || 0) < 0.2) return { tone: "green", label: "花前平稳" };
-          return { tone: "amber", label: "花前观察" };
-        }
-        return { tone: "amber", label: "继续跟踪" };
+        const risk = getAppleFrostRisk(state, targetId);
+        return { tone: risk.tone, label: risk.severityLabel };
       }
       const season = getRegionSeason(regionKey);
       const stats = stateWindowStats(state);
@@ -2163,9 +2349,10 @@
     function globalHeroSummary() {
       if (APP.cropKey === "apple") {
         const cnSeason = getRegionSeason("china_apple");
+        const frost = getAppleFrostSummary("china_apple");
         return {
           title: "中国苹果花前跟踪",
-          subtitle: `中国产区 ${cnSeason.label}期 ${regionWeatherText("china_apple")}；花前到初花窗口重点看低温、降水与大风。`
+          subtitle: `中国产区 ${cnSeason.label}期，${frost.summaryText} 花前到初花窗口重点看低温、降水与大风。`
         };
       }
       const usSeason = getRegionSeason("us");
@@ -2180,6 +2367,17 @@
       const region = REGION_CONFIG[regionKey];
       const season = getRegionSeason(regionKey);
       const stats = currentRegionStats(regionKey);
+      if (region.crop === "apple") {
+        const frost = getAppleFrostSummary(regionKey);
+        const top = frost.top;
+        if (!top) {
+          return { title: region.title, subtitle: `${region.label}天气同步中。` };
+        }
+        return {
+          title: top.risk.severity === "none" ? `${region.label}花前平稳` : `${region.label}${top.risk.severityLabel}`,
+          subtitle: `${season.label}期，${frost.summaryText} 当前最高风险位于${top.meta.zh}。`
+        };
+      }
       if (!stats.loaded) {
         return { title: region.title, subtitle: `${region.label}天气同步中。` };
       }
@@ -2273,7 +2471,21 @@
 
     function renderGlobalGrid() {
       if (APP.cropKey === "apple") {
-        dom.summaryLead.textContent = `中国苹果主产区 ${regionWeatherText("china_apple")}。`;
+        const frost = getAppleFrostSummary("china_apple");
+        dom.summaryLead.textContent = frost.summaryText;
+        dom.globalGrid.innerHTML = frost.rows.map(({ meta, risk }) => `
+          <div class="global-row">
+            <span class="global-flag">${meta.zh}</span>
+            <span class="global-main">
+              <span class="global-title">${risk.stage.label}</span>
+              <span class="global-sub">72h最低 ${risk.lowestC === null ? "--" : `${risk.lowestC.toFixed(1)}°C`} · ${risk.worstDate ? formatDateLabel(risk.worstDate) : "--"}</span>
+            </span>
+            <span class="global-side">
+              <span class="global-signal" style="color:${getToneColor(risk.tone)};">${risk.severityLabel}</span>
+            </span>
+          </div>
+        `).join("");
+        return;
       } else {
         dom.summaryLead.textContent = `美国 ${regionWeatherText("us")} · 巴西 ${regionWeatherText("brazil")} · 阿根廷 ${regionWeatherText("argentina")}`;
       }
@@ -2430,7 +2642,7 @@
       dom.beltMap.innerHTML = getSubregions(APP.regionKey).map((meta) => {
         const state = data.states[meta.id] || blankState();
         const stats = stateWindowStats(state);
-        const signal = stateSignal(APP.regionKey, state);
+        const signal = stateSignal(APP.regionKey, state, meta.id);
         const mainValue = stats.tempAnomF !== null ? displaySignedTemp(stats.tempAnomF, 1) : stats.windowTempF !== null ? displayTemp(stats.windowTempF, 0) : "--";
         const mini = stats.precipAnomIn !== null ? `雨 ${displaySignedRain(stats.precipAnomIn, 1)}` : stats.windowPrecipIn !== null ? `雨 ${displayRain(stats.windowPrecipIn, 2)}` : "天气同步中";
         return `
@@ -2457,7 +2669,7 @@
       const meta = getMeta(APP.regionKey, selectedId) || getSubregions(APP.regionKey)[0];
       const state = data.states[meta.id] || blankState();
       const stats = stateWindowStats(state);
-      const signal = stateSignal(APP.regionKey, state);
+      const signal = stateSignal(APP.regionKey, state, meta.id);
       dom.detailTitle.textContent = meta.zh;
       dom.detailSub.textContent = data.recentStart
         ? `${REGION_CONFIG[APP.regionKey].label} ｜ ${formatDateLabel(data.recentStart)}-${formatDateLabel(data.recentEnd)} 回看（当地完整日） ｜ ${formatDateLabel(data.forecastStart)}-${formatDateLabel(data.forecastEnd)} 预报（当地日）`
@@ -2502,10 +2714,33 @@
         </div>
       `).join("");
 
+      renderFrostBlock(meta.id, state);
       renderTempChart();
       renderRainChart();
       renderEcharts(state);
       renderForecast(state, data);
+    }
+
+    function renderFrostBlock(metaId, state) {
+      if (APP.regionKey !== "china_apple") {
+        dom.frostBlock.style.display = "none";
+        return;
+      }
+      const risk = getAppleFrostRisk(state, metaId);
+      dom.frostBlock.style.display = "";
+      dom.frostNote.textContent = `未来72小时 · ${risk.stage.label}`;
+      dom.frostGrid.innerHTML = [
+        { k: "物候期", v: risk.stage.label, s: "阶段估计", tone: "text" },
+        { k: "72h最低", v: risk.lowestC === null ? "--" : `${risk.lowestC.toFixed(1)}°C`, s: risk.worstDate ? formatDateLabel(risk.worstDate) : "--", tone: risk.tone },
+        { k: "风险判断", v: risk.severityLabel, s: appleThresholdLabel(risk.stage.key), tone: risk.tone }
+      ].map((item) => `
+        <div class="frost-card">
+          <div class="frost-k">${item.k}</div>
+          <div class="frost-v tone-${item.tone}">${item.v}</div>
+          <div class="frost-s">${item.s}</div>
+        </div>
+      `).join("");
+      dom.frostTip.textContent = "按中国气象局 QX/T 88-2008 苹果阈值估计，物候期为省级阶段估计值，建议结合园区实况复核。";
     }
 
     function renderForecast(state, data) {
@@ -2531,7 +2766,8 @@
       dom.boardList.innerHTML = getSubregions(APP.regionKey).map((meta) => {
         const state = data.states[meta.id] || blankState();
         const stats = stateWindowStats(state);
-        const signal = stateSignal(APP.regionKey, state);
+        const signal = stateSignal(APP.regionKey, state, meta.id);
+        const appleRisk = APP.regionKey === "china_apple" ? getAppleFrostRisk(state, meta.id) : null;
         const tempTrack = clamp(((stats.tempAnomF ?? 0) + 10) / 20, 0, 1) * 100;
         const rainTrack = clamp(((stats.precipAnomIn ?? 0) + 1.5) / 3, 0, 1) * 100;
         return `
@@ -2561,9 +2797,9 @@
               </div>
             </div>
             <div class="board-right">
-              <div class="label">未来7天雨量</div>
-              <div class="value tone-${stats.forecastPrecipIn !== null && stats.forecastPrecipIn > 1 ? "blue" : "text"}">${stats.forecastPrecipIn !== null ? displayRain(stats.forecastPrecipIn, 2) : "--"}</div>
-              <div class="sub">${meta.code}</div>
+              <div class="label">${APP.regionKey === "china_apple" ? "霜冻风险" : "未来7天雨量"}</div>
+              <div class="value tone-${APP.regionKey === "china_apple" ? appleRisk.tone : (stats.forecastPrecipIn !== null && stats.forecastPrecipIn > 1 ? "blue" : "text")}">${APP.regionKey === "china_apple" ? appleRisk.severityLabel.replace("风险", "") : (stats.forecastPrecipIn !== null ? displayRain(stats.forecastPrecipIn, 2) : "--")}</div>
+              <div class="sub">${APP.regionKey === "china_apple" ? `最低 ${appleRisk.lowestC === null ? "--" : `${appleRisk.lowestC.toFixed(1)}°C`}` : meta.code}</div>
             </div>
           </div>
         `;
