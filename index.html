@@ -438,11 +438,59 @@
     }
 
     .summary-lead {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       letter-spacing: -0.03em;
-      line-height: 1.1;
-      margin-bottom: 11px;
+      line-height: 1.35;
+      margin-bottom: 10px;
+    }
+
+    .summary-points {
+      list-style: none;
+      margin: 0 0 12px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .summary-point {
+      display: grid;
+      grid-template-columns: 22px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+    }
+
+    .point-index {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      border: 1px solid rgba(153, 176, 219, 0.14);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .point-body {
+      min-width: 0;
+      padding-top: 1px;
+    }
+
+    .point-title {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 3px;
+    }
+
+    .point-text {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.55;
     }
 
     .summary-tags {
@@ -842,6 +890,11 @@
       line-height: 1.5;
     }
 
+    .guide-block {
+      padding: 14px 16px 16px;
+      border-top: 1px solid rgba(153, 176, 219, 0.08);
+    }
+
     .chart-title {
       display: flex;
       align-items: center;
@@ -1195,14 +1248,16 @@
             <div class="section-note" id="summaryPanelNote">天气总览</div>
           </div>
           <div class="summary-lead" id="summaryLead">同步三大产区天气。</div>
+          <ol class="summary-points" id="summaryPoints"></ol>
           <div class="global-grid" id="globalGrid"></div>
         </div>
         <div class="mini-panel" id="macroPanel">
           <div class="section-head">
-            <h3 class="section-title" id="macroPanelTitle">大豆基本面</h3>
-            <div class="section-note">2025/26</div>
+            <h3 class="section-title" id="macroPanelTitle">监控口径</h3>
+            <div class="section-note" id="macroPanelNote">同步中</div>
           </div>
-          <div class="summary-lead" id="macroLead">全球供给仍不紧张。</div>
+          <div class="summary-lead" id="macroLead">关键口径同步中。</div>
+          <ol class="summary-points" id="macroPoints"></ol>
           <div class="summary-tags" id="macroTags"></div>
         </div>
       </div>
@@ -1239,11 +1294,19 @@
 
         <div class="frost-block" id="frostBlock" style="display:none;">
           <div class="section-head">
-            <h3 class="section-title">霜冻风险</h3>
+            <h3 class="section-title" id="riskPanelTitle">风险预警</h3>
             <div class="section-note" id="frostNote">未来72小时</div>
           </div>
           <div class="frost-grid" id="frostGrid"></div>
-          <div class="frost-tip" id="frostTip">按中国气象局 QX/T 88-2008 苹果阈值估计，物候期为阶段估计值。</div>
+          <div class="frost-tip" id="frostTip">仅展示已确认的官方标准口径。</div>
+        </div>
+
+        <div class="guide-block" id="guideBlock" style="display:none;">
+          <div class="section-head">
+            <h3 class="section-title" id="guideTitle">阈值与判读</h3>
+            <div class="section-note" id="guideNote">农艺参考</div>
+          </div>
+          <ol class="summary-points" id="guideList"></ol>
         </div>
 
         <div class="chart-block">
@@ -1305,6 +1368,16 @@
       <a href="https://www.agri.cn/zx/nyyw/202504/t20250403_8723667.htm" target="_blank" rel="noreferrer">农业农村部信息中心</a>
       /
       <a href="https://www.caas.cn/xwzx/mtxw/1c75324421a74eacb98162d124f88179.htm" target="_blank" rel="noreferrer">中国农科院果树所</a>
+      /
+      <a href="https://crops.extension.iastate.edu/cropnews/2014/05/soybean-planting-depth-considerations-iowa" target="_blank" rel="noreferrer">Iowa State Planting</a>
+      /
+      <a href="https://crops.extension.iastate.edu/cropnews/2014/05/imbibitional-chilling-and-frost-damage-corn-and-soybean-seedlings" target="_blank" rel="noreferrer">Iowa State Chilling</a>
+      /
+      <a href="https://std.samr.gov.cn/hb/search/stdHBDetailed?id=8B1827F1F43FBB19E05397BE0A0AB44A" target="_blank" rel="noreferrer">QX/T 88-2008</a>
+      /
+      <a href="https://std.samr.gov.cn/db/search/stdDBDetailedCNF?id=99CBC2DD1BBC9EDEE05397BE0A0A4284" target="_blank" rel="noreferrer">DB65/T 4044-2017</a>
+      /
+      <a href="https://std.samr.gov.cn/db/search/stdDBDetailedCNF?id=9B74B2E98708301FE05397BE0A0A7607" target="_blank" rel="noreferrer">DB65/T 4237-2019</a>
     </div>
   </div>
 
@@ -1853,11 +1926,14 @@
       summaryPanelTitle: document.getElementById("summaryPanelTitle"),
       summaryPanelNote: document.getElementById("summaryPanelNote"),
       summaryLead: document.getElementById("summaryLead"),
+      summaryPoints: document.getElementById("summaryPoints"),
       globalGrid: document.getElementById("globalGrid"),
       beltOverview: document.getElementById("beltOverview"),
       macroPanel: document.getElementById("macroPanel"),
       macroPanelTitle: document.getElementById("macroPanelTitle"),
+      macroPanelNote: document.getElementById("macroPanelNote"),
       macroLead: document.getElementById("macroLead"),
+      macroPoints: document.getElementById("macroPoints"),
       macroTags: document.getElementById("macroTags"),
       beltTitle: document.getElementById("beltTitle"),
       beltWindowNote: document.getElementById("beltWindowNote"),
@@ -1870,10 +1946,15 @@
       detailSignal: document.getElementById("detailSignal"),
       detailSignalText: document.getElementById("detailSignalText"),
       stateMetrics: document.getElementById("stateMetrics"),
+      riskPanelTitle: document.getElementById("riskPanelTitle"),
       frostBlock: document.getElementById("frostBlock"),
       frostNote: document.getElementById("frostNote"),
       frostGrid: document.getElementById("frostGrid"),
       frostTip: document.getElementById("frostTip"),
+      guideBlock: document.getElementById("guideBlock"),
+      guideTitle: document.getElementById("guideTitle"),
+      guideNote: document.getElementById("guideNote"),
+      guideList: document.getElementById("guideList"),
       tempHeading: document.getElementById("tempHeading"),
       tempLegend: document.getElementById("tempLegend"),
       rainHeading: document.getElementById("rainHeading"),
@@ -2304,6 +2385,7 @@
       if (tone === "green") return "var(--green)";
       if (tone === "red") return "var(--red)";
       if (tone === "blue") return "var(--blue)";
+      if (tone === "text") return "var(--text)";
       return "var(--amber)";
     }
 
@@ -2624,10 +2706,164 @@
       `).join("");
     }
 
-    function renderGlobalGrid() {
+    function renderPointList(container, items) {
+      container.innerHTML = (items || []).map((item, index) => `
+        <li class="summary-point">
+          <span class="point-index">${index + 1}</span>
+          <div class="point-body">
+            <div class="point-title">${item.title}</div>
+            <div class="point-text">${item.text}</div>
+          </div>
+        </li>
+      `).join("");
+    }
+
+    function getOverviewPoints() {
       if (APP.cropKey === "apple") {
         const frost = getAppleFrostSummary("china_apple");
-        dom.summaryLead.textContent = frost.summaryText;
+        const top = frost.top;
+        return [
+          { title: "先看物候期", text: "苹果风控先看花前、初花还是幼果，不同阶段对应的霜冻阈值不同。" },
+          { title: "再看最低温", text: top ? `${top.meta.zh}当前风险最高，未来72小时最低温是第一判读项。` : "未来72小时最低温是第一判读项。" },
+          { title: "最后看范围", text: `${frost.summaryText}，重点复核黄土高原与环渤海的花前低温。` }
+        ];
+      }
+      if (APP.cropKey === "jujube") {
+        const warning = getJujubeWarningSummary("china_jujube");
+        return [
+          { title: "先分官方口径", text: "红枣官方预警当前仅覆盖新疆，其他主产区先按天气跟踪，不直接报官方预警。" },
+          { title: "新疆看72小时最低温", text: `${warning.weatherText}，但等级阈值正文未入库前，页面不自动报轻中重。` },
+          { title: "其他产区看天气节奏", text: "河北、山东、山西、陕西、河南继续看近7天冷热偏离、雨量变化和未来7天预报。" }
+        ];
+      }
+      return [
+        { title: "美国看播前窗口", text: "美国当前重点是播前土温、冷空气与下地窗口，近7天冷热偏离最敏感。" },
+        { title: "巴西看收割推进", text: "巴西处在收获阶段，未来7天降水和连续阴雨更容易干扰收割与物流。" },
+        { title: "阿根廷看鼓粒兑现", text: "阿根廷仍看鼓粒后段的热量与水分匹配，偏热偏干容易放大单产波动。" }
+      ];
+    }
+
+    function getMacroPanelContent() {
+      if (APP.cropKey === "apple") {
+        return {
+          title: "产区判读",
+          note: "花前窗口",
+          lead: "苹果不是看总量，先看物候，再看最低温有没有触线。",
+          points: [
+            { title: "骨架产区", text: "主产带集中在黄土高原和环渤海，陕西、山东仍是代表性最强的两个锚点。" },
+            { title: "风险触发", text: "花前到初花阶段先看最低温，阴雨和大风更多影响授粉、坐果和作业节奏。" },
+            { title: "阈值口径", text: "霜冻风险用中国气象局 QX/T 88-2008 的阶段阈值，不同物候期不能混判。" }
+          ],
+          tags: [
+            { text: "主产省 陕西 山东 山西 甘肃 河南 辽宁", tone: "text" },
+            { text: "当前窗口 花前到初花", tone: "amber" },
+            { text: "重点变量 最低温 阴雨 大风", tone: "blue" }
+          ]
+        };
+      }
+      if (APP.cropKey === "jujube") {
+        return {
+          title: "监控口径",
+          note: "官方标准",
+          lead: "红枣先分清“官方预警”和“天气跟踪”两条线，再去看具体数值。",
+          points: [
+            { title: "官方预警", text: "当前只接入新疆地方标准 DB65/T 4044-2017 与 DB65/T 4237-2019。" },
+            { title: "页面边界", text: "其他主产区暂无已接入的统一等级标准，所以页面只展示天气和偏离，不自动报预警等级。" },
+            { title: "判读重点", text: "春季萌芽前先看未来72小时最低温，再配合大风、降水和区域墒情做复核。" }
+          ],
+          tags: [
+            { text: "适用范围 当前仅新疆", tone: "amber" },
+            { text: "其他产区 仅天气跟踪", tone: "text" },
+            { text: "当前焦点 低温 大风 墒情", tone: "blue" }
+          ]
+        };
+      }
+      return {
+        title: "大豆基本面",
+        note: "2025/26",
+        lead: "大豆页面同时看供给与天气，两条线都不能单独看。",
+        points: [
+          { title: "库存端", text: "USDA 3月供需仍给出全球库存 12530 万吨，绝对供给并不紧。" },
+          { title: "南美端", text: "巴西收割与阿根廷单产兑现仍是盘面交易主线，天气影响先体现在收割和鼓粒阶段。" },
+          { title: "美国端", text: "美国还在播前天气交易，真正敏感的是土温、冷湿窗口和播种节奏，而不是单日高温。" }
+        ],
+        tags: SOYBEAN_FUNDAMENTALS.tags
+      };
+    }
+
+    function getThresholdGuide(regionKey, metaId, state) {
+      const region = REGION_CONFIG[regionKey];
+      const season = getRegionSeason(regionKey);
+      if (region.crop === "apple") {
+        const stage = getApplePhenology(metaId);
+        const rule = APPLE_FROST_THRESHOLDS[stage.key];
+        return {
+          title: "阈值与判读",
+          note: "官方标准",
+          items: [
+            { title: "先看物候期", text: "苹果霜冻不能只看一个温度值，必须先确定是花芽膨大、初花还是幼果期。" },
+            { title: `当前 ${stage.label} 阈值`, text: rule ? `轻 ${rule.light[0]} 至 ${rule.light[1]}°C；中 ${rule.moderate[0]} 至 ${rule.moderate[1]}°C；重 < ${rule.severe}°C。` : "阈值同步中。" },
+            { title: "怎么看页面", text: "看未来72小时最低温是否触线；一旦触线，再结合降温时点和园区实况做复核。" }
+          ]
+        };
+      }
+      if (region.crop === "jujube") {
+        const warning = getJujubeWarning(metaId, state);
+        return {
+          title: "阈值与判读",
+          note: warning.covered ? "官方标准" : "监控边界",
+          items: warning.covered ? [
+            { title: "官方口径已覆盖", text: "新疆红枣已接入 DB65/T 4044-2017 和 DB65/T 4237-2019，两份标准都处于现行状态。" },
+            { title: "当前先看72小时最低温", text: `当前未来72小时最低温 ${warning.lowestC === null ? "同步中" : `${warning.lowestC.toFixed(1)}°C${warning.worstDate ? `，落在 ${formatDateLabel(warning.worstDate)}` : ""}` }。` },
+            { title: "为什么不直接报等级", text: "公开页面能确认标准现行，但完整等级阈值正文还没入库到页面，所以先做人工复核，不自动报轻中重。" }
+          ] : [
+            { title: "当前分区无统一等级标准", text: "本页暂未接入该分区国家或省级统一预警等级标准，所以不会直接报官方预警。" },
+            { title: "页面仍可看什么", text: "可以继续看近7天冷热偏离、降水偏离和未来7天预报，判断天气节奏是否偏离常态。" },
+            { title: "后续如何升级", text: "如果补到当地官方标准正文或阈值表，这里会从天气跟踪升级为自动预警判读。" }
+          ]
+        };
+      }
+
+      if (season.key === "preplant" || season.key === "planting") {
+        return {
+          title: "阈值与判读",
+          note: "播种参考",
+          items: [
+            { title: "播种先看土温", text: "推广资料常把播种层土温 50°F(10°C) 以上、且温度在回升，作为更稳妥的下种起点。" },
+            { title: "土壤水分不看一个百分比", text: "实操更看“有墒但不饱和”。如果土壤发黏、积水或容易板结，即使温度够了，出苗也会受拖累。" },
+            { title: "冷雨是额外风险", text: "播后 24 小时若遇 45°F(7°C) 以下冷雨，冷害和烂种风险会上升；常见播深 1 到 1.5 英寸，冷湿时可适当靠近 1.5 到 2 英寸。" }
+          ]
+        };
+      }
+
+      if (season.key === "growth") {
+        return {
+          title: "阈值与判读",
+          note: "页面观察线",
+          items: [
+            { title: "先看温度偏离", text: "页面把较常年偏暖约 3°C 以上，且同时偏干，视作热干压力更容易放大的观察线。" },
+            { title: "再看降水偏离", text: "如果较常年偏湿明显，重点不是利多利空，而是看田间积水、病害和作业节奏会不会被打断。" },
+            { title: "不要只看一天高温", text: "生长期更应该看 7 天均温和 7 天累计降水，而不是单日最高温。" }
+          ]
+        };
+      }
+
+      return {
+        title: "阈值与判读",
+        note: "页面观察线",
+        items: [
+          { title: "收割先看干燥窗口", text: "成熟后更关键的是连续干燥天数，而不是单日升温。未来 7 天雨量越大，收割和物流越容易受扰。" },
+          { title: "偏湿比偏暖更敏感", text: "页面里收获期先看未来 7 天雨量和较常年雨量偏离，偏湿比偏暖更容易拖慢节奏。" },
+          { title: "数值怎么理解", text: "温度偏离和降水偏离都是相对常年的差值，不是当天绝对天气值。" }
+        ]
+      };
+    }
+
+    function renderGlobalGrid() {
+      renderPointList(dom.summaryPoints, getOverviewPoints());
+      if (APP.cropKey === "apple") {
+        const frost = getAppleFrostSummary("china_apple");
+        dom.summaryLead.textContent = "苹果先判物候，再看最低温是否触线。";
         dom.globalGrid.innerHTML = frost.rows.map(({ meta, risk }) => `
           <div class="global-row">
             <span class="global-flag">${meta.zh}</span>
@@ -2643,28 +2879,28 @@
         return;
       }
       if (APP.cropKey === "jujube") {
-        const data = getRegionData("china_jujube");
-        dom.summaryLead.textContent = `中国红枣主产区 ${regionWeatherText("china_jujube")}。`;
-        dom.globalGrid.innerHTML = JUJUBE_META.map((meta) => {
-          const state = data.states[meta.id] || blankState();
-          const stats = stateWindowStats(state);
-          const signal = stateSignal("china_jujube", state, meta.id);
-          return `
-            <div class="global-row">
-              <span class="global-flag">${meta.zh}</span>
-              <span class="global-main">
-                <span class="global-title">${getRegionSeason("china_jujube").label}</span>
-                <span class="global-sub">72h雨量 ${stats.forecastPrecipIn === null ? "--" : displayRain(stats.forecastPrecipIn, 2)} · 温 ${stats.tempAnomF === null ? "--" : tempBiasText(stats.tempAnomF, 1)}</span>
-              </span>
-              <span class="global-side">
-                <span class="global-signal" style="color:${getToneColor(signal.tone)};">${signal.label}</span>
-              </span>
-            </div>
-          `;
-        }).join("");
+        const warning = getJujubeWarningSummary("china_jujube");
+        dom.summaryLead.textContent = "红枣先分官方预警口径，再看天气。";
+        dom.globalGrid.innerHTML = [
+          { flag: "新疆", title: "越冬冻害等级划分", sub: `${JUJUBE_WARNING_STANDARDS.xinjiang.grade.code} · 现行`, signal: "标准覆盖", tone: "blue" },
+          { flag: "新疆", title: "气象观测规范", sub: `${JUJUBE_WARNING_STANDARDS.xinjiang.observe.code} · 现行`, signal: "观测口径", tone: "blue" },
+          { flag: "覆盖", title: `${warning.coveredCount}/${warning.total} 主产区`, sub: "其余产区继续做天气跟踪，不自动报官方预警等级", signal: "仅官方标准", tone: "amber" },
+          { flag: "天气", title: warning.weatherText, sub: "基于新疆未来72小时最低温", signal: warning.xinjiang.lowestC !== null && warning.xinjiang.lowestC <= 0 ? "低温观察" : "继续跟踪", tone: warning.xinjiang.lowestC !== null && warning.xinjiang.lowestC <= 0 ? "blue" : "green" }
+        ].map((item) => `
+          <div class="global-row">
+            <span class="global-flag">${item.flag}</span>
+            <span class="global-main">
+              <span class="global-title">${item.title}</span>
+              <span class="global-sub">${item.sub}</span>
+            </span>
+            <span class="global-side">
+              <span class="global-signal" style="color:${getToneColor(item.tone)};">${item.signal}</span>
+            </span>
+          </div>
+        `).join("");
         return;
       } else {
-        dom.summaryLead.textContent = `美国 ${regionWeatherText("us")} · 巴西 ${regionWeatherText("brazil")} · 阿根廷 ${regionWeatherText("argentina")}`;
+        dom.summaryLead.textContent = "三地产区先看农时，再看冷热和雨带。";
       }
       dom.globalGrid.innerHTML = getWeatherRegions(APP.cropKey).map((region) => {
         const season = getRegionSeason(region.key);
@@ -2722,9 +2958,12 @@
     }
 
     function renderMacroPanel() {
-      const fundamentals = getCropFundamentals(APP.cropKey);
-      dom.macroLead.textContent = fundamentals.lead;
-      dom.macroTags.innerHTML = fundamentals.tags.map((tag) => `
+      const content = getMacroPanelContent();
+      dom.macroPanelTitle.textContent = content.title;
+      dom.macroPanelNote.textContent = content.note;
+      dom.macroLead.textContent = content.lead;
+      renderPointList(dom.macroPoints, content.points);
+      dom.macroTags.innerHTML = content.tags.map((tag) => `
         <span class="summary-tag" style="color:${getToneColor(tag.tone)};">${tag.text}</span>
       `).join("");
     }
@@ -2744,8 +2983,8 @@
             <div class="kpi-s">${row.s}</div>
           </div>
         `).join("");
-        dom.summaryPanelTitle.textContent = APP.cropKey === "apple" ? "苹果产区概况" : APP.cropKey === "jujube" ? "红枣产区概况" : "三地产区概况";
-        dom.summaryPanelNote.textContent = "天气总览";
+        dom.summaryPanelTitle.textContent = APP.cropKey === "apple" ? "苹果产区概况" : APP.cropKey === "jujube" ? "官方预警覆盖" : "三地产区概况";
+        dom.summaryPanelNote.textContent = APP.cropKey === "jujube" ? "仅官方标准" : "天气总览";
         dom.summaryPanel.style.display = "";
         dom.macroPanel.style.display = "";
         renderGlobalGrid();
@@ -2891,25 +3130,49 @@
         </div>
       `).join("");
 
-      renderFrostBlock(meta.id, state);
+      renderRiskBlock(meta.id, state);
+      renderGuideBlock(meta.id, state);
       renderTempChart();
       renderRainChart();
       renderEcharts(state);
       renderForecast(state, data);
     }
 
-    function renderFrostBlock(metaId, state) {
-      if (APP.regionKey !== "china_apple") {
+    function renderRiskBlock(metaId, state) {
+      if (APP.regionKey !== "china_apple" && APP.regionKey !== "china_jujube") {
         dom.frostBlock.style.display = "none";
         return;
       }
-      const risk = getAppleFrostRisk(state, metaId);
+      if (APP.regionKey === "china_apple") {
+        const risk = getAppleFrostRisk(state, metaId);
+        dom.riskPanelTitle.textContent = "霜冻风险";
+        dom.frostBlock.style.display = "";
+        dom.frostNote.textContent = `未来72小时 · ${risk.stage.label}`;
+        dom.frostGrid.innerHTML = [
+          { k: "物候期", v: risk.stage.label, s: "阶段估计", tone: "text" },
+          { k: "72h最低", v: risk.lowestC === null ? "--" : `${risk.lowestC.toFixed(1)}°C`, s: risk.worstDate ? formatDateLabel(risk.worstDate) : "--", tone: risk.tone },
+          { k: "风险判断", v: risk.severityLabel, s: appleThresholdLabel(risk.stage.key), tone: risk.tone }
+        ].map((item) => `
+          <div class="frost-card">
+            <div class="frost-k">${item.k}</div>
+            <div class="frost-v tone-${item.tone}">${item.v}</div>
+            <div class="frost-s">${item.s}</div>
+          </div>
+        `).join("");
+        dom.frostTip.textContent = "按中国气象局 QX/T 88-2008 苹果阈值估计，物候期为省级阶段估计值，建议结合园区实况复核。";
+        return;
+      }
+
+      const warning = getJujubeWarning(metaId, state);
+      dom.riskPanelTitle.textContent = "官方预警";
       dom.frostBlock.style.display = "";
-      dom.frostNote.textContent = `未来72小时 · ${risk.stage.label}`;
+      dom.frostNote.textContent = warning.covered ? "新疆地方标准" : "当前分区";
       dom.frostGrid.innerHTML = [
-        { k: "物候期", v: risk.stage.label, s: "阶段估计", tone: "text" },
-        { k: "72h最低", v: risk.lowestC === null ? "--" : `${risk.lowestC.toFixed(1)}°C`, s: risk.worstDate ? formatDateLabel(risk.worstDate) : "--", tone: risk.tone },
-        { k: "风险判断", v: risk.severityLabel, s: appleThresholdLabel(risk.stage.key), tone: risk.tone }
+        { k: "标准覆盖", v: warning.coverageLabel, s: warning.covered ? "新疆地方标准" : "未纳入本页官方预警", tone: warning.covered ? "blue" : "text" },
+        { k: "等级标准", v: warning.gradeCode, s: warning.covered ? "红枣果树越冬冻害等级划分" : "暂无统一等级标准", tone: warning.covered ? "blue" : "text" },
+        { k: "观测规范", v: warning.observeCode, s: warning.covered ? "红枣果树越冬冻害气象观测规范" : "仅天气跟踪", tone: warning.covered ? "blue" : "text" },
+        { k: "72h最低", v: warning.lowestC === null ? "--" : `${warning.lowestC.toFixed(1)}°C`, s: warning.worstDate ? formatDateLabel(warning.worstDate) : "未来72小时", tone: warning.tone },
+        { k: "当前状态", v: warning.statusLabel, s: warning.scopeLabel, tone: warning.covered ? "amber" : "text" }
       ].map((item) => `
         <div class="frost-card">
           <div class="frost-k">${item.k}</div>
@@ -2917,7 +3180,15 @@
           <div class="frost-s">${item.s}</div>
         </div>
       `).join("");
-      dom.frostTip.textContent = "按中国气象局 QX/T 88-2008 苹果阈值估计，物候期为省级阶段估计值，建议结合园区实况复核。";
+      dom.frostTip.textContent = warning.tip;
+    }
+
+    function renderGuideBlock(metaId, state) {
+      const guide = getThresholdGuide(APP.regionKey, metaId, state);
+      dom.guideBlock.style.display = "";
+      dom.guideTitle.textContent = guide.title;
+      dom.guideNote.textContent = guide.note;
+      renderPointList(dom.guideList, guide.items);
     }
 
     function renderForecast(state, data) {
@@ -2945,6 +3216,7 @@
         const stats = stateWindowStats(state);
         const signal = stateSignal(APP.regionKey, state, meta.id);
         const appleRisk = APP.regionKey === "china_apple" ? getAppleFrostRisk(state, meta.id) : null;
+        const jujubeWarning = APP.regionKey === "china_jujube" ? getJujubeWarning(meta.id, state) : null;
         const tempTrack = clamp(((stats.tempAnomF ?? 0) + 10) / 20, 0, 1) * 100;
         const rainTrack = clamp(((stats.precipAnomIn ?? 0) + 1.5) / 3, 0, 1) * 100;
         return `
@@ -2974,9 +3246,9 @@
               </div>
             </div>
             <div class="board-right">
-              <div class="label">${APP.regionKey === "china_apple" ? "霜冻风险" : "未来7天雨量"}</div>
-              <div class="value tone-${APP.regionKey === "china_apple" ? appleRisk.tone : (stats.forecastPrecipIn !== null && stats.forecastPrecipIn > 1 ? "blue" : "text")}">${APP.regionKey === "china_apple" ? appleRisk.severityLabel.replace("风险", "") : (stats.forecastPrecipIn !== null ? displayRain(stats.forecastPrecipIn, 2) : "--")}</div>
-              <div class="sub">${APP.regionKey === "china_apple" ? `最低 ${appleRisk.lowestC === null ? "--" : `${appleRisk.lowestC.toFixed(1)}°C`}` : meta.code}</div>
+              <div class="label">${APP.regionKey === "china_apple" ? "霜冻风险" : APP.regionKey === "china_jujube" ? "官方预警" : "未来7天雨量"}</div>
+              <div class="value tone-${APP.regionKey === "china_apple" ? appleRisk.tone : APP.regionKey === "china_jujube" ? (jujubeWarning.covered ? "blue" : "text") : (stats.forecastPrecipIn !== null && stats.forecastPrecipIn > 1 ? "blue" : "text")}">${APP.regionKey === "china_apple" ? appleRisk.severityLabel.replace("风险", "") : APP.regionKey === "china_jujube" ? (jujubeWarning.covered ? "已覆盖" : "未纳入") : (stats.forecastPrecipIn !== null ? displayRain(stats.forecastPrecipIn, 2) : "--")}</div>
+              <div class="sub">${APP.regionKey === "china_apple" ? `最低 ${appleRisk.lowestC === null ? "--" : `${appleRisk.lowestC.toFixed(1)}°C`}` : APP.regionKey === "china_jujube" ? (jujubeWarning.covered ? `72h低 ${jujubeWarning.lowestC === null ? "--" : `${jujubeWarning.lowestC.toFixed(1)}°C`}` : "仅天气") : meta.code}</div>
             </div>
           </div>
         `;
